@@ -1,0 +1,49 @@
+{
+  "meta": { "schema_version": "1.1.0", "awf_version": "3.3.0" },
+  "project": { "name": "MNA Vietnam", "type": "Next.js Web Application", "status": "development" },
+  "tech_stack": { 
+    "frontend": {
+      "framework": "Next.js 14/15 App Router",
+      "styling": "Tailwind CSS",
+      "components": "Lucide React, Radix UI Slot"
+    }, 
+    "backend": {
+      "framework": "Next.js API Routes",
+      "database": "Supabase PostgreSQL",
+      "email": "Nodemailer"
+    }
+  },
+  "database_schema": { 
+    "summary": "Lưu trữ dự án M&A, Leads (người dùng ký gửi/liên hệ), và Cấu hình hệ thống (Settings)",
+    "tables": [
+      {"name": "projects", "purpose": "Lưu thông tin dự án M&A"},
+      {"name": "leads", "purpose": "Lưu yêu cầu liên hệ hoặc ký gửi dự án từ khách hàng"},
+      {"name": "settings", "purpose": "Lưu cấu hình hệ thống (SMTP, API Keys) dạng global"}
+    ], 
+    "relationships_explained": "Projects có thể liên kết với Leads khi khách hàng quan tâm một dự án cụ thể."
+  },
+  "api_endpoints": [
+    { "path": "/api/auth/login", "explained": "Xử lý đăng nhập Admin, trả về session cookie" },
+    { "path": "/api/auth/logout", "explained": "Xóa admin_session cookie" },
+    { "path": "/api/leads", "explained": "Tạo, lấy danh sách, và cập nhật trạng thái leads (ký gửi/liên hệ)" },
+    { "path": "/api/leads/notify", "explained": "Gửi email thông báo tự động bằng SMTP khi trạng thái lead thay đổi" },
+    { "path": "/api/settings", "explained": "Lấy và cập nhật cấu hình hệ thống (giấu password/API key khi public)" },
+    { "path": "/api/settings/test-email", "explained": "Gửi email thử nghiệm để kiểm tra kết nối SMTP" }
+  ],
+  "business_rules": [
+    "Khách hàng xem dự án M&A công khai, liên hệ hoặc ký gửi.",
+    "Admin duyệt leads, cập nhật trạng thái qua UI và gửi email notify tự động.",
+    "Cấu hình SMTP động có thể chỉnh sửa trực tiếp trên Admin Dashboard."
+  ],
+  "features": [
+    "Danh mục dự án M&A (Lọc theo loại giao dịch, tỉnh thành, loại BĐS)",
+    "Hệ thống Ký gửi dự án BĐS (Bảo mật thông tin)",
+    "Admin Dashboard (Quản lý dự án, Quản lý Leads, Cài đặt hệ thống)",
+    "Gửi email thông báo tự động (Nodemailer + Cấu hình động SMTP)"
+  ],
+  "knowledge_items": { 
+    "patterns": ["Supabase singleton row for global settings", "Radix UI Slot for Next.js Link nesting"], 
+    "gotchas": ["Cần gọi API logout để xóa cookie server thay vì chỉ redirect", "Tham số URL (search parameters) phải đồng bộ tuyệt đối giữa components Header/Footer và DanhMucClient"], 
+    "conventions": ["Màu thương hiệu: Navy (#0A1628) và Gold (#C4A35A)"] 
+  }
+}
