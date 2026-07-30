@@ -1,5 +1,21 @@
 # Changelog
 
+## [2026-07-30]
+### Added
+- Thêm file `.gitignore` để loại trừ các file `.vbsec-tmp` sinh ra từ phần mềm quét bảo mật.
+
+### Changed
+- Hoàn thiện tính năng Đa ngôn ngữ (i18n):
+  - Đồng bộ hoá ngôn ngữ tiếng Anh cho nội dung Điều khoản sử dụng.
+  - Cập nhật thông báo lỗi tiếng Anh trong Form Ký gửi dự án.
+  - Đồng bộ các thẻ Meta (Title/Description) thành tiếng Anh khi xem giao diện EN.
+
+### Security
+- Xác thực thành công hệ thống:
+  - An toàn 100% trước lỗi SSRF (API `translate` đã được hardcode URL an toàn).
+  - Rate Limiting hoạt động chính xác ở 2 đầu mối quan trọng (`/api/leads` và `/api/auth/login`).
+  - Zero CRITICAL/HIGH/MEDIUM vulnerabilities reported.
+
 ## [2026-07-29]
 ### Added
 - Tính năng cấu hình SMTP động lưu trong cơ sở dữ liệu (Global Settings).

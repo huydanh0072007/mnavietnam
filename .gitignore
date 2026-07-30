@@ -45,3 +45,5 @@ vbsec-reports/
 .vbsec-tmp/
 .vbsec_files.txt
 
+# antigravity awf
+.brain/session.json
