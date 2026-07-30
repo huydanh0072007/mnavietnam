@@ -10,10 +10,10 @@ export async function generateMetadata({ params }: { params: Promise<any> }): Pr
   const dict = await getDictionary(lang as Locale);
   return {
     title: `${dict.about.hero_title} | M$A International`,
-    description: dict.about.desc,
+    description: dict.about.hero_desc,
     openGraph: {
       title: `${dict.about.hero_title} | M$A International`,
-      description: dict.about.desc,
+      description: dict.about.hero_desc,
       url: 'https://mnainternational.pages.dev/gioi-thieu',
     }
   };
