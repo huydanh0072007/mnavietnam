@@ -81,23 +81,23 @@ export function KyGuiClient({ categories }: { categories: MasterDataItem[] }) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Họ và tên *</label>
-                      <input type="text" name="full_name" required className="w-full bg-gray-50 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Nhập họ và tên" />
+                      <input type="text" name="full_name" required className="w-full bg-gray-50 text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Nhập họ và tên" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Chức vụ</label>
-                      <input type="text" name="role_title" className="w-full bg-gray-50 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="VD: Giám đốc đầu tư" />
+                      <input type="text" name="role_title" className="w-full bg-gray-50 text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="VD: Giám đốc đầu tư" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Đơn vị / Công ty *</label>
-                      <input type="text" name="organization" required className="w-full bg-gray-50 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Tên công ty" />
+                      <input type="text" name="organization" required className="w-full bg-gray-50 text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Tên công ty" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Số điện thoại *</label>
-                      <input type="tel" name="phone" required className="w-full bg-gray-50 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Số điện thoại liên hệ" />
+                      <input type="tel" name="phone" required className="w-full bg-gray-50 text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Số điện thoại liên hệ" />
                     </div>
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                      <input type="email" name="email" required className="w-full bg-gray-50 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Địa chỉ email" />
+                      <input type="email" name="email" required className="w-full bg-gray-50 text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Địa chỉ email" />
                     </div>
                   </div>
                 </div>
@@ -110,11 +110,11 @@ export function KyGuiClient({ categories }: { categories: MasterDataItem[] }) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Tên / Vị trí dự án *</label>
-                      <input type="text" name="project_name_location" required className="w-full bg-gray-50 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="VD: Khu dân cư tại Quận 2, TP.HCM" />
+                      <input type="text" name="project_name_location" required className="w-full bg-gray-50 text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="VD: Khu dân cư tại Quận 2, TP.HCM" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Hình thức giao dịch mong muốn</label>
-                      <select name="preferred_deal_type" className="w-full bg-gray-50 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]">
+                      <select name="preferred_deal_type" className="w-full bg-gray-50 text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]">
                         <option value="">Chọn hình thức...</option>
                         {categories.filter(c => c.category === 'deal_type').map(c => (
                           <option key={c.key} value={c.key}>{c.label}</option>
@@ -124,15 +124,15 @@ export function KyGuiClient({ categories }: { categories: MasterDataItem[] }) {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Quy mô ước tính</label>
-                      <input type="text" name="estimated_scale" className="w-full bg-gray-50 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="VD: 5ha, 1000 tỷ VNĐ" />
+                      <input type="text" name="estimated_scale" className="w-full bg-gray-50 text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="VD: 5ha, 1000 tỷ VNĐ" />
                     </div>
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả thêm / Yêu cầu đặc biệt</label>
-                      <textarea name="message" rows={4} className="w-full bg-gray-50 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Chia sẻ thêm về hiện trạng pháp lý, tiến độ, hoặc các yêu cầu bảo mật..."></textarea>
+                      <textarea name="message" rows={4} className="w-full bg-gray-50 text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Chia sẻ thêm về hiện trạng pháp lý, tiến độ, hoặc các yêu cầu bảo mật..."></textarea>
                     </div>
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Tài liệu đính kèm (Teaser/Profile nếu có)</label>
-                      <input type="file" name="attachment" className="w-full bg-gray-50 border border-gray-200 rounded-md p-2" />
+                      <input type="file" name="attachment" className="w-full bg-gray-50 text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-md p-2" />
                       {/* Hidden field to explicitly state lead_type if not using multipart check */}
                       <input type="hidden" name="lead_type" value="submission" />
                       <p className="text-xs text-gray-500 mt-2">Định dạng hỗ trợ: PDF, DOCX, PPTX (Tối đa 10MB)</p>
