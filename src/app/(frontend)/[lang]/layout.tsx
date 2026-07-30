@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
-import './globals.css';
+import '@/app/globals.css';
 import { AppShell } from '@/components/layout/AppShell';
 
 const inter = Inter({
@@ -54,15 +54,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+import { getDictionary } from '@/lib/get-dictionary';
+import { Locale } from '@/i18n-config';
+
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: { lang: string };
 }>) {
+  // If using Next.js 15, params might be a Promise, but we'll try this first.
+  const lang = params?.lang || 'vi';
+  const dict = await getDictionary(lang as Locale);
+  
   return (
-    <html lang="vi" data-scroll-behavior="smooth">
+    <html lang={lang} data-scroll-behavior="smooth">
       <body className={`${inter.variable} ${playfair.variable} antialiased min-h-screen flex flex-col`}>
-        <AppShell>{children}</AppShell>
+        <AppShell lang={lang} dict={dict}>{children}</AppShell>
       </body>
     </html>
   );

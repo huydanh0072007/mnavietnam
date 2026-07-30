@@ -6,8 +6,10 @@ import { MessageCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useSettings } from '@/lib/contexts/SettingsContext';
 
-export const Footer = () => {
+export const Footer = ({ lang = 'vi', dict }: { lang?: string; dict?: any }) => {
   const { settings, isLoading } = useSettings();
+
+  if (!dict) return null;
 
   return (
     <footer className="bg-[#0A1628] border-t border-[#1e2f47] pt-16 pb-8 text-[#E8E6E1]">
@@ -15,7 +17,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Col 1 */}
           <div>
-            <Link href="/" className="flex items-center gap-2 mb-6">
+            <Link href={`/${lang}`} className="flex items-center gap-2 mb-6">
               <div className="w-10 h-10 rounded overflow-hidden flex-shrink-0">
                 <Image src="/logo.jpg" alt="M$A International Logo" width={40} height={40} className="object-cover" />
               </div>
@@ -24,7 +26,7 @@ export const Footer = () => {
               </span>
             </Link>
             <p className="text-[#6B7280] text-sm leading-relaxed mb-6">
-              Cổng thông tin dự án M&A bất động sản hàng đầu Việt Nam. Nơi kết nối các cơ hội đầu tư, chuyển nhượng và hợp tác phát triển dự án chuyên nghiệp.
+              {dict.footer.description}
               <br/><br/>
               <strong className="text-[#C4A35A] font-serif font-medium tracking-wide">Tư vấn Chuyên nghiệp — Đối tác Độc quyền</strong>
             </p>
@@ -32,11 +34,11 @@ export const Footer = () => {
 
           {/* Col 2 */}
           <div>
-            <h4 className="text-white font-serif font-bold mb-6 uppercase tracking-wider text-sm">Liên kết nhanh</h4>
+            <h4 className="text-white font-serif font-bold mb-6 uppercase tracking-wider text-sm">{dict.footer.quickLinks}</h4>
             <ul className="space-y-3 text-sm text-[#6B7280]">
-              <li><Link href="/danh-muc" className="hover:text-[#C4A35A] transition-colors">Danh mục dự án</Link></li>
-              <li><Link href="/ky-gui" className="hover:text-[#C4A35A] transition-colors">Ký gửi dự án</Link></li>
-              <li><Link href="/gioi-thieu" className="hover:text-[#C4A35A] transition-colors">Về chúng tôi</Link></li>
+              <li><Link href={`/${lang}/danh-muc`} className="hover:text-[#C4A35A] transition-colors">{dict.navigation.projects}</Link></li>
+              <li><Link href={`/${lang}/ky-gui`} className="hover:text-[#C4A35A] transition-colors">{dict.navigation.submit}</Link></li>
+              <li><Link href={`/${lang}/gioi-thieu`} className="hover:text-[#C4A35A] transition-colors">{dict.navigation.about}</Link></li>
             </ul>
           </div>
 
@@ -44,8 +46,8 @@ export const Footer = () => {
           <div>
             <h4 className="text-white font-serif font-bold mb-6 uppercase tracking-wider text-sm">Dịch vụ</h4>
             <ul className="space-y-3 text-sm text-[#6B7280]">
-              <li><Link href="/danh-muc?deal_type=buyout" className="hover:text-[#C4A35A] transition-colors">Chuyển nhượng dự án (M&A)</Link></li>
-              <li><Link href="/danh-muc?deal_type=joint_venture" className="hover:text-[#C4A35A] transition-colors">Hợp tác đầu tư (JV)</Link></li>
+              <li><Link href={`/${lang}/danh-muc?deal_type=buyout`} className="hover:text-[#C4A35A] transition-colors">Chuyển nhượng dự án (M&A)</Link></li>
+              <li><Link href={`/${lang}/danh-muc?deal_type=joint_venture`} className="hover:text-[#C4A35A] transition-colors">Hợp tác đầu tư (JV)</Link></li>
               <li><a href="#" className="hover:text-[#C4A35A] transition-colors">Thẩm định dự án</a></li>
               <li><a href="#" className="hover:text-[#C4A35A] transition-colors">Tư vấn pháp lý M&A</a></li>
             </ul>
@@ -53,11 +55,11 @@ export const Footer = () => {
 
           {/* Col 4 */}
           <div>
-            <h4 className="text-white font-serif font-bold mb-6 uppercase tracking-wider text-sm">Liên hệ & Kết nối</h4>
+            <h4 className="text-white font-serif font-bold mb-6 uppercase tracking-wider text-sm">{dict.footer.contact}</h4>
             <ul className="space-y-4 text-sm text-[#6B7280]">
               <li className="flex items-start gap-3">
                 <span className="text-[#C4A35A] mt-1">📍</span>
-                <span>Tầng 12, Tòa nhà ABC, 123 Nguyễn Văn Linh, Quận 7, TP.HCM</span>
+                <span>{dict.footer.address}</span>
               </li>
               <li className="flex items-center gap-3">
                 <span className="text-[#C4A35A]">📞</span>
@@ -97,10 +99,10 @@ export const Footer = () => {
         </div>
 
         <div className="pt-8 border-t border-[#1e2f47] flex flex-col md:flex-row justify-between items-center text-xs text-[#6B7280]">
-          <p>&copy; {new Date().getFullYear()} M$AVietnam.com. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} M$AVietnam.com. {dict.footer.rights}</p>
           <div className="flex gap-4 mt-4 md:mt-0">
-            <Link href="/dieu-khoan-su-dung" className="hover:text-white transition-colors">Điều khoản sử dụng</Link>
-            <Link href="/chinh-sach-bao-mat" className="hover:text-white transition-colors">Chính sách bảo mật</Link>
+            <Link href={`/${lang}/dieu-khoan-su-dung`} className="hover:text-white transition-colors">Điều khoản sử dụng</Link>
+            <Link href={`/${lang}/chinh-sach-bao-mat`} className="hover:text-white transition-colors">Chính sách bảo mật</Link>
           </div>
         </div>
       </div>

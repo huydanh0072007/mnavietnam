@@ -1,0 +1,15 @@
+{
+  "navigation": {
+    "home": "Home",
+    "projects": "Projects",
+    "submit": "Submit Project",
+    "about": "About Us"
+  },
+  "footer": {
+    "description": "The premier platform for exclusive real estate project transfers and co-investment in Vietnam.",
+    "quickLinks": "Quick Links",
+    "contact": "Contact Us",
+    "address": "12th Floor, MNA Building, District 1, HCMC",
+    "rights": "All rights reserved by MNA International."
+  }
+}

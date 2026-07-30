@@ -7,7 +7,15 @@ import { Footer } from '@/components/layout/Footer';
 import { SettingsProvider } from '@/lib/contexts/SettingsContext';
 
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ 
+  children, 
+  lang, 
+  dict 
+}: { 
+  children: React.ReactNode; 
+  lang?: string; 
+  dict?: any; 
+}) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
 
@@ -17,7 +25,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SettingsProvider>
-      <Header />
+      {lang && dict && <Header lang={lang} dict={dict} />}
       <main className="flex-grow">{children}</main>
       <Footer />
     </SettingsProvider>

@@ -5,11 +5,12 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '../ui/Button';
 
-export const Header = () => {
+export const Header = ({ lang, dict }: { lang: string; dict: any }) => {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const isHomepage = pathname === '/';
+  // Do pathname bắt đầu bằng /vi hoặc /en, trang chủ sẽ là /vi hoặc /en
+  const isHomepage = pathname === '/vi' || pathname === '/en';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,11 +21,17 @@ export const Header = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Trang chủ', href: '/' },
-    { name: 'Danh mục', href: '/danh-muc' },
-    { name: 'Ký gửi dự án', href: '/ky-gui' },
-    { name: 'Giới thiệu', href: '/gioi-thieu' },
+    { name: dict.navigation.home, href: `/${lang}` },
+    { name: dict.navigation.projects, href: `/${lang}/danh-muc` },
+    { name: dict.navigation.submit, href: `/${lang}/ky-gui` },
+    { name: dict.navigation.about, href: `/${lang}/gioi-thieu` },
   ];
+
+  const switchLangUrl = (targetLang: string) => {
+    if (!pathname) return `/${targetLang}`;
+    const pathWithoutLang = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/');
+    return `/${targetLang}${pathWithoutLang.startsWith('/') ? '' : '/'}${pathWithoutLang}`;
+  };
 
   return (
     <header 
@@ -33,7 +40,7 @@ export const Header = () => {
       }`}
     >
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
-        <Link href="/" className="flex items-center gap-2 z-50">
+        <Link href={`/${lang}`} className="flex items-center gap-2 z-50">
           <div className="w-10 h-10 rounded overflow-hidden flex-shrink-0">
             <Image src="/logo.jpg" alt="M$A International Logo" width={40} height={40} className="object-cover" priority />
           </div>
@@ -56,12 +63,19 @@ export const Header = () => {
               </li>
             ))}
           </ul>
+          
+          <div className="flex items-center gap-2 ml-2">
+            <Link href={switchLangUrl('vi')} className={`text-sm ${lang === 'vi' ? 'text-[#C4A35A] font-bold' : 'text-gray-300 hover:text-white'}`}>VN</Link>
+            <span className="text-gray-500 text-sm">|</span>
+            <Link href={switchLangUrl('en')} className={`text-sm ${lang === 'en' ? 'text-[#C4A35A] font-bold' : 'text-gray-300 hover:text-white'}`}>EN</Link>
+          </div>
+
           <div className="flex gap-3 ml-4">
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/danh-muc?deal_type=buyout">Chuyển nhượng</Link>
+              <Link href={`/${lang}/danh-muc?deal_type=buyout`}>{lang === 'en' ? 'Buyout' : 'Chuyển nhượng'}</Link>
             </Button>
             <Button variant="primary" size="sm" asChild>
-              <Link href="/danh-muc?deal_type=joint_venture">Hợp tác đầu tư</Link>
+              <Link href={`/${lang}/danh-muc?deal_type=joint_venture`}>{lang === 'en' ? 'Joint Venture' : 'Hợp tác đầu tư'}</Link>
             </Button>
           </div>
         </nav>

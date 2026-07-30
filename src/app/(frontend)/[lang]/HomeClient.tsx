@@ -78,12 +78,12 @@ export default function HomeClient({ featuredProjects }: { featuredProjects: Pro
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <GlowButton>
                 <Button size="lg" asChild>
-                  <Link href="/danh-muc">Khám phá Danh mục Đầu tư</Link>
+                  <Link href={`/${lang}/danh-muc`}>Khám phá Danh mục Đầu tư</Link>
                 </Button>
               </GlowButton>
               <GlowButton>
                 <Button size="lg" variant="secondary" className="border-[#C4A35A] text-[#C4A35A] hover:bg-[#C4A35A] hover:!text-[#1A1A2E]" asChild>
-                  <Link href="/ky-gui">Ký gửi Dự án</Link>
+                  <Link href={`/${lang}/ky-gui`}>Ký gửi Dự án</Link>
                 </Button>
               </GlowButton>
             </div>
@@ -142,7 +142,7 @@ export default function HomeClient({ featuredProjects }: { featuredProjects: Pro
                 duration={800}
                 distance={50}
               >
-                <ProjectCard project={project} />
+                <ProjectCard project={project} lang={lang} />
               </ScrollReveal>
             ))}
           </div>
@@ -151,7 +151,7 @@ export default function HomeClient({ featuredProjects }: { featuredProjects: Pro
           <ScrollReveal direction="fade" delay={600} duration={800}>
             <div className="text-center mt-12">
               <Button variant="secondary" size="lg" className="border-[#1A1A2E] text-[#1A1A2E] hover:bg-[#1A1A2E] hover:text-[#C4A35A]" asChild>
-                <Link href="/danh-muc">Xem tất cả dự án</Link>
+                <Link href={`/${lang}/danh-muc`}>Xem tất cả dự án</Link>
               </Button>
             </div>
           </ScrollReveal>
@@ -183,7 +183,7 @@ export default function HomeClient({ featuredProjects }: { featuredProjects: Pro
             {/* CTA with Glow Pulse Effect */}
             <GlowButton>
               <Button size="lg" asChild>
-                <Link href="/ky-gui">Ký gửi dự án ngay</Link>
+                <Link href={`/${lang}/ky-gui`}>Ký gửi dự án ngay</Link>
               </Button>
             </GlowButton>
           </ScrollReveal>

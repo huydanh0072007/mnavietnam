@@ -5,25 +5,41 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { getProjects, getProjectBySlug } from '@/lib/projects-store';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
 import { ProjectCard } from '@/components/ui/ProjectCard';
 import { DonutChart, DonutSegment } from '@/components/ui/DonutChart';
 import { DataRoomUnlock } from '@/components/ui/DataRoomUnlock';
+import viDict from '@/dictionaries/vi.json';
+import enDict from '@/dictionaries/en.json';
 
 export const revalidate = 60; // revalidate every 60 seconds
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = await params;
+type PageParams = {
+  slug: string;
+  lang: string;
+};
+
+export async function generateMetadata({ params }: { params: PageParams }): Promise<Metadata> {
+  const { slug, lang } = await params;
   const project = await getProjectBySlug(slug);
   
   if (!project) {
     return {
-      title: 'Không tìm thấy dự án | M$A International',
+      title: lang === 'en' ? 'Project not found | M$A International' : 'Không tìm thấy dự án | M$A International',
     };
   }
 
-  const title = `${project.project_code}: ${project.title} | M$A International`;
-  const description = `Cơ hội đầu tư M&A dự án ${project.title} tại ${project.province}. Quy mô: ${project.scale}. Hình thức: ${project.deal_type === 'buyout' ? 'Chuyển nhượng 100%' : 'Hợp tác đầu tư'}.`;
+  const pTitle = lang === 'en' ? (project.title_en || project.title) : project.title;
+  const title = `${project.project_code}: ${pTitle} | M$A International`;
+  
+  const pProvince = project.province; // No translated provinces yet
+  const pScale = lang === 'en' ? (project.scale_en || project.scale) : project.scale;
+  
+  const dealTypeStrVi = project.deal_type === 'buyout' ? 'Chuyển nhượng 100%' : 'Hợp tác đầu tư';
+  const dealTypeStrEn = project.deal_type === 'buyout' ? '100% Transfer' : 'Joint Venture';
+  
+  const description = lang === 'en' 
+    ? `M&A investment opportunity: ${pTitle} in ${pProvince}. Scale: ${pScale}. Deal type: ${dealTypeStrEn}.`
+    : `Cơ hội đầu tư M&A dự án ${pTitle} tại ${pProvince}. Quy mô: ${pScale}. Hình thức: ${dealTypeStrVi}.`;
 
   return {
     title,
@@ -37,7 +53,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
           url: project.gallery_images[0] || '/hero-bg.jpg',
           width: 1200,
           height: 630,
-          alt: project.title,
+          alt: pTitle,
         },
       ],
     },
@@ -50,9 +66,11 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function ProjectDetailPage({ params }: { params: { slug: string } }) {
-  const { slug } = await params;
+export default async function ProjectDetailPage({ params }: { params: PageParams }) {
+  const { slug, lang } = await params;
   const project = await getProjectBySlug(slug);
+  const dict = lang === 'en' ? enDict : viDict;
+  const isEn = lang === 'en';
   
   if (!project || project.publish_status !== 'published') {
     notFound();
@@ -65,21 +83,35 @@ export default async function ProjectDetailPage({ params }: { params: { slug: st
 
   const capitalStructureData: DonutSegment[] = project.deal_type === 'buyout' 
     ? [
-        { label: 'Chuyển nhượng Cổ phần', value: 100, color: '#0A1628' },
+        { label: isEn ? 'Share Transfer' : 'Chuyển nhượng Cổ phần', value: 100, color: '#0A1628' },
       ]
     : [
-        { label: 'Kêu gọi đầu tư (Capex)', value: 49, color: '#C4A35A' },
-        { label: 'Chủ đầu tư đối ứng', value: 51, color: '#0A1628' },
+        { label: isEn ? 'Investment Call (Capex)' : 'Kêu gọi đầu tư (Capex)', value: 49, color: '#C4A35A' },
+        { label: isEn ? 'Counterpart Developer' : 'Chủ đầu tư đối ứng', value: 51, color: '#0A1628' },
       ];
+
+  const pTitle = isEn ? (project.title_en || project.title) : project.title;
+  const pDesc = isEn ? (project.description_en || project.description) : project.description;
+  const pStatus = isEn ? (project.status_label_en || project.status_label) : project.status_label;
+  const pScale = isEn ? (project.scale_en || project.scale) : project.scale;
+  const pLegal = isEn ? (project.legal_status_summary_en || project.legal_status_summary) : project.legal_status_summary;
+  const pCurrent = isEn ? (project.current_status_en || project.current_status) : project.current_status;
+  const pValuation = isEn ? (project.valuation_display_en || project.valuation_display) : project.valuation_display;
+  const pCapital = isEn ? (project.capital_structure_summary_en || project.capital_structure_summary) : project.capital_structure_summary;
+  const pHighlights = isEn && project.highlights_en && project.highlights_en.length > 0 ? project.highlights_en : project.highlights;
+
+  const dealTypeBadgeText = isEn 
+    ? (project.deal_type === 'buyout' ? 'Buyout' : 'Joint Venture')
+    : (project.deal_type === 'buyout' ? 'Chuyển nhượng' : 'Hợp tác đầu tư');
 
   return (
     <div className="min-h-screen bg-[#F8F6F2] pt-32 pb-24">
       <div className="container mx-auto px-4">
         {/* Breadcrumb */}
         <div className="text-sm text-[#6B7280] mb-8">
-          <Link href="/" className="hover:text-[#1A1A2E]">Trang chủ</Link>
+          <Link href={`/${lang}`} className="hover:text-[#1A1A2E]">{dict.nav.home}</Link>
           <span className="mx-2">/</span> 
-          <Link href="/danh-muc" className="hover:text-[#1A1A2E]">Danh mục dự án</Link>
+          <Link href={`/${lang}/danh-muc`} className="hover:text-[#1A1A2E]">{dict.nav.projects}</Link>
           <span className="mx-2">/</span> 
           <span className="text-[#1A1A2E] font-medium">{project.project_code}</span>
         </div>
@@ -92,7 +124,7 @@ export default async function ProjectDetailPage({ params }: { params: { slug: st
               <div className="relative h-[400px] md:h-[500px] rounded-lg overflow-hidden bg-gray-200">
                 <Image
                   src={project.gallery_images[0]}
-                  alt={project.title}
+                  alt={pTitle}
                   fill
                   className="object-cover"
                   priority
@@ -104,7 +136,7 @@ export default async function ProjectDetailPage({ params }: { params: { slug: st
                     <div key={idx} className="relative h-24 rounded-lg overflow-hidden cursor-pointer opacity-70 hover:opacity-100 transition-opacity">
                       <Image
                         src={img}
-                        alt={`${project.title} thumbnail ${idx + 2}`}
+                        alt={`${pTitle} thumbnail ${idx + 2}`}
                         fill
                         className="object-cover"
                       />
@@ -116,17 +148,21 @@ export default async function ProjectDetailPage({ params }: { params: { slug: st
 
             {/* Description */}
             <section className="bg-white p-8 rounded-lg shadow-sm">
-              <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-4">Tổng quan dự án</h2>
+              <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-4">
+                {isEn ? 'Project Overview' : 'Tổng quan dự án'}
+              </h2>
               <div className="prose max-w-none text-gray-700">
-                <p>{project.description}</p>
+                <p>{pDesc}</p>
               </div>
             </section>
 
             {/* Highlights */}
             <section className="bg-white p-8 rounded-lg shadow-sm">
-              <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-4">Điểm nhấn đầu tư</h2>
+              <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-4">
+                {isEn ? 'Investment Highlights' : 'Điểm nhấn đầu tư'}
+              </h2>
               <ul className="space-y-4">
-                {project.highlights.map((highlight, idx) => (
+                {pHighlights.map((highlight, idx) => (
                   <li key={idx} className="flex items-start gap-3">
                     <span className="text-[#C4A35A] mt-1 text-xl">✓</span>
                     <span className="text-gray-700">{highlight}</span>
@@ -137,12 +173,14 @@ export default async function ProjectDetailPage({ params }: { params: { slug: st
 
             {/* Capital Structure Chart */}
             <section className="bg-white p-8 rounded-lg shadow-sm overflow-hidden">
-              <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-8 text-center">Cơ cấu Vốn & Giao dịch</h2>
+              <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-8 text-center">
+                {isEn ? 'Capital & Deal Structure' : 'Cơ cấu Vốn & Giao dịch'}
+              </h2>
               <div className="bg-[#0A1628] rounded-xl py-12 px-4 shadow-inner">
                 <DonutChart 
                   data={capitalStructureData} 
-                  title={project.deal_type === 'buyout' ? 'M&A 100%' : 'Hợp tác 49%'} 
-                  subtitle="Cơ cấu kỳ vọng" 
+                  title={project.deal_type === 'buyout' ? 'M&A 100%' : (isEn ? 'JV 49%' : 'Hợp tác 49%')} 
+                  subtitle={isEn ? 'Expected Structure' : 'Cơ cấu kỳ vọng'} 
                 />
               </div>
             </section>
@@ -153,45 +191,45 @@ export default async function ProjectDetailPage({ params }: { params: { slug: st
             <div className="bg-white p-8 rounded-lg shadow-sm sticky top-24">
               <div className="flex flex-wrap gap-2 mb-4">
                 <Badge variant={project.deal_type === 'buyout' ? 'buyout' : 'jv'}>
-                  {project.deal_type === 'buyout' ? 'Chuyển nhượng' : 'Hợp tác đầu tư'}
+                  {dealTypeBadgeText}
                 </Badge>
-                <Badge variant="status">{project.status_label}</Badge>
+                <Badge variant="status">{pStatus}</Badge>
               </div>
 
-              <h1 className="text-3xl font-serif font-bold text-[#1A1A2E] mb-2">{project.title}</h1>
+              <h1 className="text-3xl font-serif font-bold text-[#1A1A2E] mb-2">{pTitle}</h1>
               <div className="text-[#C4A35A] font-medium mb-6 text-lg">{project.project_code}</div>
 
               {/* Specs Table */}
               <div className="space-y-4 mb-8">
                 <div className="flex justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">Vị trí</span>
+                  <span className="text-gray-500">{isEn ? 'Location' : 'Vị trí'}</span>
                   <span className="font-medium text-right text-[#1A1A2E]">{project.district}, {project.province}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">Quy mô</span>
-                  <span className="font-medium text-right text-[#1A1A2E]">{project.scale}</span>
+                  <span className="text-gray-500">{isEn ? 'Scale' : 'Quy mô'}</span>
+                  <span className="font-medium text-right text-[#1A1A2E]">{pScale}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">Pháp lý</span>
-                  <span className="font-medium text-right text-[#1A1A2E]">{project.legal_status_summary}</span>
+                  <span className="text-gray-500">{isEn ? 'Legal Status' : 'Pháp lý'}</span>
+                  <span className="font-medium text-right text-[#1A1A2E]">{pLegal}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">Hiện trạng</span>
-                  <span className="font-medium text-right text-[#1A1A2E]">{project.current_status}</span>
+                  <span className="text-gray-500">{isEn ? 'Current Status' : 'Hiện trạng'}</span>
+                  <span className="font-medium text-right text-[#1A1A2E]">{pCurrent}</span>
                 </div>
                 {project.show_valuation && (
                   <div className="flex justify-between py-3 border-b border-gray-100">
-                    <span className="text-gray-500">Định giá / Tổng mức ĐT</span>
-                    <span className="font-medium text-right text-[#1A1A2E]">{project.valuation_display}</span>
+                    <span className="text-gray-500">{isEn ? 'Valuation / Total Inv.' : 'Định giá / Tổng mức ĐT'}</span>
+                    <span className="font-medium text-right text-[#1A1A2E]">{pValuation}</span>
                   </div>
                 )}
                 <div className="flex justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">Cấu trúc giao dịch</span>
-                  <span className="font-medium text-right text-[#1A1A2E]">{project.capital_structure_summary}</span>
+                  <span className="text-gray-500">{isEn ? 'Deal Structure' : 'Cấu trúc giao dịch'}</span>
+                  <span className="font-medium text-right text-[#1A1A2E]">{pCapital}</span>
                 </div>
               </div>
               <div className="mt-8">
-                <DataRoomUnlock projectTitle={project.title} />
+                <DataRoomUnlock projectTitle={pTitle} />
               </div>
             </div>
           </div>
@@ -200,10 +238,12 @@ export default async function ProjectDetailPage({ params }: { params: { slug: st
         {/* Related Projects */}
         {relatedProjects.length > 0 && (
           <div className="mt-24 pt-12 border-t border-gray-200">
-            <h2 className="text-3xl font-serif font-bold text-[#1A1A2E] mb-8">Dự án tương tự</h2>
+            <h2 className="text-3xl font-serif font-bold text-[#1A1A2E] mb-8">
+              {isEn ? 'Similar Projects' : 'Dự án tương tự'}
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {relatedProjects.map(p => (
-                <ProjectCard key={p.id} project={p} />
+                <ProjectCard key={p.id} project={p} lang={lang} />
               ))}
             </div>
           </div>

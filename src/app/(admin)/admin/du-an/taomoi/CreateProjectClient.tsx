@@ -14,7 +14,9 @@ import {
   Trash2, 
   CheckCircle2,
   FileText,
-  DollarSign
+  DollarSign,
+  Languages,
+  Loader2
 } from 'lucide-react';
 
 import { MasterDataItem, MdProvince, MdDistrict } from '@/lib/master-data-store';
@@ -49,6 +51,18 @@ function CreateProjectForm({ categories, provinces, districts }: CreateProjectCl
   ]);
   const [newHighlight, setNewHighlight] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
+
+  // English Fields
+  const [titleEn, setTitleEn] = useState('');
+  const [statusLabelEn, setStatusLabelEn] = useState('');
+  const [scaleEn, setScaleEn] = useState('');
+  const [legalStatusEn, setLegalStatusEn] = useState('');
+  const [currentStatusEn, setCurrentStatusEn] = useState('');
+  const [valuationDisplayEn, setValuationDisplayEn] = useState('');
+  const [capitalStructureEn, setCapitalStructureEn] = useState('');
+  const [descriptionEn, setDescriptionEn] = useState('');
+  const [highlightsEn, setHighlightsEn] = useState<string[]>([]);
+  const [isTranslating, setIsTranslating] = useState(false);
   
   // Nếu có dữ liệu truyền vào từ Lead (có title), tự động chuyển trạng thái bài viết thành Draft
   const [publishStatus, setPublishStatus] = useState<PublishStatus>(searchParams.get('title') ? 'draft' : 'published');
@@ -62,6 +76,45 @@ function CreateProjectForm({ categories, provinces, districts }: CreateProjectCl
 
   const handleRemoveHighlight = (index: number) => {
     setHighlights(prev => prev.filter((_, i) => i !== index));
+    if (highlightsEn.length > index) {
+      setHighlightsEn(prev => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleAutoTranslate = async () => {
+    setIsTranslating(true);
+    try {
+      const translateText = async (text: string) => {
+        if (!text) return '';
+        const res = await fetch('/api/admin/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, targetLang: 'en', sourceLang: 'vi' }),
+        });
+        const data = await res.json();
+        return data.translatedText || text;
+      };
+
+      if (title && !titleEn) setTitleEn(await translateText(title));
+      if (statusLabel && !statusLabelEn) setStatusLabelEn(await translateText(statusLabel));
+      if (scale && !scaleEn) setScaleEn(await translateText(scale));
+      if (legalStatus && !legalStatusEn) setLegalStatusEn(await translateText(legalStatus));
+      if (currentStatus && !currentStatusEn) setCurrentStatusEn(await translateText(currentStatus));
+      if (valuationDisplay && !valuationDisplayEn) setValuationDisplayEn(await translateText(valuationDisplay));
+      if (capitalStructure && !capitalStructureEn) setCapitalStructureEn(await translateText(capitalStructure));
+      if (description && !descriptionEn) setDescriptionEn(await translateText(description));
+
+      // Translate highlights if they haven't been translated
+      if (highlights.length > 0 && highlightsEn.length !== highlights.length) {
+        const translatedHLs = await Promise.all(highlights.map(h => translateText(h)));
+        setHighlightsEn(translatedHLs);
+      }
+    } catch (error) {
+      console.error('Translation failed:', error);
+      alert('Không thể dịch tự động lúc này. Vui lòng thử lại sau.');
+    } finally {
+      setIsTranslating(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -74,20 +127,29 @@ function CreateProjectForm({ categories, provinces, districts }: CreateProjectCl
     const newProject: Partial<Project> = {
       project_code: projectCode,
       title,
+      title_en: titleEn,
       slug: generateSlug(title),
       deal_type: dealType,
       status_label: statusLabel,
+      status_label_en: statusLabelEn,
       project_type: projectType,
       province,
       district,
       scale: scale || '10 ha',
+      scale_en: scaleEn,
       legal_status_summary: legalStatus,
+      legal_status_summary_en: legalStatusEn,
       current_status: currentStatus,
+      current_status_en: currentStatusEn,
       valuation_display: valuationDisplay,
+      valuation_display_en: valuationDisplayEn,
       show_valuation: showValuation,
       capital_structure_summary: capitalStructure,
+      capital_structure_summary_en: capitalStructureEn,
       highlights: highlights.length > 0 ? highlights : ['Dự án tiềm năng cao'],
+      highlights_en: highlightsEn.length > 0 ? highlightsEn : [],
       description: description || title,
+      description_en: descriptionEn,
       gallery_images: [
         'https://picsum.photos/seed/mna_new1/800/600',
         'https://picsum.photos/seed/mna_new2/800/600'
@@ -129,6 +191,16 @@ function CreateProjectForm({ categories, provinces, districts }: CreateProjectCl
             </button>
 
             <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleAutoTranslate}
+                disabled={isTranslating}
+                className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 flex items-center gap-2 transition-colors disabled:opacity-50"
+              >
+                {isTranslating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Languages className="w-4 h-4" />}
+                Dịch tự động (EN)
+              </button>
+
               <button
                 type="button"
                 onClick={() => setPublishStatus('draft')}
@@ -182,16 +254,28 @@ function CreateProjectForm({ categories, provinces, districts }: CreateProjectCl
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tên Dự án</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="VD: Khu đô thị sinh thái Long Thành"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tên Dự án (VI)</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="VD: Khu đô thị sinh thái Long Thành"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tên Dự án (EN)</label>
+                    <input
+                      type="text"
+                      placeholder="VD: Long Thanh Eco City"
+                      value={titleEn}
+                      onChange={(e) => setTitleEn(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -249,13 +333,21 @@ function CreateProjectForm({ categories, provinces, districts }: CreateProjectCl
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Quy mô</label>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Quy mô (VI)</label>
                     <input
                       type="text"
                       required
                       placeholder="VD: 50 ha"
                       value={scale}
                       onChange={(e) => setScale(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A] mb-2"
+                    />
+                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Quy mô (EN)</label>
+                    <input
+                      type="text"
+                      placeholder="VD: 50 hectares"
+                      value={scaleEn}
+                      onChange={(e) => setScaleEn(e.target.value)}
                       className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
                     />
                   </div>
@@ -266,63 +358,151 @@ function CreateProjectForm({ categories, provinces, districts }: CreateProjectCl
               <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
                 <h2 className="text-lg font-bold text-gray-900 font-serif border-b border-gray-100 pb-3">Pháp lý & Hiện trạng</h2>
 
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tình trạng Pháp lý Tổng quan</label>
-                  <select
-                    value={legalStatus}
-                    onChange={(e) => setLegalStatus(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                  >
-                    <option value="">Chọn tình trạng pháp lý...</option>
-                    {categories.filter(c => c.category === 'legal_status').map(c => (
-                      <option key={c.key} value={c.label}>{c.label}</option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tình trạng Pháp lý (VI)</label>
+                    <select
+                      value={legalStatus}
+                      onChange={(e) => setLegalStatus(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                    >
+                      <option value="">Chọn tình trạng pháp lý...</option>
+                      {categories.filter(c => c.category === 'legal_status').map(c => (
+                        <option key={c.key} value={c.label}>{c.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tình trạng Pháp lý (EN)</label>
+                    <input
+                      type="text"
+                      value={legalStatusEn}
+                      onChange={(e) => setLegalStatusEn(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                      placeholder="Legal Status EN"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Hiện trạng Thực tế</label>
-                  <select
-                    value={currentStatus}
-                    onChange={(e) => setCurrentStatus(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                  >
-                    <option value="">Chọn hiện trạng...</option>
-                    {categories.filter(c => c.category === 'project_status').map(c => (
-                      <option key={c.key} value={c.label}>{c.label}</option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Hiện trạng Thực tế (VI)</label>
+                    <select
+                      value={currentStatus}
+                      onChange={(e) => setCurrentStatus(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                    >
+                      <option value="">Chọn hiện trạng...</option>
+                      {categories.filter(c => c.category === 'project_status').map(c => (
+                        <option key={c.key} value={c.label}>{c.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Hiện trạng Thực tế (EN)</label>
+                    <input
+                      type="text"
+                      value={currentStatusEn}
+                      onChange={(e) => setCurrentStatusEn(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                      placeholder="Current Status EN"
+                    />
+                  </div>
                 </div>
 
                 {dealType === 'joint_venture' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Cơ cấu Vốn Kêu gọi Tổng quan (VI)</label>
+                      <input
+                        type="text"
+                        value={capitalStructure}
+                        onChange={(e) => setCapitalStructure(e.target.value)}
+                        placeholder="VD: Mời chào 49% cổ phần, Capex 500 Tỷ"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Cơ cấu Vốn Kêu gọi Tổng quan (EN)</label>
+                      <input
+                        type="text"
+                        value={capitalStructureEn}
+                        onChange={(e) => setCapitalStructureEn(e.target.value)}
+                        placeholder="VD: Offering 49% shares, Capex 500 Billion"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Description */}
+              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                <h2 className="text-lg font-bold text-gray-900 font-serif border-b border-gray-100 pb-3">Tổng quan dự án</h2>
+
+                <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Cơ cấu Vốn Kêu gọi Tổng quan</label>
-                    <input
-                      type="text"
-                      value={capitalStructure}
-                      onChange={(e) => setCapitalStructure(e.target.value)}
-                      placeholder="VD: Mời chào 49% cổ phần, Capex 500 Tỷ"
+                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Mô tả chi tiết (VI)</label>
+                    <textarea
+                      rows={4}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="VD: Dự án nằm ở vị trí chiến lược..."
                       className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
                     />
                   </div>
-                )}
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Mô tả chi tiết (EN)</label>
+                    <textarea
+                      rows={4}
+                      value={descriptionEn}
+                      onChange={(e) => setDescriptionEn(e.target.value)}
+                      placeholder="VD: The project is strategically located..."
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Highlights */}
               <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
                 <h2 className="text-lg font-bold text-gray-900 font-serif border-b border-gray-100 pb-3">Điểm nhấn Sinh lời</h2>
 
-                <div className="space-y-2">
+                <div className="space-y-4">
                   {highlights.map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-100 text-sm text-gray-800">
-                      <span>• {item}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveHighlight(idx)}
-                        className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                    <div key={idx} className="flex flex-col gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100 text-sm text-gray-800">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold">Điểm nhấn {idx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveHighlight(idx)}
+                          className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={item}
+                        onChange={(e) => {
+                          const newHL = [...highlights];
+                          newHL[idx] = e.target.value;
+                          setHighlights(newHL);
+                        }}
+                        className="w-full bg-white border border-gray-200 rounded-md px-3 py-1.5 text-sm"
+                        placeholder="VI"
+                      />
+                      <input
+                        type="text"
+                        value={highlightsEn[idx] || ''}
+                        onChange={(e) => {
+                          const newHL = [...highlightsEn];
+                          newHL[idx] = e.target.value;
+                          setHighlightsEn(newHL);
+                        }}
+                        className="w-full bg-white border border-gray-200 rounded-md px-3 py-1.5 text-sm"
+                        placeholder="EN"
+                      />
                     </div>
                   ))}
                 </div>
@@ -371,14 +551,26 @@ function CreateProjectForm({ categories, provinces, districts }: CreateProjectCl
                 </div>
 
                 {showValuation && (
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Định giá / Khoảng giá hiển thị</label>
-                    <input
-                      type="text"
-                      value={valuationDisplay}
-                      onChange={(e) => setValuationDisplay(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm font-bold text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                    />
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Định giá / Khoảng giá hiển thị (VI)</label>
+                      <input
+                        type="text"
+                        value={valuationDisplay}
+                        onChange={(e) => setValuationDisplay(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm font-bold text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Định giá / Khoảng giá hiển thị (EN)</label>
+                      <input
+                        type="text"
+                        value={valuationDisplayEn}
+                        onChange={(e) => setValuationDisplayEn(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm font-bold text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                        placeholder="VD: 1,200 Billion VND"
+                      />
+                    </div>
                   </div>
                 )}
               </div>

@@ -1,0 +1,15 @@
+{
+  "navigation": {
+    "home": "Trang chủ",
+    "projects": "Danh mục",
+    "submit": "Ký gửi dự án",
+    "about": "Giới thiệu"
+  },
+  "footer": {
+    "description": "Nền tảng kết nối Độc quyền chuyển nhượng và hợp tác đầu tư phát triển dự án bất động sản uy tín hàng đầu tại Việt Nam.",
+    "quickLinks": "Liên kết nhanh",
+    "contact": "Liên hệ",
+    "address": "Tầng 12, Tòa nhà MNA, Quận 1, TP.HCM",
+    "rights": "Bản quyền thuộc về MNA International."
+  }
+}
