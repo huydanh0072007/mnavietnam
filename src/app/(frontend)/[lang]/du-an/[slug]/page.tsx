@@ -13,10 +13,7 @@ import enDict from '@/dictionaries/en.json';
 
 export const revalidate = 60; // revalidate every 60 seconds
 
-type PageParams = {
-  slug: string;
-  lang: string;
-};
+type PageParams = Promise<any>;
 
 export async function generateMetadata({ params }: { params: PageParams }): Promise<Metadata> {
   const { slug, lang } = await params;
@@ -109,9 +106,9 @@ export default async function ProjectDetailPage({ params }: { params: PageParams
       <div className="container mx-auto px-4">
         {/* Breadcrumb */}
         <div className="text-sm text-[#6B7280] mb-8">
-          <Link href={`/${lang}`} className="hover:text-[#1A1A2E]">{dict.nav.home}</Link>
+          <Link href={`/${lang}`} className="hover:text-[#1A1A2E]">{dict.navigation.home}</Link>
           <span className="mx-2">/</span> 
-          <Link href={`/${lang}/danh-muc`} className="hover:text-[#1A1A2E]">{dict.nav.projects}</Link>
+          <Link href={`/${lang}/danh-muc`} className="hover:text-[#1A1A2E]">{dict.navigation.projects}</Link>
           <span className="mx-2">/</span> 
           <span className="text-[#1A1A2E] font-medium">{project.project_code}</span>
         </div>

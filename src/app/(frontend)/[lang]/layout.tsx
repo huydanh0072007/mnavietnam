@@ -62,10 +62,9 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { lang: string };
+  params: Promise<any>;
 }>) {
-  // If using Next.js 15, params might be a Promise, but we'll try this first.
-  const lang = params?.lang || 'vi';
+  const { lang } = await params;
   const dict = await getDictionary(lang as Locale);
   
   return (

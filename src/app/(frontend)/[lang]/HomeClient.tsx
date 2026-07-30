@@ -16,7 +16,7 @@ import { InteractiveStars } from '@/components/animations/InteractiveStars';
 import { ShimmerLine } from '@/components/animations/ShimmerLine';
 import { GlowButton } from '@/components/animations/GlowButton';
 
-export default function HomeClient({ featuredProjects }: { featuredProjects: Project[] }) {
+export default function HomeClient({ featuredProjects, lang }: { featuredProjects: Project[], lang: string }) {
   const { settings, isLoading } = useSettings();
 
   // Split title if it contains line breaks (simulating <br/>)
