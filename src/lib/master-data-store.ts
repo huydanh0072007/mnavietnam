@@ -5,39 +5,39 @@ const supabaseAdmin = getSupabaseServerClient();
 // === HARDCODED MOCK DATA (used when Supabase is not configured) ===
 export const FALLBACK_MASTER_DATA = [
   // Loại giao dịch
-  { id: 'dt-1', category: 'deal_type', key: 'buyout', label: 'Chuyển nhượng', sort_order: 1, is_active: true },
-  { id: 'dt-2', category: 'deal_type', key: 'joint_venture', label: 'Hợp tác đầu tư', sort_order: 2, is_active: true },
+  { id: 'dt-1', category: 'deal_type', key: 'buyout', label: 'Chuyển nhượng', label_en: 'Buyout', sort_order: 1, is_active: true },
+  { id: 'dt-2', category: 'deal_type', key: 'joint_venture', label: 'Hợp tác đầu tư', label_en: 'Joint Venture', sort_order: 2, is_active: true },
 
   // Loại dự án
-  { id: 'pt-1', category: 'project_type', key: 'residential', label: 'Khu dân cư / Đô thị', sort_order: 1, is_active: true },
-  { id: 'pt-2', category: 'project_type', key: 'resort', label: 'Khu nghỉ dưỡng / Khách sạn', sort_order: 2, is_active: true },
-  { id: 'pt-3', category: 'project_type', key: 'commercial', label: 'Thương mại / Văn phòng', sort_order: 3, is_active: true },
-  { id: 'pt-4', category: 'project_type', key: 'urban_low_rise', label: 'Đô thị thấp tầng', sort_order: 4, is_active: true },
-  { id: 'pt-5', category: 'project_type', key: 'industrial', label: 'Khu công nghiệp / Cụm CN', sort_order: 5, is_active: true },
-  { id: 'pt-6', category: 'project_type', key: 'other', label: 'Khác', sort_order: 6, is_active: true },
+  { id: 'pt-1', category: 'project_type', key: 'residential', label: 'Khu dân cư / Đô thị', label_en: 'Residential / Urban', sort_order: 1, is_active: true },
+  { id: 'pt-2', category: 'project_type', key: 'resort', label: 'Khu nghỉ dưỡng / Khách sạn', label_en: 'Resort / Hotel', sort_order: 2, is_active: true },
+  { id: 'pt-3', category: 'project_type', key: 'commercial', label: 'Thương mại / Văn phòng', label_en: 'Commercial / Office', sort_order: 3, is_active: true },
+  { id: 'pt-4', category: 'project_type', key: 'urban_low_rise', label: 'Đô thị thấp tầng', label_en: 'Low-rise Urban', sort_order: 4, is_active: true },
+  { id: 'pt-5', category: 'project_type', key: 'industrial', label: 'Khu công nghiệp / Cụm CN', label_en: 'Industrial Park', sort_order: 5, is_active: true },
+  { id: 'pt-6', category: 'project_type', key: 'other', label: 'Khác', label_en: 'Other', sort_order: 6, is_active: true },
 
   // Lead Type
-  { id: 'lt-1', category: 'lead_type', key: 'interest', label: 'Quan tâm dự án', sort_order: 1, is_active: true },
-  { id: 'lt-2', category: 'lead_type', key: 'submission', label: 'Ký gửi dự án', sort_order: 2, is_active: true },
+  { id: 'lt-1', category: 'lead_type', key: 'interest', label: 'Quan tâm dự án', label_en: 'Project Interest', sort_order: 1, is_active: true },
+  { id: 'lt-2', category: 'lead_type', key: 'submission', label: 'Ký gửi dự án', label_en: 'Project Submission', sort_order: 2, is_active: true },
 
   // Investor Lead Status
-  { id: 'ils-1', category: 'investor_lead_status', key: 'new', label: 'Mới tiếp nhận', sort_order: 1, is_active: true },
-  { id: 'ils-2', category: 'investor_lead_status', key: 'contacted', label: 'Đã liên hệ', sort_order: 2, is_active: true },
-  { id: 'ils-3', category: 'investor_lead_status', key: 'nda_sent', label: 'Đã ký NDA', sort_order: 3, is_active: true },
-  { id: 'ils-4', category: 'investor_lead_status', key: 'due_diligence', label: 'Đang thẩm định', sort_order: 4, is_active: true },
-  { id: 'ils-5', category: 'investor_lead_status', key: 'closed_won', label: 'Giao dịch thành công', sort_order: 5, is_active: true },
-  { id: 'ils-6', category: 'investor_lead_status', key: 'closed_lost', label: 'Không thành công', sort_order: 6, is_active: true },
+  { id: 'ils-1', category: 'investor_lead_status', key: 'new', label: 'Mới tiếp nhận', label_en: 'New', sort_order: 1, is_active: true },
+  { id: 'ils-2', category: 'investor_lead_status', key: 'contacted', label: 'Đã liên hệ', label_en: 'Contacted', sort_order: 2, is_active: true },
+  { id: 'ils-3', category: 'investor_lead_status', key: 'nda_sent', label: 'Đã ký NDA', label_en: 'NDA Signed', sort_order: 3, is_active: true },
+  { id: 'ils-4', category: 'investor_lead_status', key: 'due_diligence', label: 'Đang thẩm định', label_en: 'Due Diligence', sort_order: 4, is_active: true },
+  { id: 'ils-5', category: 'investor_lead_status', key: 'closed_won', label: 'Giao dịch thành công', label_en: 'Closed Won', sort_order: 5, is_active: true },
+  { id: 'ils-6', category: 'investor_lead_status', key: 'closed_lost', label: 'Không thành công', label_en: 'Closed Lost', sort_order: 6, is_active: true },
 
   // Submission Lead Status
-  { id: 'sls-1', category: 'submission_lead_status', key: 'draft_pending', label: 'Chờ duyệt', sort_order: 1, is_active: true },
-  { id: 'sls-2', category: 'submission_lead_status', key: 'in_progress', label: 'Đang xử lý / Đánh giá', sort_order: 2, is_active: true },
-  { id: 'sls-3', category: 'submission_lead_status', key: 'published', label: 'Đã xuất bản (Live)', sort_order: 3, is_active: true },
-  { id: 'sls-4', category: 'submission_lead_status', key: 'rejected', label: 'Từ chối', sort_order: 4, is_active: true },
+  { id: 'sls-1', category: 'submission_lead_status', key: 'draft_pending', label: 'Chờ duyệt', label_en: 'Pending Review', sort_order: 1, is_active: true },
+  { id: 'sls-2', category: 'submission_lead_status', key: 'in_progress', label: 'Đang xử lý / Đánh giá', label_en: 'In Progress / Evaluating', sort_order: 2, is_active: true },
+  { id: 'sls-3', category: 'submission_lead_status', key: 'published', label: 'Đã xuất bản (Live)', label_en: 'Published (Live)', sort_order: 3, is_active: true },
+  { id: 'sls-4', category: 'submission_lead_status', key: 'rejected', label: 'Từ chối', label_en: 'Rejected', sort_order: 4, is_active: true },
   
   // Publish Status
-  { id: 'ps-1', category: 'publish_status', key: 'draft', label: 'Nháp', sort_order: 1, is_active: true },
-  { id: 'ps-2', category: 'publish_status', key: 'published', label: 'Đã xuất bản', sort_order: 2, is_active: true },
-  { id: 'ps-3', category: 'publish_status', key: 'hidden', label: 'Đã ẩn', sort_order: 3, is_active: true },
+  { id: 'ps-1', category: 'publish_status', key: 'draft', label: 'Nháp', label_en: 'Draft', sort_order: 1, is_active: true },
+  { id: 'ps-2', category: 'publish_status', key: 'published', label: 'Đã xuất bản', label_en: 'Published', sort_order: 2, is_active: true },
+  { id: 'ps-3', category: 'publish_status', key: 'hidden', label: 'Đã ẩn', label_en: 'Hidden', sort_order: 3, is_active: true },
 ];
 
 export const FALLBACK_PROVINCES = [
@@ -61,6 +61,7 @@ export interface MasterDataItem {
   category: string;
   key: string;
   label: string;
+  label_en?: string;
   sort_order: number;
   is_active: boolean;
 }
@@ -97,7 +98,15 @@ export async function getMasterData(category: string): Promise<MasterDataItem[]>
       console.error(`Error fetching master data for ${category}:`, error);
       return [];
     }
-    return data as MasterDataItem[];
+    
+    // Inject label_en from fallback if missing
+    return (data as MasterDataItem[]).map(item => {
+      if (!item.label_en) {
+        const fallback = FALLBACK_MASTER_DATA.find(f => f.key === item.key && f.category === item.category);
+        if (fallback) item.label_en = fallback.label_en;
+      }
+      return item;
+    });
   } catch (err) {
     console.error(`Exception fetching master data for ${category}:`, err);
     return [];
@@ -117,7 +126,15 @@ export async function getAllMasterData(): Promise<MasterDataItem[]> {
       console.error(`Error fetching all master data:`, error);
       return [];
     }
-    return data as MasterDataItem[];
+    
+    // Inject label_en from fallback if missing
+    return (data as MasterDataItem[]).map(item => {
+      if (!item.label_en) {
+        const fallback = FALLBACK_MASTER_DATA.find(f => f.key === item.key && f.category === item.category);
+        if (fallback) item.label_en = fallback.label_en;
+      }
+      return item;
+    });
   } catch (err) {
     console.error(`Exception fetching all master data:`, err);
     return [];

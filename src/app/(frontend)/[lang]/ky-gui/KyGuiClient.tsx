@@ -7,7 +7,7 @@ import { CheckCircle, Loader2 } from 'lucide-react';
 
 import { MasterDataItem } from '@/lib/master-data-store';
 
-export function KyGuiClient({ categories }: { categories: MasterDataItem[] }) {
+export function KyGuiClient({ categories, dict, lang }: { categories: MasterDataItem[], dict: any, lang?: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -43,10 +43,10 @@ export function KyGuiClient({ categories }: { categories: MasterDataItem[] }) {
       <section className="bg-[#0A1628] pt-40 pb-20 text-center">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-6">
-            Ký gửi / Hợp tác dự án
+            {dict.submit.title}
           </h1>
           <p className="text-[#E8E6E1] text-lg max-w-2xl mx-auto opacity-90">
-            Kết nối dự án của bạn với mạng lưới hơn 200 nhà đầu tư uy tín. Chúng tôi đảm bảo bảo mật thông tin tuyệt đối.
+            {dict.submit.desc}
           </p>
         </div>
       </section>
@@ -62,12 +62,12 @@ export function KyGuiClient({ categories }: { categories: MasterDataItem[] }) {
                   <div className="w-24 h-24 bg-[#1a2e4a] rounded-full flex items-center justify-center mb-6">
                     <CheckCircle className="w-12 h-12 text-emerald-400" />
                   </div>
-                  <h2 className="text-3xl font-serif font-bold text-white mb-4">Gửi thông tin thành công</h2>
+                  <h2 className="text-3xl font-serif font-bold text-white mb-4">{dict.submit.success_title}</h2>
                   <p className="text-gray-300 mb-8 max-w-md mx-auto">
-                    Cảm ơn bạn đã tin tưởng MNA International. Chuyên viên của chúng tôi sẽ liên hệ với bạn trong vòng 24h làm việc để trao đổi chi tiết.
+                    {dict.submit.success_desc}
                   </p>
                   <Button size="lg" onClick={() => setIsSuccess(false)}>
-                    Gửi dự án khác
+                    {dict.submit.success_btn}
                   </Button>
                 </div>
               )}
@@ -76,28 +76,28 @@ export function KyGuiClient({ categories }: { categories: MasterDataItem[] }) {
                 {/* Thông tin liên hệ */}
                 <div>
                   <h3 className="text-xl font-serif font-bold text-white border-b border-gray-800 pb-4 mb-6">
-                    1. Thông tin liên hệ
+                    1. {dict.submit.contact_info}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Họ và tên *</label>
-                      <input type="text" name="full_name" required className="w-full bg-[#0A1628] text-white placeholder:text-gray-500 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Nhập họ và tên" />
+                      <label className="block text-sm font-medium text-gray-300 mb-2">{dict.submit.form_name} *</label>
+                      <input type="text" name="full_name" required className="w-full bg-[#0A1628] text-white placeholder:text-gray-400 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder={dict.submit.form_name_placeholder} />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Chức vụ</label>
-                      <input type="text" name="role_title" className="w-full bg-[#0A1628] text-white placeholder:text-gray-500 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="VD: Giám đốc đầu tư" />
+                      <label className="block text-sm font-medium text-gray-300 mb-2">{dict.submit.form_role}</label>
+                      <input type="text" name="role_title" className="w-full bg-[#0A1628] text-white placeholder:text-gray-400 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder={dict.submit.form_role_placeholder} />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Đơn vị / Công ty *</label>
-                      <input type="text" name="organization" required className="w-full bg-[#0A1628] text-white placeholder:text-gray-500 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Tên công ty" />
+                      <label className="block text-sm font-medium text-gray-300 mb-2">{dict.submit.form_company} *</label>
+                      <input type="text" name="organization" required className="w-full bg-[#0A1628] text-white placeholder:text-gray-400 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder={dict.submit.form_company_placeholder} />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Số điện thoại *</label>
-                      <input type="tel" name="phone" required className="w-full bg-[#0A1628] text-white placeholder:text-gray-500 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Số điện thoại liên hệ" />
+                      <label className="block text-sm font-medium text-gray-300 mb-2">{dict.submit.form_phone} *</label>
+                      <input type="tel" name="phone" required className="w-full bg-[#0A1628] text-white placeholder:text-gray-400 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder={dict.submit.form_phone_placeholder} />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Email *</label>
-                      <input type="email" name="email" required className="w-full bg-[#0A1628] text-white placeholder:text-gray-500 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Địa chỉ email" />
+                      <label className="block text-sm font-medium text-gray-300 mb-2">{dict.submit.form_email} *</label>
+                      <input type="email" name="email" required className="w-full bg-[#0A1628] text-white placeholder:text-gray-400 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder={dict.submit.form_email_placeholder} />
                     </div>
                   </div>
                 </div>
@@ -105,37 +105,37 @@ export function KyGuiClient({ categories }: { categories: MasterDataItem[] }) {
                 {/* Thông tin dự án */}
                 <div>
                   <h3 className="text-xl font-serif font-bold text-white border-b border-gray-800 pb-4 mb-6">
-                    2. Sơ bộ về dự án
+                    2. {dict.submit.project_info}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Tên / Vị trí dự án *</label>
-                      <input type="text" name="project_name_location" required className="w-full bg-[#0A1628] text-white placeholder:text-gray-500 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="VD: Khu dân cư tại Quận 2, TP.HCM" />
+                      <label className="block text-sm font-medium text-gray-300 mb-2">{dict.submit.form_project_name}</label>
+                      <input type="text" name="project_name_location" required className="w-full bg-[#0A1628] text-white placeholder:text-gray-400 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder={dict.submit.form_project_name_placeholder} />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Hình thức giao dịch mong muốn</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">{dict.submit.form_deal_type}</label>
                       <select name="preferred_deal_type" className="w-full bg-[#0A1628] text-white border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]">
-                        <option value="">Chọn hình thức...</option>
+                        <option value="" className="bg-[#0A1628] text-white">{dict.submit.form_deal_type_select}</option>
                         {categories.filter(c => c.category === 'deal_type').map(c => (
-                          <option key={c.key} value={c.key}>{c.label}</option>
+                          <option key={c.key} value={c.key} className="bg-[#0A1628] text-white">{(lang === 'en' && c.label_en) ? c.label_en : c.label}</option>
                         ))}
-                        <option value="other">Chưa xác định / Khác</option>
+                        <option value="other" className="bg-[#0A1628] text-white">{dict.submit.form_deal_type_other}</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Quy mô ước tính</label>
-                      <input type="text" name="estimated_scale" className="w-full bg-[#0A1628] text-white placeholder:text-gray-500 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="VD: 5ha, 1000 tỷ VNĐ" />
+                      <label className="block text-sm font-medium text-gray-300 mb-2">{dict.submit.form_scale}</label>
+                      <input type="text" name="estimated_scale" className="w-full bg-[#0A1628] text-white placeholder:text-gray-400 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder={dict.submit.form_scale_placeholder} />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Mô tả thêm / Yêu cầu đặc biệt</label>
-                      <textarea name="message" rows={4} className="w-full bg-[#0A1628] text-white placeholder:text-gray-500 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder="Chia sẻ thêm về hiện trạng pháp lý, tiến độ, hoặc các yêu cầu bảo mật..."></textarea>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">{dict.submit.form_message}</label>
+                      <textarea name="message" rows={4} className="w-full bg-[#0A1628] text-white placeholder:text-gray-400 border border-gray-700 rounded-md p-3 focus:ring-[#C4A35A] focus:border-[#C4A35A]" placeholder={dict.submit.form_message_placeholder}></textarea>
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Tài liệu đính kèm (Teaser/Profile nếu có)</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">{dict.submit.form_attachment}</label>
                       <input type="file" name="attachment" className="w-full bg-[#0A1628] text-white border border-gray-700 rounded-md p-2 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#C4A35A] file:text-[#0A1628] hover:file:bg-[#a38541] cursor-pointer" />
                       {/* Hidden field to explicitly state lead_type if not using multipart check */}
                       <input type="hidden" name="lead_type" value="submission" />
-                      <p className="text-xs text-gray-400 mt-2">Định dạng hỗ trợ: PDF, DOCX, PPTX (Tối đa 10MB)</p>
+                      <p className="text-xs text-gray-400 mt-2">{dict.submit.form_attachment_desc}</p>
                     </div>
                   </div>
                 </div>
@@ -145,16 +145,16 @@ export function KyGuiClient({ categories }: { categories: MasterDataItem[] }) {
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">
                         <Loader2 className="w-5 h-5 animate-spin" />
-                        Đang xử lý hồ sơ...
+                        {dict.submit.form_submitting}
                       </span>
                     ) : (
-                      'Gửi thông tin dự án'
+                      dict.submit.form_submit_btn
                     )}
                   </Button>
                   <div className="flex items-start gap-3 mt-6">
                     <input type="checkbox" required id="consent" className="mt-1 w-4 h-4 text-[#C4A35A] bg-[#0A1628] border-gray-700 rounded focus:ring-[#C4A35A]" />
                     <label htmlFor="consent" className="text-sm text-gray-300">
-                      Tôi đồng ý với <Link href="/dieu-khoan-su-dung" className="text-[#C4A35A] hover:underline">Điều khoản sử dụng</Link> và <Link href="/chinh-sach-bao-mat" className="text-[#C4A35A] hover:underline">Chính sách Bảo vệ Dữ liệu Cá nhân theo Luật số 91/2025/QH15</Link>. Chúng tôi cam kết bảo mật tuyệt đối thông tin dự án.
+                      {dict.submit.form_consent} <Link href={`/${lang}/dieu-khoan-su-dung`} className="text-[#C4A35A] hover:underline">{dict.submit.form_consent_terms}</Link> {dict.submit.form_consent_and} <Link href={`/${lang}/chinh-sach-bao-mat`} className="text-[#C4A35A] hover:underline">{dict.submit.form_consent_privacy}</Link>{dict.submit.form_consent_commit}
                     </label>
                   </div>
                 </div>

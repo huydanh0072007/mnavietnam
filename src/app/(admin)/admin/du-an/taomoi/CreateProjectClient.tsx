@@ -278,6 +278,29 @@ function CreateProjectForm({ categories, provinces, districts }: CreateProjectCl
                   </div>
                 </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Nhãn Trạng thái (VI)</label>
+                    <input
+                      type="text"
+                      placeholder="VD: Sẵn Sàng Giao Dịch"
+                      value={statusLabel}
+                      onChange={(e) => setStatusLabel(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Nhãn Trạng thái (EN)</label>
+                    <input
+                      type="text"
+                      placeholder="VD: Ready for Transaction"
+                      value={statusLabelEn}
+                      onChange={(e) => setStatusLabelEn(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                    />
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Loại hình BĐS</label>

@@ -11,7 +11,13 @@ export const metadata: Metadata = {
   description: 'Khám phá danh mục các cơ hội đầu tư, chuyển nhượng 100% hoặc hợp tác đầu tư phát triển dự án bất động sản cao cấp được thẩm định pháp lý và quy hoạch bởi chuyên gia M$A International.',
 };
 
-export default async function DanhMucPage() {
+import { getDictionary } from '@/lib/get-dictionary';
+
+export default async function DanhMucPage({ params }: { params: Promise<any> }) {
+  const resolvedParams = await params;
+  const lang = resolvedParams.lang;
+  const dict = await getDictionary(lang as any);
+  
   const [allProjects, categoriesData, provincesData] = await Promise.all([
     getProjects(),
     getAllMasterData(),
@@ -25,6 +31,8 @@ export default async function DanhMucPage() {
         initialProjects={publishedProjects} 
         categories={categoriesData} 
         provinces={provincesData} 
+        dict={dict}
+        lang={lang as string}
       />
     </Suspense>
   );

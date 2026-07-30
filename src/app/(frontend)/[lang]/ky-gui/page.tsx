@@ -13,7 +13,13 @@ export const metadata: Metadata = {
   }
 };
 
-export default async function KyGuiPage() {
+import { getDictionary } from '@/lib/get-dictionary';
+
+export default async function KyGuiPage({ params }: { params: Promise<any> }) {
+  const resolvedParams = await params;
+  const lang = resolvedParams.lang;
+  const dict = await getDictionary(lang as any);
+  
   const categoriesData = await getAllMasterData();
-  return <KyGuiClient categories={categoriesData} />;
+  return <KyGuiClient categories={categoriesData} dict={dict} lang={lang as string} />;
 }

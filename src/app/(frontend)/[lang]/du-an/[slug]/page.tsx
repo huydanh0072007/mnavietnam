@@ -10,6 +10,7 @@ import { DonutChart, DonutSegment } from '@/components/ui/DonutChart';
 import { DataRoomUnlock } from '@/components/ui/DataRoomUnlock';
 import viDict from '@/dictionaries/vi.json';
 import enDict from '@/dictionaries/en.json';
+import { getDictionary } from '@/lib/get-dictionary';
 
 export const revalidate = 60; // revalidate every 60 seconds
 
@@ -66,7 +67,7 @@ export async function generateMetadata({ params }: { params: PageParams }): Prom
 export default async function ProjectDetailPage({ params }: { params: PageParams }) {
   const { slug, lang } = await params;
   const project = await getProjectBySlug(slug);
-  const dict = lang === 'en' ? enDict : viDict;
+  const dict = await getDictionary(lang as any);
   const isEn = lang === 'en';
   
   if (!project || project.publish_status !== 'published') {
@@ -146,7 +147,7 @@ export default async function ProjectDetailPage({ params }: { params: PageParams
             {/* Description */}
             <section className="bg-white p-8 rounded-lg shadow-sm">
               <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-4">
-                {isEn ? 'Project Overview' : 'Tổng quan dự án'}
+                {dict.project_detail.specs}
               </h2>
               <div className="prose max-w-none text-gray-700">
                 <p>{pDesc}</p>
@@ -156,7 +157,7 @@ export default async function ProjectDetailPage({ params }: { params: PageParams
             {/* Highlights */}
             <section className="bg-white p-8 rounded-lg shadow-sm">
               <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-4">
-                {isEn ? 'Investment Highlights' : 'Điểm nhấn đầu tư'}
+                {dict.project_detail.highlights}
               </h2>
               <ul className="space-y-4">
                 {pHighlights.map((highlight, idx) => (
@@ -171,7 +172,7 @@ export default async function ProjectDetailPage({ params }: { params: PageParams
             {/* Capital Structure Chart */}
             <section className="bg-white p-8 rounded-lg shadow-sm overflow-hidden">
               <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-8 text-center">
-                {isEn ? 'Capital & Deal Structure' : 'Cơ cấu Vốn & Giao dịch'}
+                {dict.project_detail.deal_type} & {dict.project_detail.scale}
               </h2>
               <div className="bg-[#0A1628] rounded-xl py-12 px-4 shadow-inner">
                 <DonutChart 
@@ -199,34 +200,34 @@ export default async function ProjectDetailPage({ params }: { params: PageParams
               {/* Specs Table */}
               <div className="space-y-4 mb-8">
                 <div className="flex justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">{isEn ? 'Location' : 'Vị trí'}</span>
+                  <span className="text-gray-500">{dict.project_detail.location}</span>
                   <span className="font-medium text-right text-[#1A1A2E]">{project.district}, {project.province}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">{isEn ? 'Scale' : 'Quy mô'}</span>
+                  <span className="text-gray-500">{dict.project_detail.scale}</span>
                   <span className="font-medium text-right text-[#1A1A2E]">{pScale}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">{isEn ? 'Legal Status' : 'Pháp lý'}</span>
+                  <span className="text-gray-500">{dict.project_detail.legal_status}</span>
                   <span className="font-medium text-right text-[#1A1A2E]">{pLegal}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">{isEn ? 'Current Status' : 'Hiện trạng'}</span>
+                  <span className="text-gray-500">{dict.project_detail.current_status}</span>
                   <span className="font-medium text-right text-[#1A1A2E]">{pCurrent}</span>
                 </div>
                 {project.show_valuation && (
                   <div className="flex justify-between py-3 border-b border-gray-100">
-                    <span className="text-gray-500">{isEn ? 'Valuation / Total Inv.' : 'Định giá / Tổng mức ĐT'}</span>
+                    <span className="text-gray-500">{dict.project_detail.valuation}</span>
                     <span className="font-medium text-right text-[#1A1A2E]">{pValuation}</span>
                   </div>
                 )}
                 <div className="flex justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">{isEn ? 'Deal Structure' : 'Cấu trúc giao dịch'}</span>
+                  <span className="text-gray-500">{dict.project_detail.deal_type}</span>
                   <span className="font-medium text-right text-[#1A1A2E]">{pCapital}</span>
                 </div>
               </div>
               <div className="mt-8">
-                <DataRoomUnlock projectTitle={pTitle} />
+                <DataRoomUnlock projectTitle={pTitle} dict={dict} lang={lang} />
               </div>
             </div>
           </div>
@@ -236,7 +237,7 @@ export default async function ProjectDetailPage({ params }: { params: PageParams
         {relatedProjects.length > 0 && (
           <div className="mt-24 pt-12 border-t border-gray-200">
             <h2 className="text-3xl font-serif font-bold text-[#1A1A2E] mb-8">
-              {isEn ? 'Similar Projects' : 'Dự án tương tự'}
+              {dict.project_detail.related}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {relatedProjects.map(p => (

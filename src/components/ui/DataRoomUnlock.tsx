@@ -7,7 +7,7 @@ import { Lock, FileText, CheckCircle2, ShieldCheck, Download, Mail, PenTool } fr
 
 type Step = 'locked' | 'identity' | 'otp' | 'signing' | 'unlocked';
 
-export const DataRoomUnlock = ({ projectTitle }: { projectTitle: string }) => {
+export const DataRoomUnlock = ({ projectTitle, dict, lang }: { projectTitle: string, dict?: any, lang?: string }) => {
   const [step, setStep] = useState<Step>('locked');
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({ name: '', org: '', email: '', cccd: '' });

@@ -16,9 +16,11 @@ interface DanhMucContentProps {
   initialProjects: Project[];
   categories: MasterDataItem[];
   provinces: MdProvince[];
+  dict: any;
+  lang?: string;
 }
 
-export function DanhMucContent({ initialProjects, categories, provinces }: DanhMucContentProps) {
+export function DanhMucContent({ initialProjects, categories, provinces, dict, lang }: DanhMucContentProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   
@@ -70,11 +72,11 @@ export function DanhMucContent({ initialProjects, categories, provinces }: DanhM
         {/* Page Header */}
         <div className="mb-12">
           <div className="text-sm text-[#6B7280] mb-4">
-            Trang chủ <span className="mx-2">/</span> <span className="text-[#1A1A2E] font-medium">Danh mục dự án</span>
+            {dict.navigation.home} <span className="mx-2">/</span> <span className="text-[#1A1A2E] font-medium">{dict.navigation.projects}</span>
           </div>
-          <h1 className="text-4xl font-serif font-bold text-[#1A1A2E] mb-4">Danh mục Dự án M&A</h1>
+          <h1 className="text-4xl font-serif font-bold text-[#1A1A2E] mb-4">{dict.projects.title}</h1>
           <p className="text-[#6B7280] max-w-2xl">
-            Khám phá các cơ hội đầu tư hấp dẫn được chúng tôi thẩm định và tuyển chọn kỹ lưỡng.
+            {dict.projects.description}
           </p>
         </div>
 
@@ -87,19 +89,19 @@ export function DanhMucContent({ initialProjects, categories, provinces }: DanhM
                 className={`px-6 py-2 text-sm font-medium rounded-sm transition-colors ${dealTypeFilter === 'all' ? 'bg-white shadow-sm text-[#1A1A2E]' : 'text-gray-500 hover:text-[#1A1A2E]'}`}
                 onClick={() => updateFilter('type', 'all')}
               >
-                Tất cả
+                {dict.projects.filter_all}
               </button>
               <button
                 className={`px-6 py-2 text-sm font-medium rounded-sm transition-colors ${dealTypeFilter === 'buyout' ? 'bg-[#DC2626] text-white shadow-sm' : 'text-gray-500 hover:text-[#1A1A2E]'}`}
                 onClick={() => updateFilter('type', 'buyout')}
               >
-                Chuyển nhượng
+                {dict.projects.filter_buyout}
               </button>
               <button
                 className={`px-6 py-2 text-sm font-medium rounded-sm transition-colors ${dealTypeFilter === 'joint_venture' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-500 hover:text-[#1A1A2E]'}`}
                 onClick={() => updateFilter('type', 'joint_venture')}
               >
-                Hợp tác đầu tư
+                {dict.projects.filter_jv}
               </button>
             </div>
 
@@ -109,9 +111,9 @@ export function DanhMucContent({ initialProjects, categories, provinces }: DanhM
                 value={projectTypeFilter}
                 onChange={(e) => updateFilter('category', e.target.value)}
               >
-                <option value="all">Loại bất động sản</option>
+                <option value="all">{dict.projects.filter_type}</option>
                 {categories.filter(c => c.category === 'project_type').map(c => (
-                  <option key={c.key} value={c.key}>{c.label}</option>
+                  <option key={c.key} value={c.key}>{(lang === 'en' && c.label_en) ? c.label_en : c.label}</option>
                 ))}
               </select>
 
@@ -120,7 +122,7 @@ export function DanhMucContent({ initialProjects, categories, provinces }: DanhM
                 value={provinceFilter}
                 onChange={(e) => updateFilter('province', e.target.value)}
               >
-                <option value="all">Tỉnh thành</option>
+                <option value="all">{dict.projects.filter_province}</option>
                 {activeProvinces.map(prov => (
                   <option key={prov.code} value={prov.name}>{prov.name}</option>
                 ))}
@@ -128,7 +130,7 @@ export function DanhMucContent({ initialProjects, categories, provinces }: DanhM
 
               <input 
                 type="text" 
-                placeholder="Tìm kiếm dự án..." 
+                placeholder={dict.projects.search_placeholder} 
                 className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-md focus:ring-[#C4A35A] focus:border-[#C4A35A] block p-2.5"
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
@@ -139,14 +141,14 @@ export function DanhMucContent({ initialProjects, categories, provinces }: DanhM
 
         {/* Results Info */}
         <div className="mb-6 text-[#6B7280]">
-          Hiển thị <strong>{filteredProjects.length}</strong> dự án phù hợp
+          {dict.projects.showing} <strong>{filteredProjects.length}</strong> {dict.projects.matching}
         </div>
 
         {/* Projects Grid */}
         {filteredProjects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProjects.map(project => (
-              <ProjectCard key={project.id} project={project} />
+              <ProjectCard key={project.id} project={project} lang={lang} />
             ))}
           </div>
         ) : (
@@ -154,8 +156,8 @@ export function DanhMucContent({ initialProjects, categories, provinces }: DanhM
             <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
               <SearchX className="w-10 h-10 text-gray-400" />
             </div>
-            <h3 className="text-xl font-medium text-[#1A1A2E] mb-3">Không tìm thấy dự án phù hợp</h3>
-            <p className="text-gray-500 max-w-md text-center">Chúng tôi hiện không có dự án nào khớp với tiêu chí tìm kiếm của bạn. Hãy thử thay đổi bộ lọc hoặc từ khóa.</p>
+            <h3 className="text-xl font-medium text-[#1A1A2E] mb-3">{dict.projects.not_found_title}</h3>
+            <p className="text-gray-500 max-w-md text-center">{dict.projects.not_found_desc}</p>
             <button 
               className="mt-8 px-6 py-2.5 bg-[#1A1A2E] text-white text-sm font-medium rounded-lg hover:bg-[#C4A35A] transition-colors shadow-md"
               onClick={() => {
@@ -163,7 +165,7 @@ export function DanhMucContent({ initialProjects, categories, provinces }: DanhM
                 router.replace('?', { scroll: false });
               }}
             >
-              Xóa tất cả bộ lọc
+              {dict.projects.clear_filters}
             </button>
           </div>
         )}
