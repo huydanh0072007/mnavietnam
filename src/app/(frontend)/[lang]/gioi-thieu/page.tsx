@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   }
 };
 
-export default function GioiThieuPage() {
-  return <GioiThieuClient />;
+import { getDictionary } from '@/lib/get-dictionary';
+import { Locale } from '@/i18n-config';
+
+export default async function GioiThieuPage({ params }: { params: Promise<any> }) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang as Locale);
+  return <GioiThieuClient lang={lang} dict={dict} />;
 }

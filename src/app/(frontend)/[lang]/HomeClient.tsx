@@ -18,9 +18,13 @@ import { GlowButton } from '@/components/animations/GlowButton';
 
 export default function HomeClient({ featuredProjects, lang, dict }: { featuredProjects: Project[], lang: string, dict: any }) {
   const { settings, isLoading } = useSettings();
+  const isEn = lang === 'en';
+
+  const heroTitle = isEn && dict.home.hero_title ? dict.home.hero_title : settings.hero_title;
+  const heroSubtitle = isEn && dict.home.hero_subtitle ? dict.home.hero_subtitle : settings.hero_subtitle;
 
   // Split title if it contains line breaks (simulating <br/>)
-  const titleParts = settings.hero_title.split('<br/>');
+  const titleParts = heroTitle ? heroTitle.split('<br/>') : [];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -54,7 +58,7 @@ export default function HomeClient({ featuredProjects, lang, dict }: { featuredP
                   <span className="text-[#C4A35A]">{titleParts[1]}</span>
                 </>
               ) : (
-                <>{settings.hero_title}</>
+                <>{heroTitle}</>
               )}
             </h1>
           </ScrollReveal>
@@ -68,7 +72,7 @@ export default function HomeClient({ featuredProjects, lang, dict }: { featuredP
                   <div className="h-4 bg-white/10 animate-pulse rounded w-5/6 mx-auto"></div>
                 </div>
               ) : (
-                <p>{settings.hero_subtitle}</p>
+                <p>{heroSubtitle}</p>
               )}
             </div>
           </ScrollReveal>

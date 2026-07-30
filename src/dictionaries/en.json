@@ -6,6 +6,8 @@
     "about": "About Us"
   },
   "home": {
+    "hero_title": "LEADING REAL ESTATE M&A<br/>PORTAL IN VIETNAM",
+    "hero_subtitle": "An exclusive connection platform between reputable Developers and International Investor Networks.",
     "network": "Real Estate M&A Network",
     "explore_btn": "Explore Portfolio",
     "submit_btn": "Submit Project",
@@ -106,19 +108,26 @@
     "contact_office": "Office"
   },
   "about": {
-    "hero_title": "Accompanying Prosperity",
-    "hero_desc": "MNA International is a leading real estate M&A consulting and networking firm, offering strategic investment opportunities with transparent legal status and sustainable profitability.",
+    "hero_title": "About M$AVietnam",
+    "hero_desc": "A reliable bridge between real estate developers and domestic as well as international investor networks.",
+    "vision_title": "Vision & Mission",
+    "vision_desc_1": "Founded with the goal of transparent and professionalizing the real estate M&A market in Vietnam, M$AVietnam is proud to be a pioneer platform connecting high-quality investment opportunities.",
+    "vision_desc_2": "We understand that every real estate M&A deal requires a deep understanding of the market, legal, and financial aspects. With a team of experienced experts, we are not only a connector but also a reliable consultant throughout the transaction process.",
     "core_values": "Core Values",
-    "value_1_title": "Exclusive",
-    "value_1_desc": "We provide access to high-quality off-market projects that are not publicly available on the market.",
-    "value_2_title": "Transparent",
-    "value_2_desc": "All project information is thoroughly evaluated regarding legal, financial, and development potential.",
-    "value_3_title": "Professional",
-    "value_3_desc": "An experienced team of experts in the fields of investment, finance, and real estate law.",
+    "value_1_title": "Transparency",
+    "value_1_desc": "All project information is preliminarily evaluated, ensuring authenticity and clear legal status before being introduced to investors.",
+    "value_2_title": "Confidentiality",
+    "value_2_desc": "We strictly adhere to the NDA process, ensuring that transaction information and client identity are kept strictly confidential.",
+    "value_3_title": "Efficiency",
+    "value_3_desc": "Shorten the time to find partners and negotiate through a deep connection network and professional workflow.",
     "team": "Our Expert Team",
     "team_desc": "The leading experts behind the success of real estate M&A deals.",
     "partner_title": "Become a Strategic Partner",
     "partner_desc": "Discover large-scale real estate investment and distribution cooperation opportunities with MNA International.",
-    "partner_btn": "Contact for Partnership"
+    "partner_btn": "Contact for Partnership",
+    "stat_years": "Years of experience",
+    "stat_partners": "Investment partners",
+    "stat_value": "Transaction value",
+    "stat_security": "Information security"
   }
 }

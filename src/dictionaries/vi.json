@@ -6,8 +6,10 @@
     "about": "Giới thiệu"
   },
   "home": {
-    "network": "Mạng lưới M&A Bất động sản",
-    "explore_btn": "Khám phá Danh mục Đầu tư",
+    "hero_title": "CỔNG THÔNG TIN DỰ ÁN M&A<br/>HÀNG ĐẦU VIỆT NAM",
+    "hero_subtitle": "Nền tảng kết nối Độc quyền giữa các Chủ đầu tư uy tín và Mạng lưới Nhà đầu tư Quốc tế.",
+    "network": "Mạng Lưới M&A Bất Động Sản",
+    "explore_btn": "Khám phá Danh mục",
     "submit_btn": "Ký gửi Dự án",
     "stats_projects": "Dự án đã xử lý",
     "stats_value": "Tỷ VNĐ Giao dịch",
@@ -106,19 +108,26 @@
     "contact_office": "Văn phòng"
   },
   "about": {
-    "hero_title": "Đồng Hành Cùng Sự Thịnh Vượng",
-    "hero_desc": "MNA International là đơn vị tư vấn và kết nối M&A bất động sản hàng đầu, mang đến các cơ hội đầu tư chiến lược với tính pháp lý minh bạch và giá trị sinh lời bền vững.",
+    "hero_title": "Về M$AVietnam",
+    "hero_desc": "Cầu nối tin cậy giữa các nhà phát triển bất động sản và mạng lưới nhà đầu tư trong nước cũng như quốc tế.",
+    "vision_title": "Tầm nhìn & Sứ mệnh",
+    "vision_desc_1": "Được thành lập với mục tiêu minh bạch hóa và chuyên nghiệp hóa thị trường mua bán, sáp nhập dự án bất động sản tại Việt Nam, M$AVietnam tự hào là nền tảng tiên phong kết nối các cơ hội đầu tư chất lượng cao.",
+    "vision_desc_2": "Chúng tôi hiểu rằng mỗi thương vụ M&A bất động sản đều đòi hỏi sự am hiểu sâu sắc về thị trường, pháp lý và tài chính. Với đội ngũ chuyên gia giàu kinh nghiệm, chúng tôi không chỉ là người kết nối mà còn là nhà tư vấn đáng tin cậy xuyên suốt quá trình giao dịch.",
     "core_values": "Giá trị cốt lõi",
-    "value_1_title": "Độc quyền",
-    "value_1_desc": "Chúng tôi cung cấp quyền truy cập vào các dự án off-market chất lượng cao, không công bố rộng rãi trên thị trường.",
-    "value_2_title": "Minh bạch",
-    "value_2_desc": "Mọi thông tin dự án đều được thẩm định kỹ lưỡng về pháp lý, tài chính và tiềm năng phát triển.",
-    "value_3_title": "Chuyên nghiệp",
-    "value_3_desc": "Đội ngũ chuyên gia giàu kinh nghiệm trong lĩnh vực đầu tư, tài chính và luật bất động sản.",
+    "value_1_title": "Minh bạch",
+    "value_1_desc": "Mọi thông tin dự án đều được thẩm định sơ bộ, đảm bảo tính xác thực và pháp lý rõ ràng trước khi giới thiệu đến nhà đầu tư.",
+    "value_2_title": "Bảo mật",
+    "value_2_desc": "Chúng tôi tuân thủ nghiêm ngặt quy trình NDA, đảm bảo thông tin thương vụ và danh tính khách hàng được giữ kín tuyệt đối.",
+    "value_3_title": "Hiệu quả",
+    "value_3_desc": "Rút ngắn thời gian tìm kiếm đối tác và đàm phán thông qua mạng lưới kết nối sâu rộng và quy trình làm việc chuyên nghiệp.",
     "team": "Đội ngũ chuyên gia",
     "team_desc": "Những chuyên gia hàng đầu đứng sau sự thành công của các thương vụ M&A bất động sản.",
-    "partner_title": "Trở thành đối tác chiến lược",
-    "partner_desc": "Khám phá các cơ hội hợp tác đầu tư và phân phối các dự án bất động sản quy mô lớn cùng MNA International.",
-    "partner_btn": "Liên hệ hợp tác"
+    "partner_title": "Trở thành Đối tác Chiến lược",
+    "partner_desc": "Khám phá cơ hội hợp tác đầu tư và phân phối các dự án bất động sản quy mô lớn cùng MNA International.",
+    "partner_btn": "Liên hệ Hợp tác",
+    "stat_years": "Năm kinh nghiệm",
+    "stat_partners": "Đối tác đầu tư",
+    "stat_value": "Giá trị giao dịch",
+    "stat_security": "Bảo mật thông tin"
   }
 }
