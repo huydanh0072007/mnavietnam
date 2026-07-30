@@ -27,7 +27,7 @@ export function AppShell({
     <SettingsProvider>
       {lang && dict && <Header lang={lang} dict={dict} />}
       <main className="flex-grow">{children}</main>
-      <Footer />
+      <Footer lang={lang} dict={dict} />
     </SettingsProvider>
   );
 }

@@ -28,7 +28,7 @@ export const Footer = ({ lang = 'vi', dict }: { lang?: string; dict?: any }) => 
             <p className="text-[#6B7280] text-sm leading-relaxed mb-6">
               {dict.footer.description}
               <br/><br/>
-              <strong className="text-[#C4A35A] font-serif font-medium tracking-wide">Tư vấn Chuyên nghiệp — Đối tác Độc quyền</strong>
+              <strong className="text-[#C4A35A] font-serif font-medium tracking-wide">{dict.footer.slogan}</strong>
             </p>
           </div>
 
@@ -44,12 +44,12 @@ export const Footer = ({ lang = 'vi', dict }: { lang?: string; dict?: any }) => 
 
           {/* Col 3 */}
           <div>
-            <h4 className="text-white font-serif font-bold mb-6 uppercase tracking-wider text-sm">Dịch vụ</h4>
+            <h4 className="text-white font-serif font-bold mb-6 uppercase tracking-wider text-sm">{dict.footer.services}</h4>
             <ul className="space-y-3 text-sm text-[#6B7280]">
-              <li><Link href={`/${lang}/danh-muc?deal_type=buyout`} className="hover:text-[#C4A35A] transition-colors">Chuyển nhượng dự án (M&A)</Link></li>
-              <li><Link href={`/${lang}/danh-muc?deal_type=joint_venture`} className="hover:text-[#C4A35A] transition-colors">Hợp tác đầu tư (JV)</Link></li>
-              <li><a href="#" className="hover:text-[#C4A35A] transition-colors">Thẩm định dự án</a></li>
-              <li><a href="#" className="hover:text-[#C4A35A] transition-colors">Tư vấn pháp lý M&A</a></li>
+              <li><Link href={`/${lang}/danh-muc?deal_type=buyout`} className="hover:text-[#C4A35A] transition-colors">{dict.footer.service_buyout}</Link></li>
+              <li><Link href={`/${lang}/danh-muc?deal_type=joint_venture`} className="hover:text-[#C4A35A] transition-colors">{dict.footer.service_jv}</Link></li>
+              <li><a href="#" className="hover:text-[#C4A35A] transition-colors">{dict.footer.service_eval}</a></li>
+              <li><a href="#" className="hover:text-[#C4A35A] transition-colors">{dict.footer.service_legal}</a></li>
             </ul>
           </div>
 
@@ -101,8 +101,8 @@ export const Footer = ({ lang = 'vi', dict }: { lang?: string; dict?: any }) => 
         <div className="pt-8 border-t border-[#1e2f47] flex flex-col md:flex-row justify-between items-center text-xs text-[#6B7280]">
           <p>&copy; {new Date().getFullYear()} M$AVietnam.com. {dict.footer.rights}</p>
           <div className="flex gap-4 mt-4 md:mt-0">
-            <Link href={`/${lang}/dieu-khoan-su-dung`} className="hover:text-white transition-colors">Điều khoản sử dụng</Link>
-            <Link href={`/${lang}/chinh-sach-bao-mat`} className="hover:text-white transition-colors">Chính sách bảo mật</Link>
+            <Link href={`/${lang}/dieu-khoan-su-dung`} className="hover:text-white transition-colors">{dict.footer.terms}</Link>
+            <Link href={`/${lang}/chinh-sach-bao-mat`} className="hover:text-white transition-colors">{dict.footer.privacy}</Link>
           </div>
         </div>
       </div>

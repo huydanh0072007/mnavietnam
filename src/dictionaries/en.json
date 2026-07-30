@@ -5,11 +5,34 @@
     "submit": "Submit Project",
     "about": "About Us"
   },
+  "home": {
+    "network": "Real Estate M&A Network",
+    "explore_btn": "Explore Portfolio",
+    "submit_btn": "Submit Project",
+    "stats_projects": "Projects Handled",
+    "stats_value": "Billion VND Transacted",
+    "stats_investors": "Partner Investors",
+    "stats_provinces": "Provinces Covered",
+    "opportunities": "Investment Opportunities",
+    "featured_deals": "Featured Deals",
+    "view_all_deals": "View All Projects",
+    "cta_title": "Own a project and looking for partners?",
+    "cta_desc": "We have a network of over 200 reputable institutional and individual investors ready to participate in buying, selling, or co-investing in potential projects.",
+    "cta_btn": "Submit Project Now"
+  },
   "footer": {
     "description": "The premier platform for exclusive real estate project transfers and co-investment in Vietnam.",
+    "slogan": "Professional Consulting — Exclusive Partnerships",
     "quickLinks": "Quick Links",
+    "services": "Services",
+    "service_buyout": "Project Transfer (M&A)",
+    "service_jv": "Joint Venture (JV)",
+    "service_eval": "Project Appraisal",
+    "service_legal": "M&A Legal Consulting",
     "contact": "Contact Us",
     "address": "12th Floor, MNA Building, District 1, HCMC",
-    "rights": "All rights reserved by MNA International."
+    "rights": "All rights reserved by MNA International.",
+    "terms": "Terms of Use",
+    "privacy": "Privacy Policy"
   }
 }

@@ -16,7 +16,7 @@ import { InteractiveStars } from '@/components/animations/InteractiveStars';
 import { ShimmerLine } from '@/components/animations/ShimmerLine';
 import { GlowButton } from '@/components/animations/GlowButton';
 
-export default function HomeClient({ featuredProjects, lang }: { featuredProjects: Project[], lang: string }) {
+export default function HomeClient({ featuredProjects, lang, dict }: { featuredProjects: Project[], lang: string, dict: any }) {
   const { settings, isLoading } = useSettings();
 
   // Split title if it contains line breaks (simulating <br/>)
@@ -39,7 +39,7 @@ export default function HomeClient({ featuredProjects, lang }: { featuredProject
           {/* Subtitle — fade in first */}
           <ScrollReveal direction="fade" delay={200} duration={1000}>
             <span className="text-[#C4A35A] font-medium tracking-[0.2em] uppercase text-sm md:text-base mb-6 block">
-              Mạng lưới M&A Bất động sản
+              {dict.home.network}
             </span>
           </ScrollReveal>
 
@@ -78,12 +78,12 @@ export default function HomeClient({ featuredProjects, lang }: { featuredProject
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <GlowButton>
                 <Button size="lg" asChild>
-                  <Link href={`/${lang}/danh-muc`}>Khám phá Danh mục Đầu tư</Link>
+                  <Link href={`/${lang}/danh-muc`}>{dict.home.explore_btn}</Link>
                 </Button>
               </GlowButton>
               <GlowButton>
                 <Button size="lg" variant="secondary" className="border-[#C4A35A] text-[#C4A35A] hover:bg-[#C4A35A] hover:!text-[#1A1A2E]" asChild>
-                  <Link href={`/${lang}/ky-gui`}>Ký gửi Dự án</Link>
+                  <Link href={`/${lang}/ky-gui`}>{dict.home.submit_btn}</Link>
                 </Button>
               </GlowButton>
             </div>
@@ -98,16 +98,16 @@ export default function HomeClient({ featuredProjects, lang }: { featuredProject
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
             <ScrollReveal direction="up" delay={0} duration={700}>
-              <StatCounter value={50} label="Dự án đã xử lý" suffix="+" />
+              <StatCounter value={50} label={dict.home.stats_projects} suffix="+" />
             </ScrollReveal>
             <ScrollReveal direction="up" delay={150} duration={700}>
-              <StatCounter value={15000} label="Tỷ VNĐ Giao dịch" suffix="+" />
+              <StatCounter value={15000} label={dict.home.stats_value} suffix="+" />
             </ScrollReveal>
             <ScrollReveal direction="up" delay={300} duration={700}>
-              <StatCounter value={200} label="Nhà đầu tư đối tác" suffix="+" />
+              <StatCounter value={200} label={dict.home.stats_investors} suffix="+" />
             </ScrollReveal>
             <ScrollReveal direction="up" delay={450} duration={700}>
-              <StatCounter value={12} label="Tỉnh thành phủ sóng" suffix="+" />
+              <StatCounter value={12} label={dict.home.stats_provinces} suffix="+" />
             </ScrollReveal>
           </div>
         </div>
@@ -122,10 +122,10 @@ export default function HomeClient({ featuredProjects, lang }: { featuredProject
           <ScrollReveal direction="up" duration={800}>
             <div className="text-center mb-16">
               <span className="text-[#C4A35A] font-medium tracking-[0.2em] uppercase text-sm block mb-4">
-                Cơ hội đầu tư
+                {dict.home.opportunities}
               </span>
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#1A1A2E] mb-6">
-                Dự án Tâm Điểm
+                {dict.home.featured_deals}
               </h2>
               {/* Shimmer Gold Line */}
               <ShimmerLine width="6rem" height="3px" />
@@ -151,7 +151,7 @@ export default function HomeClient({ featuredProjects, lang }: { featuredProject
           <ScrollReveal direction="fade" delay={600} duration={800}>
             <div className="text-center mt-12">
               <Button variant="secondary" size="lg" className="border-[#1A1A2E] text-[#1A1A2E] hover:bg-[#1A1A2E] hover:text-[#C4A35A]" asChild>
-                <Link href={`/${lang}/danh-muc`}>Xem tất cả dự án</Link>
+                <Link href={`/${lang}/danh-muc`}>{dict.home.view_all_deals}</Link>
               </Button>
             </div>
           </ScrollReveal>
@@ -169,13 +169,13 @@ export default function HomeClient({ featuredProjects, lang }: { featuredProject
         <div className="container mx-auto px-4 text-center relative z-10">
           <ScrollReveal direction="up" duration={800}>
             <h2 className="text-3xl md:text-5xl font-serif font-bold text-white mb-6">
-              Bạn sở hữu dự án cần tìm đối tác?
+              {dict.home.cta_title}
             </h2>
           </ScrollReveal>
 
           <ScrollReveal direction="up" delay={200} duration={800}>
             <p className="text-[#E8E6E1] text-lg max-w-2xl mx-auto mb-10 opacity-80">
-              Chúng tôi có mạng lưới hơn 200 nhà đầu tư tổ chức và cá nhân uy tín, sẵn sàng tham gia mua bán hoặc hợp tác đầu tư các dự án tiềm năng.
+              {dict.home.cta_desc}
             </p>
           </ScrollReveal>
 
@@ -183,7 +183,7 @@ export default function HomeClient({ featuredProjects, lang }: { featuredProject
             {/* CTA with Glow Pulse Effect */}
             <GlowButton>
               <Button size="lg" asChild>
-                <Link href={`/${lang}/ky-gui`}>Ký gửi dự án ngay</Link>
+                <Link href={`/${lang}/ky-gui`}>{dict.home.cta_btn}</Link>
               </Button>
             </GlowButton>
           </ScrollReveal>

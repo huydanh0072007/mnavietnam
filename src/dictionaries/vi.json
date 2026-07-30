@@ -5,11 +5,34 @@
     "submit": "Ký gửi dự án",
     "about": "Giới thiệu"
   },
+  "home": {
+    "network": "Mạng lưới M&A Bất động sản",
+    "explore_btn": "Khám phá Danh mục Đầu tư",
+    "submit_btn": "Ký gửi Dự án",
+    "stats_projects": "Dự án đã xử lý",
+    "stats_value": "Tỷ VNĐ Giao dịch",
+    "stats_investors": "Nhà đầu tư đối tác",
+    "stats_provinces": "Tỉnh thành phủ sóng",
+    "opportunities": "Cơ hội đầu tư",
+    "featured_deals": "Dự án Tâm Điểm",
+    "view_all_deals": "Xem tất cả dự án",
+    "cta_title": "Bạn sở hữu dự án cần tìm đối tác?",
+    "cta_desc": "Chúng tôi có mạng lưới hơn 200 nhà đầu tư tổ chức và cá nhân uy tín, sẵn sàng tham gia mua bán hoặc hợp tác đầu tư các dự án tiềm năng.",
+    "cta_btn": "Ký gửi dự án ngay"
+  },
   "footer": {
     "description": "Nền tảng kết nối Độc quyền chuyển nhượng và hợp tác đầu tư phát triển dự án bất động sản uy tín hàng đầu tại Việt Nam.",
+    "slogan": "Tư vấn Chuyên nghiệp — Đối tác Độc quyền",
     "quickLinks": "Liên kết nhanh",
+    "services": "Dịch vụ",
+    "service_buyout": "Chuyển nhượng dự án (M&A)",
+    "service_jv": "Hợp tác đầu tư (JV)",
+    "service_eval": "Thẩm định dự án",
+    "service_legal": "Tư vấn pháp lý M&A",
     "contact": "Liên hệ",
     "address": "Tầng 12, Tòa nhà MNA, Quận 1, TP.HCM",
-    "rights": "Bản quyền thuộc về MNA International."
+    "rights": "Bản quyền thuộc về MNA International.",
+    "terms": "Điều khoản sử dụng",
+    "privacy": "Chính sách bảo mật"
   }
 }
