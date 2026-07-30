@@ -6,6 +6,15 @@ import { Locale } from '@/i18n-config';
 // We can define metadata or dynamic revalidation here if needed
 export const revalidate = 60; // revalidate every 60 seconds
 
+export async function generateMetadata({ params }: { params: Promise<any> }): Promise<import('next').Metadata> {
+  const { lang } = await params;
+  const dict = await getDictionary(lang as Locale);
+  return {
+    title: `${dict.navigation.home} | M$A International`,
+    description: dict.hero.subtitle,
+  };
+}
+
 export default async function Home({ params }: { params: Promise<any> }) {
   const allProjects = await getProjects();
   // TODO: Use lang to select title/title_en inside the project cards later if needed

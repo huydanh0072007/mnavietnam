@@ -42,4 +42,6 @@ next-env.d.ts
 
 # security reports
 vbsec-reports/
+.vbsec-tmp/
+.vbsec_files.txt
 

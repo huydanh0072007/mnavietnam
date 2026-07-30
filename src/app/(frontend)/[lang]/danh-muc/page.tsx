@@ -6,12 +6,16 @@ import { getAllMasterData, getProvinces } from '@/lib/master-data-store';
 
 export const revalidate = 60; // revalidate every 60 seconds
 
-export const metadata: Metadata = {
-  title: 'Danh mục Dự án M&A Bất động sản | M$A International',
-  description: 'Khám phá danh mục các cơ hội đầu tư, chuyển nhượng 100% hoặc hợp tác đầu tư phát triển dự án bất động sản cao cấp được thẩm định pháp lý và quy hoạch bởi chuyên gia M$A International.',
-};
-
 import { getDictionary } from '@/lib/get-dictionary';
+
+export async function generateMetadata({ params }: { params: Promise<any> }): Promise<Metadata> {
+  const { lang } = await params;
+  const dict = await getDictionary(lang as any);
+  return {
+    title: `${dict.projects.title} | M$A International`,
+    description: dict.projects.description,
+  };
+}
 
 export default async function DanhMucPage({ params }: { params: Promise<any> }) {
   const resolvedParams = await params;

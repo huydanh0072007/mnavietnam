@@ -27,11 +27,11 @@ export function KyGuiClient({ categories, dict, lang }: { categories: MasterData
       if (res.ok && data.success) {
         setIsSuccess(true);
       } else {
-        alert(data.errors?.join('\n') || 'Đã có lỗi xảy ra.');
+        alert(data.errors?.join('\n') || dict.submit.error_occurred);
       }
     } catch (error) {
       console.error('Submit error:', error);
-      alert('Đã có lỗi xảy ra. Vui lòng thử lại sau.');
+      alert(dict.submit.error_occurred);
     } finally {
       setIsSubmitting(false);
     }

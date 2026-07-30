@@ -105,7 +105,8 @@
     "contact_info": "Thông tin liên hệ",
     "contact_phone": "Hotline",
     "contact_email": "Email",
-    "contact_office": "Văn phòng"
+    "contact_office": "Văn phòng",
+    "error_occurred": "Đã có lỗi xảy ra. Vui lòng thử lại sau."
   },
   "about": {
     "hero_title": "Về M$AVietnam",
@@ -129,5 +130,28 @@
     "stat_partners": "Đối tác đầu tư",
     "stat_value": "Giá trị giao dịch",
     "stat_security": "Bảo mật thông tin"
+  },
+  "terms": {
+    "title": "Điều khoản sử dụng",
+    "last_updated": "Cập nhật lần cuối: 28/07/2026",
+    "welcome": "Chào mừng bạn đến với M$A International (\"Chúng tôi\", \"Nền tảng\"). Khi truy cập và sử dụng trang web của chúng tôi, bạn (\"Người dùng\") đồng ý tuân thủ các Điều khoản sử dụng này. Nếu bạn không đồng ý với bất kỳ phần nào của các điều khoản, vui lòng không sử dụng Nền tảng của chúng tôi.",
+    "section_1_title": "1. Dịch vụ của chúng tôi",
+    "section_1_desc": "M$A International là nền tảng kết nối các nhà đầu tư, chủ dự án, và các bên liên quan trong lĩnh vực Mua bán & Sáp nhập (M&A) và Hợp tác đầu tư Bất động sản. Chúng tôi đóng vai trò là bên trung gian cung cấp thông tin và hỗ trợ kết nối, không phải là một bên trong bất kỳ hợp đồng giao dịch bất động sản nào trừ khi có thỏa thuận khác bằng văn bản.",
+    "section_2_title": "2. Tính chính xác của Thông tin",
+    "section_2_desc": "Chúng tôi nỗ lực tối đa để đảm bảo các dự án được niêm yết có thông tin minh bạch, rõ ràng. Tuy nhiên, M$A International không đảm bảo tính chính xác tuyệt đối, đầy đủ hoặc tính hợp pháp của mọi thông tin do bên thứ ba (Chủ dự án, Người ký gửi) cung cấp. Các nhà đầu tư cần tiến hành thẩm định chuyên sâu (Due Diligence) trước khi ra quyết định đầu tư.",
+    "section_3_title": "3. Trách nhiệm của Người dùng",
+    "section_3_item_1": "Người dùng cam kết cung cấp thông tin trung thực, chính xác khi đăng ký ký gửi dự án hoặc liên hệ đầu tư.",
+    "section_3_item_2": "Nghiêm cấm việc sử dụng Nền tảng cho các mục đích lừa đảo, vi phạm pháp luật, rửa tiền, hoặc xâm phạm quyền lợi hợp pháp của bên thứ ba.",
+    "section_3_item_3": "Người dùng phải tự bảo mật thông tin tài khoản và thông tin giao dịch liên quan.",
+    "section_4_title": "4. Sở hữu trí tuệ",
+    "section_4_desc": "Mọi nội dung, thương hiệu, biểu tượng, hình ảnh, văn bản, thiết kế đồ họa trên trang web này thuộc sở hữu của M$A International hoặc các đối tác hợp pháp của chúng tôi và được bảo hộ bởi luật sở hữu trí tuệ. Bất kỳ hành vi sao chép, tái bản hoặc sử dụng trái phép nào đều bị nghiêm cấm.",
+    "section_5_title": "5. Chấm dứt sử dụng",
+    "section_5_desc": "Chúng tôi có quyền đơn phương tạm ngưng hoặc chấm dứt quyền truy cập của Người dùng vào Nền tảng bất cứ lúc nào, không cần báo trước, nếu phát hiện Người dùng vi phạm các Điều khoản sử dụng này hoặc có hành vi gây tổn hại đến uy tín của M$A International.",
+    "section_6_title": "6. Miễn trừ trách nhiệm",
+    "section_6_desc": "M$A International sẽ không chịu trách nhiệm pháp lý đối với bất kỳ thiệt hại trực tiếp, gián tiếp, ngẫu nhiên, hoặc hệ quả nào phát sinh từ việc sử dụng hoặc không thể sử dụng Nền tảng của chúng tôi, hoặc từ các giao dịch phát sinh thông qua Nền tảng.",
+    "section_7_title": "7. Sửa đổi Điều khoản",
+    "section_7_desc": "Chúng tôi có quyền sửa đổi, bổ sung các Điều khoản này bất cứ lúc nào. Các thay đổi sẽ có hiệu lực ngay khi được đăng tải trên trang web. Việc Người dùng tiếp tục sử dụng Nền tảng sau khi có thay đổi đồng nghĩa với việc chấp nhận các sửa đổi đó.",
+    "section_8_title": "8. Luật điều chỉnh",
+    "section_8_desc": "Các Điều khoản sử dụng này được điều chỉnh và giải thích theo quy định của pháp luật nước Cộng hòa Xã hội Chủ nghĩa Việt Nam."
   }
 }

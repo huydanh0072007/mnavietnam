@@ -105,7 +105,8 @@
     "contact_info": "Contact Information",
     "contact_phone": "Hotline",
     "contact_email": "Email",
-    "contact_office": "Office"
+    "contact_office": "Office",
+    "error_occurred": "An error occurred. Please try again later."
   },
   "about": {
     "hero_title": "About M$AVietnam",
@@ -129,5 +130,28 @@
     "stat_partners": "Investment partners",
     "stat_value": "Transaction value",
     "stat_security": "Information security"
+  },
+  "terms": {
+    "title": "Terms of Use",
+    "last_updated": "Last updated: July 28, 2026",
+    "welcome": "Welcome to M$A International (\"We\", \"Platform\"). By accessing and using our website, you (\"User\") agree to be bound by these Terms of Use. If you do not agree with any part of the terms, please do not use our Platform.",
+    "section_1_title": "1. Our Services",
+    "section_1_desc": "M$A International is a platform connecting investors, project owners, and stakeholders in the field of Real Estate Mergers & Acquisitions (M&A) and Joint Ventures. We act as an intermediary providing information and supporting connections, and are not a party to any real estate transaction contract unless otherwise agreed in writing.",
+    "section_2_title": "2. Accuracy of Information",
+    "section_2_desc": "We make every effort to ensure that listed projects have transparent and clear information. However, M$A International does not guarantee absolute accuracy, completeness, or legality of any information provided by third parties (Project Owners, Submitters). Investors must conduct deep Due Diligence before making investment decisions.",
+    "section_3_title": "3. User Responsibilities",
+    "section_3_item_1": "Users commit to providing truthful and accurate information when registering to submit a project or contact for investment.",
+    "section_3_item_2": "It is strictly forbidden to use the Platform for fraudulent purposes, illegal activities, money laundering, or infringement of the legitimate rights of third parties.",
+    "section_3_item_3": "Users must secure their account information and related transaction information themselves.",
+    "section_4_title": "4. Intellectual Property",
+    "section_4_desc": "All content, trademarks, logos, images, text, and graphic designs on this website are owned by M$A International or our legal partners and are protected by intellectual property laws. Any unauthorized copying, reproduction, or use is strictly prohibited.",
+    "section_5_title": "5. Termination of Use",
+    "section_5_desc": "We reserve the right to unilaterally suspend or terminate a User's access to the Platform at any time, without prior notice, if we discover the User has violated these Terms of Use or engaged in behavior that damages the reputation of M$A International.",
+    "section_6_title": "6. Disclaimer of Liability",
+    "section_6_desc": "M$A International shall not be legally liable for any direct, indirect, incidental, or consequential damages arising from the use or inability to use our Platform, or from transactions arising through the Platform.",
+    "section_7_title": "7. Modification of Terms",
+    "section_7_desc": "We reserve the right to amend or supplement these Terms at any time. Changes will take effect immediately upon being posted on the website. The User's continued use of the Platform after changes are made constitutes acceptance of those amendments.",
+    "section_8_title": "8. Governing Law",
+    "section_8_desc": "These Terms of Use are governed by and construed in accordance with the laws of the Socialist Republic of Vietnam."
   }
 }
