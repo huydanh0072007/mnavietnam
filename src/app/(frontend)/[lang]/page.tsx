@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: { params: Promise<any> }): Pr
   const dict = await getDictionary(lang as Locale);
   return {
     title: `${dict.navigation.home} | M$A International`,
-    description: dict.hero.subtitle,
+    description: dict.home.hero_subtitle,
   };
 }
 
