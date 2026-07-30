@@ -88,6 +88,7 @@ function CreateProjectForm({ categories, provinces, districts }: CreateProjectCl
         if (!text) return '';
         const res = await fetch('/api/admin/translate', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text, targetLang: 'en', sourceLang: 'vi' }),
         });

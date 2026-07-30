@@ -58,7 +58,7 @@ export default function AdminSettingsPage() {
   const [isTestingEmail, setIsTestingEmail] = useState(false);
 
   useEffect(() => {
-    fetch('/api/settings')
+    fetch('/api/settings', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if(data) {
@@ -98,6 +98,7 @@ export default function AdminSettingsPage() {
     try {
       await fetch('/api/settings', {
         method: 'POST',
+        credentials: 'include',
         headers: { 
           'Content-Type': 'application/json',
           'x-csrf-protection': '1'
@@ -149,6 +150,7 @@ export default function AdminSettingsPage() {
     try {
       const res = await fetch('/api/settings/test-email', {
         method: 'POST',
+        credentials: 'include',
         headers: { 
           'Content-Type': 'application/json',
           'x-csrf-protection': '1'

@@ -61,7 +61,7 @@ export default function AdminLeadsPage() {
   const [sendEmail, setSendEmail] = useState(true);
 
   React.useEffect(() => {
-    fetch('/api/leads')
+    fetch('/api/leads', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (!data.error && Array.isArray(data)) {
@@ -123,6 +123,7 @@ export default function AdminLeadsPage() {
 
       await fetch('/api/leads', {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: leadId, updates })
       });
@@ -131,6 +132,7 @@ export default function AdminLeadsPage() {
       if (sendEmail) {
         await fetch('/api/leads/notify', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ leadId, newStatus })
         });
@@ -159,6 +161,7 @@ export default function AdminLeadsPage() {
     try {
       await fetch('/api/leads', {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: selectedLead.id, updates: { internal_notes: updatedNotes } })
       });

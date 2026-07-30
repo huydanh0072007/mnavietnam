@@ -24,7 +24,7 @@ export default function VDRManagementPage() {
   const [signatures, setSignatures] = useState<NDASignature[]>([]);
 
   React.useEffect(() => {
-    fetch('/api/leads')
+    fetch('/api/leads', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (!data.error && Array.isArray(data)) {

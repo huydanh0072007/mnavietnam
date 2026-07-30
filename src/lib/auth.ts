@@ -54,39 +54,44 @@ export function verifyCredentials(email: string, password: string): boolean {
   }
 }
 
-// Generate a secure session token
+// Generate a secure session token (stateless using HMAC)
 export function generateSessionToken(): string {
   return crypto.randomBytes(32).toString('hex');
 }
 
-// In-memory session store (for MVP - replace with Redis/DB in production)
-const sessions = new Map<string, { email: string; createdAt: number; expiresAt: number }>();
-
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 export function createSession(email: string): string {
-  const token = generateSessionToken();
-  const now = Date.now();
-  sessions.set(token, {
-    email,
-    createdAt: now,
-    expiresAt: now + SESSION_DURATION_MS,
-  });
-  return token;
+  const expiresAt = Date.now() + SESSION_DURATION_MS;
+  const payload = `${email}|${expiresAt}`;
+  
+  // Use ADMIN_PASSWORD_HASH as secret for HMAC
+  const secret = process.env.ADMIN_PASSWORD_HASH || 'default_secret_for_dev';
+  const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+  
+  return `${payload}|${signature}`;
 }
 
 export function validateSession(token: string): boolean {
-  const session = sessions.get(token);
-  if (!session) return false;
-  if (Date.now() > session.expiresAt) {
-    sessions.delete(token);
-    return false;
-  }
-  return true;
+  if (!token) return false;
+  const parts = token.split('|');
+  if (parts.length !== 3) return false;
+  
+  const [email, expiresAtStr, signature] = parts;
+  const expiresAt = parseInt(expiresAtStr, 10);
+  
+  if (isNaN(expiresAt) || Date.now() > expiresAt) return false;
+  
+  const payload = `${email}|${expiresAt}`;
+  const secret = process.env.ADMIN_PASSWORD_HASH || 'default_secret_for_dev';
+  const expectedSignature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+  
+  return signature === expectedSignature;
 }
 
 export function destroySession(token: string): void {
-  sessions.delete(token);
+  // Stateless token cannot be destroyed on the server.
+  // The client must delete the cookie.
 }
 
 // Cookie name for session

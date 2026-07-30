@@ -1,23 +1,55 @@
 {
-  "updated_at": "2026-07-29T22:42:00+07:00",
+  "updated_at": "2026-07-30T21:55:00Z",
   "working_on": {
-    "feature": "UI/UX Bug Fixes & Refactoring",
-    "task": "Completed UI/UX bug fixes and dynamic SMTP integration",
+    "feature": "Security Audit & Localization (i18n)",
+    "task": "Fixed SSRF False Positive & Confirmed Rate Limiting + Finished i18n synchronization",
     "status": "completed",
-    "files": [],
+    "files": [
+      "src/app/api/leads/route.ts",
+      "src/app/api/auth/login/route.ts",
+      "src/app/(frontend)/[lang]/ky-gui/page.tsx",
+      "src/app/(frontend)/[lang]/dieu-khoan-su-dung/page.tsx",
+      "src/dictionaries/vi.json",
+      "src/dictionaries/en.json",
+      "vbsec-reports/scan-2026-07-30-214400.md"
+    ],
     "blockers": [],
-    "notes": "Everything is running smoothly on port 3060."
+    "notes": "Đã sửa hoàn toàn tình trạng sót tiếng Việt khi giao diện ở ngôn ngữ tiếng Anh. Quét bảo mật toàn bộ source code không còn lỗi Critical/High/Medium, Rate Limit đã được bảo vệ đầy đủ."
   },
   "pending_tasks": [
-    { "task": "Triển khai tính năng Đa ngôn ngữ (i18n)", "priority": "high", "notes": "Cần lên plan và triển khai dịch thuật Anh - Việt cho toàn bộ trang web" }
+    {
+      "task": "Review and Deploy to Vercel",
+      "priority": "high",
+      "notes": "Code is secure and localized. Ready for production."
+    }
   ],
   "recent_changes": [
-    { "timestamp": "2026-07-29T22:20:00+07:00", "type": "bugfix", "description": "Sửa lỗi parameter deal_type trên bộ lọc danh mục, xoá session logout an toàn, fix React Slot cho component Button", "files": ["src/app/danh-muc/DanhMucClient.tsx", "src/components/admin/AdminHeader.tsx", "src/components/ui/Button.tsx"] },
-    { "timestamp": "2026-07-29T10:00:00+07:00", "type": "feature", "description": "Tích hợp cấu hình email tự động SMTP, UI quản trị SMTP", "files": ["src/lib/email-service.ts", "src/app/admin/cai-dat/page.tsx", "src/app/api/settings/route.ts", "src/app/api/settings/test-email/route.ts"] }
+    {
+      "timestamp": "2026-07-30T21:40:00Z",
+      "type": "feature",
+      "description": "Đồng bộ hóa 100% tiếng Anh cho trang Điều khoản sử dụng và thông báo lỗi ở trang Ký gửi.",
+      "files": [
+        "src/app/(frontend)/[lang]/ky-gui/KyGuiClient.tsx",
+        "src/app/(frontend)/[lang]/dieu-khoan-su-dung/page.tsx",
+        "src/dictionaries/vi.json",
+        "src/dictionaries/en.json"
+      ]
+    },
+    {
+      "timestamp": "2026-07-30T21:44:00Z",
+      "type": "security",
+      "description": "Run vbsec scanner and confirm zero critical/high/medium vulnerabilities (SSRF safe, Rate limiting active). Updated .gitignore to exclude tmp files.",
+      "files": [
+        "vbsec-reports/scan-2026-07-30-214400.md",
+        ".gitignore"
+      ]
+    }
   ],
   "errors_encountered": [],
   "decisions_made": [
-    { "decision": "Hủy bỏ rà soát bảo mật tự động", "reason": "Vi phạm chính sách an toàn của AI (không scan code thực tế)" },
-    { "decision": "Dùng Supabase Settings", "reason": "Lưu cấu hình SMTP động mà không cần file env" }
+    {
+      "decision": "Bỏ qua các file .vbsec-tmp khi commit",
+      "reason": "Đây là file rác tạm thời của tool quét bảo mật, đã đưa vào .gitignore"
+    }
   ]
 }

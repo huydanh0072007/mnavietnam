@@ -16,6 +16,13 @@
   - Rate Limiting hoạt động chính xác ở 2 đầu mối quan trọng (`/api/leads` và `/api/auth/login`).
   - Zero CRITICAL/HIGH/MEDIUM vulnerabilities reported.
 
+### Deployment & Infra
+- Fix lỗi thiếu CSS giao diện Admin (do file layout chưa import thư viện TailwindCSS).
+- Fix các lỗi gõ sai tên biến Dictionary (TypeScript) gây ra lỗi Build trên Vercel:
+  - Lỗi tại trang Giới thiệu (`dict.about.hero_desc`)
+  - Lỗi tại trang Chủ (`dict.home.hero_subtitle`)
+- Hoàn tất Deploy lên Vercel thành công và cấu hình đầy đủ Environment Variables.
+
 ## [2026-07-29]
 ### Added
 - Tính năng cấu hình SMTP động lưu trong cơ sở dữ liệu (Global Settings).
