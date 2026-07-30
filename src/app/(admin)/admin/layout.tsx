@@ -1,5 +1,6 @@
 'use client';
 
+import '@/app/globals.css';
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
