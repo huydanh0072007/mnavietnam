@@ -4,18 +4,18 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Project } from '@/lib/types';
-import { toggleProjectFeatured, toggleProjectPublishStatus } from './actions';
+import { toggleProjectFeatured, toggleProjectPublishStatus, actionHideProject } from './actions';
 import { 
   Plus, 
   Search, 
-  Filter, 
   Star, 
   Eye, 
   EyeOff, 
   Edit3, 
-  Trash2, 
   FileDown,
-  Building2
+  Loader2,
+  AlertCircle,
+  X
 } from 'lucide-react';
 
 export default function AdminProjectsClient({ initialProjects }: { initialProjects: Project[] }) {
@@ -23,12 +23,17 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
   const [search, setSearch] = useState('');
   const [dealTypeFilter, setDealTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  // Filter projects
+  // Confirm Hide Modal State
+  const [hideConfirmProject, setHideConfirmProject] = useState<Project | null>(null);
+
+  // Filter projects (also filter out is_active === false)
   const filtered = projects.filter(p => {
+    if (p.is_active === false) return false;
     const matchSearch = p.title.toLowerCase().includes(search.toLowerCase()) || 
-                        p.project_code.toLowerCase().includes(search.toLowerCase()) ||
-                        p.province.toLowerCase().includes(search.toLowerCase());
+                        (p.project_code || '').toLowerCase().includes(search.toLowerCase()) ||
+                        (p.province || '').toLowerCase().includes(search.toLowerCase());
     const matchDeal = dealTypeFilter === 'all' || p.deal_type === dealTypeFilter;
     const matchStatus = statusFilter === 'all' || p.publish_status === statusFilter;
     return matchSearch && matchDeal && matchStatus;
@@ -39,15 +44,16 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
     if (!project) return;
     const newStatus = !project.is_featured;
     
-    // Optimistic UI update
+    setLoadingId(`featured_${id}`);
     setProjects(prev => prev.map(p => p.id === id ? { ...p, is_featured: newStatus } : p));
     
     try {
       await toggleProjectFeatured(id, newStatus);
     } catch (error) {
       console.error(error);
-      // Revert on error
       setProjects(prev => prev.map(p => p.id === id ? { ...p, is_featured: project.is_featured } : p));
+    } finally {
+      setLoadingId(null);
     }
   };
 
@@ -56,15 +62,32 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
     if (!project) return;
     const newStatus = project.publish_status === 'published' ? 'hidden' : 'published';
     
-    // Optimistic UI update
+    setLoadingId(`publish_${id}`);
     setProjects(prev => prev.map(p => p.id === id ? { ...p, publish_status: newStatus } : p));
     
     try {
       await toggleProjectPublishStatus(id, newStatus);
     } catch (error) {
       console.error(error);
-      // Revert on error
       setProjects(prev => prev.map(p => p.id === id ? { ...p, publish_status: project.publish_status } : p));
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  const handleConfirmHide = async () => {
+    if (!hideConfirmProject) return;
+    const id = hideConfirmProject.id;
+    setLoadingId(`hide_${id}`);
+    try {
+      await actionHideProject(id);
+      setProjects(prev => prev.filter(p => p.id !== id));
+      setHideConfirmProject(null);
+    } catch (error) {
+      console.error(error);
+      alert('Không thể ẩn dự án lúc này');
+    } finally {
+      setLoadingId(null);
     }
   };
 
@@ -72,7 +95,7 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
     <div className="flex-1 pb-16">
       <AdminHeader 
         title="Quản lý Danh mục Dự án" 
-        subtitle="Đăng bài, ẩn/hiện dự án, ghim Dự án Tâm điểm và cập nhật Teaser PDF" 
+        subtitle="Đăng bài, chỉnh sửa, ẩn/hiện dự án, ghim Dự án Tâm điểm và cập nhật Teaser PDF" 
       />
 
       <main className="px-8 py-8 space-y-6 max-w-7xl">
@@ -146,12 +169,17 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
                     <td className="py-4 px-6">
                       <button
                         onClick={() => toggleFeatured(project.id)}
+                        disabled={loadingId === `featured_${project.id}`}
                         title={project.is_featured ? "Hủy ghim tâm điểm" : "Ghim dự án tâm điểm"}
                         className={`p-1.5 rounded-lg transition-colors ${
                           project.is_featured ? 'text-[#C4A35A] bg-[#C4A35A]/10' : 'text-gray-300 hover:text-gray-400'
                         }`}
                       >
-                        <Star className="w-5 h-5 fill-current" />
+                        {loadingId === `featured_${project.id}` ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Star className="w-5 h-5 fill-current" />
+                        )}
                       </button>
                     </td>
 
@@ -194,10 +222,15 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
                     {/* Teaser PDF */}
                     <td className="py-4 px-6">
                       {project.teaser_pdf ? (
-                        <span className="inline-flex items-center gap-1 text-xs text-emerald-700 font-medium">
+                        <a 
+                          href={project.teaser_pdf.startsWith('http') ? project.teaser_pdf : `/uploads/${project.teaser_pdf}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-xs text-emerald-700 font-medium hover:underline"
+                        >
                           <FileDown className="w-3.5 h-3.5" />
-                          Đã tải PDF
-                        </span>
+                          Xem PDF
+                        </a>
                       ) : (
                         <span className="text-xs text-gray-400 font-normal">Chưa có</span>
                       )}
@@ -214,19 +247,33 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
 
                     {/* Actions */}
                     <td className="py-4 px-6 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1.5">
+                        {/* Edit Button */}
+                        <Link
+                          href={`/admin/du-an/${project.id}/sua`}
+                          title="Chỉnh sửa dự án"
+                          className="p-1.5 rounded-lg text-gray-500 hover:bg-amber-50 hover:text-[#C4A35A] transition-colors"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </Link>
+
+                        {/* Toggle Publish Status */}
                         <button
                           onClick={() => handleTogglePublishStatus(project.id)}
+                          disabled={loadingId === `publish_${project.id}`}
                           title={project.publish_status === 'published' ? "Ẩn bài" : "Công khai bài"}
-                          className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                          className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
                         >
-                          {project.publish_status === 'published' ? (
+                          {loadingId === `publish_${project.id}` ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                          ) : project.publish_status === 'published' ? (
                             <EyeOff className="w-4 h-4 text-amber-600" />
                           ) : (
                             <Eye className="w-4 h-4 text-emerald-600" />
                           )}
                         </button>
 
+                        {/* View Public Page */}
                         <Link
                           href={`/du-an/${project.slug}`}
                           target="_blank"
@@ -235,15 +282,67 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
                         >
                           <Eye className="w-4 h-4" />
                         </Link>
+
+                        {/* Hide Project Button (Soft Delete) */}
+                        <button
+                          onClick={() => setHideConfirmProject(project)}
+                          title="Ẩn dự án này"
+                          className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                          <EyeOff className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
                 ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="py-12 text-center text-gray-400">
+                      Không tìm thấy dự án phù hợp
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </div>
       </main>
+
+      {/* CONFIRM HIDE MODAL */}
+      {hideConfirmProject && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <div className="flex items-center gap-3 text-red-600 border-b border-gray-100 pb-3">
+              <AlertCircle className="w-6 h-6 shrink-0" />
+              <h3 className="text-lg font-bold text-gray-900">Xác nhận Ẩn Dự án</h3>
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Bạn có chắc chắn muốn ẩn dự án <strong className="text-gray-900">"{hideConfirmProject.title}"</strong> ({hideConfirmProject.project_code}) không? 
+              Dự án sẽ chuyển sang trạng thái Ẩn và không hiển thị trên giao diện công khai.
+            </p>
+            <div className="flex justify-end gap-3 pt-2">
+              <button 
+                onClick={() => setHideConfirmProject(null)}
+                className="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-900"
+              >
+                Hủy
+              </button>
+              <button 
+                onClick={handleConfirmHide} 
+                disabled={loadingId === `hide_${hideConfirmProject.id}`}
+                className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1.5 shadow-sm"
+              >
+                {loadingId === `hide_${hideConfirmProject.id}` ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <EyeOff className="w-4 h-4" />
+                )}
+                Xác nhận Ẩn
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -80,19 +80,40 @@ export async function updateProject(id: string, updates: Partial<Project>): Prom
   return data as Project;
 }
 
+export async function getProjectById(id: string): Promise<Project | null> {
+  if (!isSupabaseConfigured) {
+    return null;
+  }
+
+  const supabase = getSupabaseServerClient();
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error('Error fetching project by id:', error);
+    return null;
+  }
+
+  return data as Project;
+}
+
 export async function deleteProject(id: string): Promise<boolean> {
   if (!isSupabaseConfigured) return false;
 
   const supabase = getSupabaseServerClient();
   const { error } = await supabase
     .from('projects')
-    .delete()
+    .update({ is_active: false, publish_status: 'hidden', updated_at: new Date().toISOString() })
     .eq('id', id);
 
   if (error) {
-    console.error('Error deleting project:', error);
+    console.error('Error hiding/deleting project:', error);
     return false;
   }
 
   return true;
 }
+

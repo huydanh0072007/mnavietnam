@@ -5,22 +5,20 @@ import { useRouter } from 'next/navigation';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { 
   Search, 
-  Filter, 
   Download, 
   MessageSquare, 
   Phone, 
   Mail, 
   Building2, 
   FileText, 
-  Clock, 
-  CheckCircle2, 
-  XCircle, 
   AlertCircle,
   Send,
-  User,
-  Tag,
   X,
-  ChevronRight
+  ChevronRight,
+  PlusCircle,
+  EyeOff,
+  Loader2,
+  Upload
 } from 'lucide-react';
 import { formatDate, getLeadStatusLabel } from '@/lib/utils';
 
@@ -43,9 +41,9 @@ interface LeadItem {
   internal_notes: Array<{text: string; author: string; timestamp: string}>;
   audit_logs?: Array<{action: string; file_url?: string; timestamp: string}>;
   signature_url?: string;
+  is_active?: boolean;
   created_at: string;
 }
-
 
 export default function AdminLeadsPage() {
   const router = useRouter();
@@ -55,30 +53,180 @@ export default function AdminLeadsPage() {
   const [search, setSearch] = useState('');
   const [newNoteText, setNewNoteText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmittingNewLead, setIsSubmittingNewLead] = useState(false);
+  const [isHidingLead, setIsHidingLead] = useState(false);
 
   // Status Modal State
   const [statusModal, setStatusModal] = useState<{isOpen: boolean; leadId: string; newStatus: string; currentStatus: string} | null>(null);
   const [sendEmail, setSendEmail] = useState(true);
 
-  React.useEffect(() => {
+  // Confirm Hide Modal State
+  const [showHideConfirm, setShowHideConfirm] = useState(false);
+
+  // Create Lead Modal State
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    lead_type: 'interest' as 'interest' | 'submission',
+    full_name: '',
+    role_title: '',
+    organization: '',
+    phone: '',
+    email: '',
+    project_name_location: '',
+    preferred_deal_type: 'buyout',
+    estimated_scale: '',
+    message: '',
+    attachment_url: '',
+  });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
+
+  const fetchLeads = () => {
+    setIsLoading(true);
     fetch('/api/leads', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (!data.error && Array.isArray(data)) {
-          setLeads(data);
-          if (data.length > 0) setSelectedLead(data[0]);
+          // Filter out is_active === false
+          const activeLeads = data.filter((l: LeadItem) => l.is_active !== false);
+          setLeads(activeLeads);
+          if (activeLeads.length > 0 && !selectedLead) {
+            setSelectedLead(activeLeads[0]);
+          }
         }
       })
       .finally(() => setIsLoading(false));
+  };
+
+  React.useEffect(() => {
+    fetchLeads();
   }, []);
 
-  const filteredLeads = leads.filter(l => {
+  // Filter out non-active leads first
+  const activeLeadsOnly = leads.filter(l => l.is_active !== false);
+
+  const filteredLeads = activeLeadsOnly.filter(l => {
     const matchType = typeFilter === 'all' || l.lead_type === typeFilter;
-    const matchSearch = l.full_name.toLowerCase().includes(search.toLowerCase()) ||
-                        l.organization.toLowerCase().includes(search.toLowerCase()) ||
-                        l.phone.includes(search);
+    const matchSearch = (l.full_name || '').toLowerCase().includes(search.toLowerCase()) ||
+                        (l.organization || '').toLowerCase().includes(search.toLowerCase()) ||
+                        (l.phone || '').includes(search);
     return matchType && matchSearch;
   });
+
+  const handleFileUpload = async (file: File) => {
+    setIsUploadingFile(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        setCreateForm(prev => ({ ...prev, attachment_url: data.url }));
+      } else {
+        alert(data.error || 'Lỗi tải file');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Không thể tải file lên');
+    } finally {
+      setIsUploadingFile(false);
+    }
+  };
+
+  const handleCreateLeadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!createForm.full_name.trim() || !createForm.organization.trim() || !createForm.phone.trim() || !createForm.email.trim()) {
+      alert('Vui lòng điền các trường bắt buộc (*)');
+      return;
+    }
+
+    setIsSubmittingNewLead(true);
+    try {
+      let finalAttachmentUrl = createForm.attachment_url;
+      if (selectedFile && !finalAttachmentUrl) {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+        const uploadData = await uploadRes.json();
+        if (uploadData.success) {
+          finalAttachmentUrl = uploadData.url;
+        }
+      }
+
+      const body = {
+        ...createForm,
+        attachment_url: finalAttachmentUrl,
+      };
+
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        alert('Tạo Lead mới thành công!');
+        setShowCreateModal(false);
+        setCreateForm({
+          lead_type: 'interest',
+          full_name: '',
+          role_title: '',
+          organization: '',
+          phone: '',
+          email: '',
+          project_name_location: '',
+          preferred_deal_type: 'buyout',
+          estimated_scale: '',
+          message: '',
+          attachment_url: '',
+        });
+        setSelectedFile(null);
+        fetchLeads();
+      } else {
+        alert(data.errors?.join(', ') || 'Không thể tạo Lead');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Có lỗi xảy ra khi gửi yêu cầu');
+    } finally {
+      setIsSubmittingNewLead(false);
+    }
+  };
+
+  const handleHideLead = async () => {
+    if (!selectedLead) return;
+    setIsHidingLead(true);
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedLead.id,
+          updates: { is_active: false }
+        })
+      });
+
+      if (res.ok) {
+        setShowHideConfirm(false);
+        const updatedList = leads.filter(l => l.id !== selectedLead.id);
+        setLeads(updatedList);
+        setSelectedLead(updatedList.length > 0 ? updatedList[0] : null);
+      } else {
+        alert('Không thể ẩn Lead này');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Lỗi khi xử lý ẩn Lead');
+    } finally {
+      setIsHidingLead(false);
+    }
+  };
 
   const handleStatusChange = (leadId: string, currentStatus: string, newStatus: string) => {
     setStatusModal({ isOpen: true, leadId, newStatus, currentStatus });
@@ -107,7 +255,7 @@ export default function AdminLeadsPage() {
         
         const leadToUpdate = leads.find(l => l.id === leadId) || selectedLead;
         if (leadToUpdate) {
-          const updatedNotes = [...leadToUpdate.internal_notes, newNote];
+          const updatedNotes = [...(leadToUpdate.internal_notes || []), newNote];
           setLeads(prev => prev.map(l => l.id === leadId ? { ...l, internal_notes: updatedNotes } : l));
           if (selectedLead && selectedLead.id === leadId) {
             setSelectedLead(prev => prev ? { ...prev, internal_notes: updatedNotes } : null);
@@ -128,7 +276,6 @@ export default function AdminLeadsPage() {
         body: JSON.stringify({ id: leadId, updates })
       });
       
-      // Send email if selected
       if (sendEmail) {
         await fetch('/api/leads/notify', {
           method: 'POST',
@@ -153,7 +300,8 @@ export default function AdminLeadsPage() {
       timestamp: new Date().toISOString().replace('T', ' ').slice(0, 16),
     };
 
-    const updatedNotes = [...selectedLead.internal_notes, newNote];
+    const currentNotes = selectedLead.internal_notes || [];
+    const updatedNotes = [...currentNotes, newNote];
     setLeads(prev => prev.map(l => l.id === selectedLead.id ? { ...l, internal_notes: updatedNotes } : l));
     setSelectedLead(prev => prev ? { ...prev, internal_notes: updatedNotes } : null);
     setNewNoteText('');
@@ -219,19 +367,19 @@ export default function AdminLeadsPage() {
                 onClick={() => setTypeFilter('all')}
                 className={`px-3 py-1.5 rounded-md transition-colors ${typeFilter === 'all' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}
               >
-                Tất cả ({leads.length})
+                Tất cả ({activeLeadsOnly.length})
               </button>
               <button
                 onClick={() => setTypeFilter('interest')}
                 className={`px-3 py-1.5 rounded-md transition-colors ${typeFilter === 'interest' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
               >
-                Nhà đầu tư ({leads.filter(l => l.lead_type === 'interest').length})
+                Nhà đầu tư ({activeLeadsOnly.filter(l => l.lead_type === 'interest').length})
               </button>
               <button
                 onClick={() => setTypeFilter('submission')}
                 className={`px-3 py-1.5 rounded-md transition-colors ${typeFilter === 'submission' ? 'bg-purple-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
               >
-                Ký gửi dự án ({leads.filter(l => l.lead_type === 'submission').length})
+                Ký gửi dự án ({activeLeadsOnly.filter(l => l.lead_type === 'submission').length})
               </button>
             </div>
 
@@ -247,65 +395,83 @@ export default function AdminLeadsPage() {
             </div>
           </div>
 
-          <button
-            onClick={handleExportExcel}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-all shadow-md shrink-0"
-          >
-            <Download className="w-4 h-4" />
-            Xuất Excel (.CSV)
-          </button>
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="bg-[#C4A35A] hover:bg-[#b09048] text-[#0A1628] font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-all shadow-md shrink-0"
+            >
+              <PlusCircle className="w-4 h-4" />
+              Tạo Lead Mới
+            </button>
+
+            <button
+              onClick={handleExportExcel}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-all shadow-md shrink-0"
+            >
+              <Download className="w-4 h-4" />
+              Xuất Excel
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Leads List */}
           <div className="lg:col-span-5 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden divide-y divide-gray-100">
             <div className="p-4 bg-gray-50/80 border-b border-gray-200 text-xs font-bold uppercase text-gray-500 tracking-wider">
               Danh sách Lead ({filteredLeads.length})
             </div>
 
             <div className="max-h-[600px] overflow-y-auto divide-y divide-gray-100">
-              {filteredLeads.map((lead) => {
-                const isSelected = selectedLead?.id === lead.id;
-                return (
-                  <div
-                    key={lead.id}
-                    onClick={() => setSelectedLead(lead)}
-                    className={`p-4 cursor-pointer transition-all hover:bg-gray-50 ${
-                      isSelected ? 'bg-amber-50/70 border-l-4 border-[#C4A35A]' : ''
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-bold text-gray-500">{lead.id}</span>
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          lead.lead_type === 'interest' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
-                        }`}>
-                          {lead.lead_type === 'interest' ? 'NĐT' : 'Ký gửi'}
-                        </span>
+              {isLoading ? (
+                <div className="p-8 text-center text-gray-400">Đang tải danh sách...</div>
+              ) : filteredLeads.length === 0 ? (
+                <div className="p-8 text-center text-gray-400">Không có dữ liệu Lead</div>
+              ) : (
+                filteredLeads.map((lead) => {
+                  const isSelected = selectedLead?.id === lead.id;
+                  return (
+                    <div
+                      key={lead.id}
+                      onClick={() => setSelectedLead(lead)}
+                      className={`p-4 cursor-pointer transition-all hover:bg-gray-50 ${
+                        isSelected ? 'bg-amber-50/70 border-l-4 border-[#C4A35A]' : ''
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-xs font-bold text-gray-500">{lead.id}</span>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            lead.lead_type === 'interest' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                          }`}>
+                            {lead.lead_type === 'interest' ? 'NĐT' : 'Ký gửi'}
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-gray-400">{formatDate(lead.created_at)}</span>
                       </div>
-                      <span className="text-[11px] text-gray-400">{formatDate(lead.created_at)}</span>
+
+                      <div className="font-bold text-sm text-gray-900">{lead.full_name}</div>
+                      <div className="text-xs text-gray-500 truncate">{lead.organization}</div>
+
+                      <div className="mt-3 flex items-center justify-between">
+                        <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                          lead.status === 'new' ? 'bg-amber-100 text-amber-800 animate-pulse' :
+                          lead.status === 'draft_pending' ? 'bg-purple-100 text-purple-800' :
+                          lead.status === 'nda_sent' ? 'bg-indigo-100 text-indigo-800' :
+                          'bg-gray-100 text-gray-700'
+                        }`}>
+                          {getLeadStatusLabel(lead.status)}
+                        </span>
+
+                        <ChevronRight className={`w-4 h-4 text-gray-400 ${isSelected ? 'text-[#C4A35A] translate-x-1' : ''} transition-transform`} />
+                      </div>
                     </div>
-
-                    <div className="font-bold text-sm text-gray-900">{lead.full_name}</div>
-                    <div className="text-xs text-gray-500 truncate">{lead.organization}</div>
-
-                    <div className="mt-3 flex items-center justify-between">
-                      <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${
-                        lead.status === 'new' ? 'bg-amber-100 text-amber-800 animate-pulse' :
-                        lead.status === 'draft_pending' ? 'bg-purple-100 text-purple-800' :
-                        lead.status === 'nda_sent' ? 'bg-indigo-100 text-indigo-800' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
-                        {getLeadStatusLabel(lead.status)}
-                      </span>
-
-                      <ChevronRight className={`w-4 h-4 text-gray-400 ${isSelected ? 'text-[#C4A35A] translate-x-1' : ''} transition-transform`} />
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
 
+          {/* Lead Detail View */}
           <div className="lg:col-span-7 bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-6">
             {selectedLead ? (
               <>
@@ -332,31 +498,43 @@ export default function AdminLeadsPage() {
                     )}
                   </div>
 
-                  <div className="bg-gray-50 p-2 rounded-lg border border-gray-200 text-right">
-                    <label className="block text-[10px] font-bold uppercase text-gray-500 mb-1">Cập nhật Trạng thái</label>
-                    <select
-                      value={selectedLead.status}
-                      onChange={(e) => handleStatusChange(selectedLead.id, selectedLead.status, e.target.value)}
-                      className="bg-white border border-gray-300 font-bold text-xs rounded px-2.5 py-1.5 text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                  <div className="flex flex-col items-end gap-3">
+                    <div className="bg-gray-50 p-2 rounded-lg border border-gray-200 text-right w-full">
+                      <label className="block text-[10px] font-bold uppercase text-gray-500 mb-1">Trạng thái</label>
+                      <select
+                        value={selectedLead.status}
+                        onChange={(e) => handleStatusChange(selectedLead.id, selectedLead.status, e.target.value)}
+                        className="bg-white border border-gray-300 font-bold text-xs rounded px-2.5 py-1.5 text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                      >
+                        {selectedLead.lead_type === 'interest' ? (
+                          <>
+                            <option value="new">Mới (New)</option>
+                            <option value="contacted">Đã liên hệ (Contacted)</option>
+                            <option value="nda_sent">Đang gửi NDA (NDA Sent)</option>
+                            <option value="due_diligence">Đang thẩm định (Due Diligence)</option>
+                            <option value="closed_won">Đóng deal (Closed Won)</option>
+                            <option value="closed_lost">Không thành công (Closed Lost)</option>
+                          </>
+                        ) : (
+                          <>
+                            <option value="draft_pending">Draft chờ thẩm định</option>
+                            <option value="in_progress">Đang làm việc offline</option>
+                            <option value="published">Đã lên bài (Published)</option>
+                            <option value="rejected">Từ chối ký gửi</option>
+                          </>
+                        )}
+                      </select>
+                    </div>
+
+                    {/* Hide Lead Button */}
+                    <button
+                      onClick={() => setShowHideConfirm(true)}
+                      className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-semibold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition-colors"
+                      title="Ẩn Lead khỏi hệ thống"
                     >
-                      {selectedLead.lead_type === 'interest' ? (
-                        <>
-                          <option value="new">Mới (New)</option>
-                          <option value="contacted">Đã liên hệ (Contacted)</option>
-                          <option value="nda_sent">Đang gửi NDA (NDA Sent)</option>
-                          <option value="due_diligence">Đang thẩm định (Due Diligence)</option>
-                          <option value="closed_won">Đóng deal (Closed Won)</option>
-                          <option value="closed_lost">Không thành công (Closed Lost)</option>
-                        </>
-                      ) : (
-                        <>
-                          <option value="draft_pending">Draft chờ thẩm định</option>
-                          <option value="in_progress">Đang làm việc offline</option>
-                          <option value="published">Đã lên bài (Published)</option>
-                          <option value="rejected">Từ chối ký gửi</option>
-                        </>
-                      )}
-                    </select>
+                      <EyeOff className="w-3.5 h-3.5" />
+                      Ẩn Lead này
+                    </button>
                   </div>
                 </div>
 
@@ -412,7 +590,7 @@ export default function AdminLeadsPage() {
                     <div className="flex flex-col gap-2">
                       {selectedLead.attachment_url && (
                         <a href={selectedLead.attachment_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors group">
-                          <span className="text-sm font-semibold text-gray-800">Tài liệu dự án (Teaser/Profile)</span>
+                          <span className="text-sm font-semibold text-gray-800">Tài liệu đính kèm (Teaser/Profile)</span>
                           <Download className="w-4 h-4 text-gray-400 group-hover:text-gray-800" />
                         </a>
                       )}
@@ -428,37 +606,16 @@ export default function AdminLeadsPage() {
                   </div>
                 )}
 
-                {/* Audit Logs / Activity History */}
-                {selectedLead.audit_logs && selectedLead.audit_logs.length > 0 && (
-                  <div>
-                    <h3 className="text-xs font-bold uppercase text-gray-500 mb-3 border-t border-gray-200 pt-4">Lịch sử Hoạt động (Audit Log)</h3>
-                    <div className="space-y-3 relative before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent">
-                      {selectedLead.audit_logs.map((log, idx) => (
-                        <div key={idx} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                          <div className="flex items-center justify-center w-6 h-6 rounded-full border border-white bg-blue-100 text-blue-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                          </div>
-                          <div className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.5rem)] bg-white p-3 rounded border border-gray-200 shadow-sm text-sm">
-                            <div className="font-semibold text-gray-800 mb-1">{log.action}</div>
-                            {log.file_url && <a href={log.file_url} className="text-xs text-blue-600 hover:underline break-all mb-1 block" target="_blank" rel="noopener noreferrer">Xem file</a>}
-                            <time className="text-xs font-medium text-gray-400">{new Date(log.timestamp).toLocaleString('vi-VN')}</time>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 {/* Internal Notes Section */}
                 <div className="border-t border-gray-100 pt-5 space-y-4">
                   <h3 className="text-xs font-bold uppercase text-gray-500 flex items-center gap-2">
                     <MessageSquare className="w-4 h-4 text-[#C4A35A]" />
-                    Ghi chú Nội bộ ({selectedLead.internal_notes.length})
+                    Ghi chú Nội bộ ({(selectedLead.internal_notes || []).length})
                   </h3>
 
                   {/* Notes Timeline */}
                   <div className="space-y-3 max-h-48 overflow-y-auto">
-                    {selectedLead.internal_notes.length > 0 ? (
+                    {(selectedLead.internal_notes || []).length > 0 ? (
                       selectedLead.internal_notes.map((note, idx) => (
                         <div key={idx} className="p-3 bg-gray-50 rounded-lg text-xs space-y-1">
                           <div className="flex items-center justify-between text-gray-400 font-medium">
@@ -500,6 +657,218 @@ export default function AdminLeadsPage() {
         </div>
       </main>
 
+      {/* CREATE LEAD MODAL */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl my-8 overflow-hidden">
+            <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
+              <h3 className="font-bold text-gray-900 font-serif text-lg flex items-center gap-2">
+                <PlusCircle className="w-5 h-5 text-[#C4A35A]" />
+                Tạo Lead Khách hàng Mới
+              </h3>
+              <button onClick={() => setShowCreateModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateLeadSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Loại Lead *</label>
+                  <select
+                    value={createForm.lead_type}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, lead_type: e.target.value as any }))}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                  >
+                    <option value="interest">Nhà đầu tư (Quan tâm dự án)</option>
+                    <option value="submission">Ký gửi dự án (Chủ sở hữu)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Họ và tên *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="VD: Nguyễn Văn A"
+                    value={createForm.full_name}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, full_name: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Chức danh</label>
+                  <input
+                    type="text"
+                    placeholder="VD: Giám đốc Đầu tư"
+                    value={createForm.role_title}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, role_title: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Đơn vị / Tổ chức *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="VD: Tập đoàn ABC"
+                    value={createForm.organization}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, organization: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Số điện thoại *</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="VD: 0901234567"
+                    value={createForm.phone}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, phone: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Email liên hệ *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="VD: contact@example.com"
+                    value={createForm.email}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Tên dự án quan tâm / Ký gửi</label>
+                  <input
+                    type="text"
+                    placeholder="VD: Khu đô thị MNA Long Thành"
+                    value={createForm.project_name_location}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, project_name_location: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Hình thức giao dịch</label>
+                  <select
+                    value={createForm.preferred_deal_type}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, preferred_deal_type: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                  >
+                    <option value="buyout">Chuyển nhượng toàn phần (100%)</option>
+                    <option value="joint_venture">Hợp tác đầu tư / Liên doanh</option>
+                    <option value="share_transfer">Chuyển nhượng cổ phần</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Quy mô ước tính</label>
+                <input
+                  type="text"
+                  placeholder="VD: 50 ha hoặc Capex 1.000 Tỷ"
+                  value={createForm.estimated_scale}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, estimated_scale: e.target.value }))}
+                  className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Nội dung / Ghi chú chi tiết</label>
+                <textarea
+                  rows={3}
+                  placeholder="Nhu cầu chi tiết của nhà đầu tư hoặc thông tin sơ bộ dự án..."
+                  value={createForm.message}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, message: e.target.value }))}
+                  className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Tài liệu đính kèm (Teaser / Profile PDF / Doc)</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx,.png,.jpg"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) {
+                        setSelectedFile(f);
+                        handleFileUpload(f);
+                      }
+                    }}
+                    className="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+                  />
+                  {isUploadingFile && <Loader2 className="w-5 h-5 animate-spin text-[#C4A35A] shrink-0" />}
+                </div>
+                {createForm.attachment_url && (
+                  <div className="text-xs text-emerald-600 font-semibold mt-1 flex items-center gap-1">
+                    ✓ Đã tải file: <a href={createForm.attachment_url} target="_blank" rel="noreferrer" className="underline truncate max-w-xs">{createForm.attachment_url}</a>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-900"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingNewLead || isUploadingFile}
+                  className="bg-[#0A1628] hover:bg-[#1E2D42] text-white font-bold px-5 py-2 rounded-lg text-sm flex items-center gap-2 shadow-sm disabled:opacity-50"
+                >
+                  {isSubmittingNewLead ? <Loader2 className="w-4 h-4 animate-spin text-[#C4A35A]" /> : <Send className="w-4 h-4 text-[#C4A35A]" />}
+                  Tạo Lead
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CONFIRM HIDE LEAD MODAL */}
+      {showHideConfirm && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <div className="flex items-center gap-3 text-red-600">
+              <AlertCircle className="w-6 h-6 shrink-0" />
+              <h3 className="text-lg font-bold text-gray-900">Xác nhận Ẩn Lead</h3>
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Bạn có chắc chắn muốn ẩn Lead của <strong className="text-gray-900">{selectedLead?.full_name}</strong> không? 
+              Lead bị ẩn sẽ không còn hiển thị trên danh sách quản trị.
+            </p>
+            <div className="flex justify-end gap-3 pt-2">
+              <button 
+                onClick={() => setShowHideConfirm(false)}
+                className="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-900"
+              >
+                Hủy
+              </button>
+              <button 
+                onClick={handleHideLead} 
+                disabled={isHidingLead}
+                className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1.5"
+              >
+                {isHidingLead ? <Loader2 className="w-4 h-4 animate-spin" /> : <EyeOff className="w-4 h-4" />}
+                Xác nhận Ẩn
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Status Update Modal */}
       {statusModal && statusModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -529,7 +898,7 @@ export default function AdminLeadsPage() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold text-gray-900">Gửi Email thông báo (Mock)</span>
-                  <span className="text-xs text-gray-500">Hệ thống sẽ ghi chú "Đã gửi email" vào lịch sử (tính năng gửi email thật sẽ cập nhật sau).</span>
+                  <span className="text-xs text-gray-500">Hệ thống sẽ ghi chú "Đã gửi email" vào lịch sử.</span>
                 </div>
               </label>
             </div>

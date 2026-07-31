@@ -255,43 +255,81 @@ export async function saveProvince(province: Partial<MdProvince>) {
   if (error) throw error;
 }
 
+export async function updateProvinceName(code: string, name: string) {
+  if (!isSupabaseConfigured) return;
+  const { error } = await supabaseAdmin
+    .from('md_provinces')
+    .update({ name })
+    .eq('code', code);
+  if (error) throw error;
+}
+
+export async function toggleProvinceActive(code: string, is_active: boolean) {
+  if (!isSupabaseConfigured) return;
+  const { error } = await supabaseAdmin
+    .from('md_provinces')
+    .update({ is_active })
+    .eq('code', code);
+  if (error) throw error;
+}
+
 export async function deleteProvince(code: string) {
   const { error } = await supabaseAdmin
     .from('md_provinces')
-    .delete()
+    .update({ is_active: false })
     .eq('code', code);
+  if (error) throw error;
+}
+
+export async function addMasterDataItem(category: string, key: string, label: string) {
+  if (!isSupabaseConfigured) return;
+  const { error } = await supabaseAdmin
+    .from('master_data')
+    .insert([{
+      category,
+      key,
+      label,
+      is_active: true,
+      sort_order: 99
+    }]);
+  if (error) throw error;
+}
+
+export async function updateMasterDataItem(id: string, label: string) {
+  if (!isSupabaseConfigured) return;
+  const { error } = await supabaseAdmin
+    .from('master_data')
+    .update({ label })
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function toggleMasterDataItemActive(id: string, is_active: boolean) {
+  if (!isSupabaseConfigured) return;
+  const { error } = await supabaseAdmin
+    .from('master_data')
+    .update({ is_active })
+    .eq('id', id);
   if (error) throw error;
 }
 
 export async function saveDistrict(district: Partial<MdDistrict>) {
-  const { error } = await supabaseAdmin
-    .from('md_districts')
-    .upsert([district], { onConflict: 'code' });
-  if (error) throw error;
+  // Deprecated: district functionality removed
+  return;
 }
 
 export async function deleteDistrict(code: string) {
-  const { error } = await supabaseAdmin
-    .from('md_districts')
-    .delete()
-    .eq('code', code);
-  if (error) throw error;
+  // Deprecated: district functionality removed
+  return;
 }
 
-export async function batchUpsertLocations(provinces: Partial<MdProvince>[], districts: Partial<MdDistrict>[]) {
+export async function batchUpsertLocations(provinces: Partial<MdProvince>[], districts: Partial<MdDistrict>[] = []) {
   // Upsert Provinces first
-  if (provinces.length > 0) {
+  if (provinces.length > 0 && isSupabaseConfigured) {
     const { error: provError } = await supabaseAdmin
       .from('md_provinces')
       .upsert(provinces, { onConflict: 'code' });
     if (provError) throw provError;
   }
-
-  // Then Upsert Districts
-  if (districts.length > 0) {
-    const { error: distError } = await supabaseAdmin
-      .from('md_districts')
-      .upsert(districts, { onConflict: 'code' });
-    if (distError) throw distError;
-  }
 }
+

@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AdminHeader } from '@/components/admin/AdminHeader';
-import { createProjectAction } from '../actions';
+import { updateProjectAction } from '../../actions';
 import { Project, DealType, ProjectType, PublishStatus } from '@/lib/types';
 import { generateSlug } from '@/lib/utils';
 import { 
@@ -17,55 +17,51 @@ import {
   Languages,
   Loader2
 } from 'lucide-react';
-
 import { MasterDataItem, MdProvince } from '@/lib/master-data-store';
 
-interface CreateProjectClientProps {
+interface EditProjectClientProps {
+  initialProject: Project;
   categories: MasterDataItem[];
   provinces: MdProvince[];
 }
 
-function CreateProjectForm({ categories, provinces }: CreateProjectClientProps) {
+export function EditProjectClient({ initialProject, categories, provinces }: EditProjectClientProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const [projectCode, setProjectCode] = useState(`MNA-0${Math.floor(Math.random() * 90 + 10)}`);
-  const [title, setTitle] = useState(searchParams.get('title') || '');
-  const [dealType, setDealType] = useState<DealType>((searchParams.get('dealType') as DealType) || 'buyout');
-  const [statusLabel, setStatusLabel] = useState('Sẵn Sàng Giao Dịch');
-  const [projectType, setProjectType] = useState<ProjectType>('residential');
-  const [province, setProvince] = useState('Thành phố Hồ Chí Minh');
-  const [scale, setScale] = useState(searchParams.get('scale') || '');
-  const [legalStatus, setLegalStatus] = useState('Quy hoạch 1/500, đã hoàn thành nghĩa vụ tài chính');
-  const [currentStatus, setCurrentStatus] = useState('Đất sạch, sẵn sàng khởi công');
-  const [valuationDisplay, setValuationDisplay] = useState('1,200 Tỷ VNĐ');
-  const [showValuation, setShowValuation] = useState(false);
-  const [capitalStructure, setCapitalStructure] = useState('Mời chào 49% cổ phần, Capex 500 Tỷ');
-  const [description, setDescription] = useState(searchParams.get('desc') || '');
-  const [teaserPdfUrl, setTeaserPdfUrl] = useState('');
+  const [projectCode, setProjectCode] = useState(initialProject.project_code || '');
+  const [title, setTitle] = useState(initialProject.title || '');
+  const [dealType, setDealType] = useState<DealType>(initialProject.deal_type || 'buyout');
+  const [statusLabel, setStatusLabel] = useState(initialProject.status_label || 'Sẵn Sàng Giao Dịch');
+  const [projectType, setProjectType] = useState<ProjectType>(initialProject.project_type || 'residential');
+  const [province, setProvince] = useState(initialProject.province || 'Thành phố Hồ Chí Minh');
+  const [scale, setScale] = useState(initialProject.scale || '');
+  const [legalStatus, setLegalStatus] = useState(initialProject.legal_status_summary || '');
+  const [currentStatus, setCurrentStatus] = useState(initialProject.current_status || '');
+  const [valuationDisplay, setValuationDisplay] = useState(initialProject.valuation_display || '');
+  const [showValuation, setShowValuation] = useState(!!initialProject.show_valuation);
+  const [capitalStructure, setCapitalStructure] = useState(initialProject.capital_structure_summary || '');
+  const [description, setDescription] = useState(initialProject.description || '');
+  const [teaserPdfUrl, setTeaserPdfUrl] = useState(initialProject.teaser_pdf || '');
   const [isUploadingPdf, setIsUploadingPdf] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [highlights, setHighlights] = useState<string[]>([
-    'Vị trí đắc địa mặt tiền đại lộ lớn',
-    'Pháp lý hoàn chỉnh 100%, có 1/500'
-  ]);
+  const [highlights, setHighlights] = useState<string[]>(initialProject.highlights || []);
   const [newHighlight, setNewHighlight] = useState('');
-  const [isFeatured, setIsFeatured] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(!!initialProject.is_featured);
 
   // English Fields
-  const [titleEn, setTitleEn] = useState('');
-  const [statusLabelEn, setStatusLabelEn] = useState('');
-  const [scaleEn, setScaleEn] = useState('');
-  const [legalStatusEn, setLegalStatusEn] = useState('');
-  const [currentStatusEn, setCurrentStatusEn] = useState('');
-  const [valuationDisplayEn, setValuationDisplayEn] = useState('');
-  const [capitalStructureEn, setCapitalStructureEn] = useState('');
-  const [descriptionEn, setDescriptionEn] = useState('');
-  const [highlightsEn, setHighlightsEn] = useState<string[]>([]);
+  const [titleEn, setTitleEn] = useState(initialProject.title_en || '');
+  const [statusLabelEn, setStatusLabelEn] = useState(initialProject.status_label_en || '');
+  const [scaleEn, setScaleEn] = useState(initialProject.scale_en || '');
+  const [legalStatusEn, setLegalStatusEn] = useState(initialProject.legal_status_summary_en || '');
+  const [currentStatusEn, setCurrentStatusEn] = useState(initialProject.current_status_en || '');
+  const [valuationDisplayEn, setValuationDisplayEn] = useState(initialProject.valuation_display_en || '');
+  const [capitalStructureEn, setCapitalStructureEn] = useState(initialProject.capital_structure_summary_en || '');
+  const [descriptionEn, setDescriptionEn] = useState(initialProject.description_en || '');
+  const [highlightsEn, setHighlightsEn] = useState<string[]>(initialProject.highlights_en || []);
   const [isTranslating, setIsTranslating] = useState(false);
   
-  const [publishStatus, setPublishStatus] = useState<PublishStatus>(searchParams.get('title') ? 'draft' : 'published');
+  const [publishStatus, setPublishStatus] = useState<PublishStatus>(initialProject.publish_status || 'published');
 
   const handleAddHighlight = () => {
     if (newHighlight.trim()) {
@@ -149,7 +145,7 @@ function CreateProjectForm({ categories, provinces }: CreateProjectClientProps) 
 
     setIsSubmitting(true);
 
-    const newProject: Partial<Project> = {
+    const updatedProject: Partial<Project> = {
       project_code: projectCode,
       title,
       title_en: titleEn,
@@ -174,24 +170,18 @@ function CreateProjectForm({ categories, provinces }: CreateProjectClientProps) 
       highlights_en: highlightsEn.length > 0 ? highlightsEn : [],
       description: description || title,
       description_en: descriptionEn,
-      gallery_images: [
-        'https://picsum.photos/seed/mna_new1/800/600',
-        'https://picsum.photos/seed/mna_new2/800/600'
-      ],
-      teaser_pdf: teaserPdfUrl || 'teaser_sample.pdf',
+      teaser_pdf: teaserPdfUrl,
       is_featured: isFeatured,
-      featured_order: 1,
       publish_status: publishStatus,
-      is_active: true,
     };
 
     try {
-      await createProjectAction(newProject);
-      alert('Đã thêm dự án thành công!');
+      await updateProjectAction(initialProject.id, updatedProject);
+      alert('Cập nhật dự án thành công!');
       router.push('/admin/du-an');
     } catch (error) {
       console.error(error);
-      alert('Có lỗi xảy ra khi thêm dự án.');
+      alert('Có lỗi xảy ra khi cập nhật dự án.');
     } finally {
       setIsSubmitting(false);
     }
@@ -200,8 +190,8 @@ function CreateProjectForm({ categories, provinces }: CreateProjectClientProps) 
   return (
     <div className="flex-1 pb-16">
       <AdminHeader 
-        title="Thêm Dự án M&A Mới" 
-        subtitle="Biên tập và chuẩn hóa thông tin Teaser công khai cho dự án" 
+        title={`Chỉnh sửa Dự án: ${initialProject.title}`} 
+        subtitle={`Mã dự án: ${initialProject.project_code || initialProject.id}`} 
       />
 
       <main className="px-8 py-8 max-w-5xl">
@@ -242,7 +232,7 @@ function CreateProjectForm({ categories, provinces }: CreateProjectClientProps) 
                 className="px-6 py-2 text-sm font-bold text-[#0A1628] bg-[#C4A35A] hover:bg-[#b09048] rounded-lg flex items-center gap-2 transition-all shadow-md disabled:opacity-50"
               >
                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                Xuất bản Dự án
+                Lưu Thay Đổi
               </button>
             </div>
           </div>
@@ -623,13 +613,13 @@ function CreateProjectForm({ categories, provinces }: CreateProjectClientProps) 
                   ) : (
                     <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                   )}
-                  <div className="text-xs font-semibold text-gray-700">Tải lên file Teaser PDF</div>
+                  <div className="text-xs font-semibold text-gray-700">Tải lên file Teaser PDF mới</div>
                   <div className="text-[11px] text-gray-400 mt-1">Bucket 'attachments' / Tối đa 15MB</div>
                 </label>
 
                 {teaserPdfUrl && (
                   <div className="text-xs text-emerald-600 font-semibold flex items-center gap-1">
-                    ✓ File PDF: <a href={teaserPdfUrl} target="_blank" rel="noreferrer" className="underline truncate max-w-xs">{teaserPdfUrl}</a>
+                    ✓ File PDF hiện tại: <a href={teaserPdfUrl} target="_blank" rel="noreferrer" className="underline truncate max-w-xs">{teaserPdfUrl}</a>
                   </div>
                 )}
               </div>
@@ -666,13 +656,5 @@ function CreateProjectForm({ categories, provinces }: CreateProjectClientProps) 
         </form>
       </main>
     </div>
-  );
-}
-
-export function CreateProjectClient(props: CreateProjectClientProps) {
-  return (
-    <Suspense fallback={<div className="p-8 text-center text-gray-500">Đang tải...</div>}>
-      <CreateProjectForm {...props} />
-    </Suspense>
   );
 }

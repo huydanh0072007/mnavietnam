@@ -16,7 +16,7 @@ export interface Project {
   status_label_en?: string;
   project_type: ProjectType;
   province: string;
-  district: string;
+  district?: string;
   scale: string;
   scale_en?: string;
   legal_status_summary: string;
@@ -37,6 +37,7 @@ export interface Project {
   is_featured: boolean;
   featured_order: number;
   publish_status: PublishStatus;
+  is_active?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -61,6 +62,7 @@ export interface Lead {
   internal_notes: Array<{text: string; author: string; timestamp: string}>;
   audit_logs?: Array<{action: string; file_url?: string; timestamp: string}>;
   signature_url?: string;
+  is_active?: boolean;
   created_at: string;
 }
 
