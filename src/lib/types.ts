@@ -1,5 +1,5 @@
-export type DealType = 'buyout' | 'joint_venture';
-export type ProjectType = 'residential' | 'resort' | 'commercial' | 'urban_low_rise' | 'industrial' | 'other';
+export type DealType = 'buyout' | 'partial_transfer' | 'share_transfer' | 'joint_venture' | 'lease';
+export type ProjectType = 'residential' | 'resort' | 'commercial' | 'industrial' | 'logistics' | 'hospitality' | 'healthcare' | 'education' | 'energy' | 'agriculture' | 'other';
 export type PublishStatus = 'draft' | 'published' | 'hidden';
 export type LeadType = 'interest' | 'submission';
 export type InvestorLeadStatus = 'new' | 'contacted' | 'nda_sent' | 'due_diligence' | 'closed_won' | 'closed_lost';
