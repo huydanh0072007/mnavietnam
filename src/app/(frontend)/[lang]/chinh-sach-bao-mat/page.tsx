@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-import { getDictionary } from '@/dictionaries/dictionaries';
+import { getDictionary } from '@/lib/get-dictionary';
 
 export async function generateMetadata({ params: { lang } }: { params: { lang: string } }): Promise<Metadata> {
   const dict = await getDictionary(lang as any);
