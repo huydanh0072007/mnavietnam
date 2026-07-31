@@ -2,7 +2,8 @@ import React from 'react';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/get-dictionary';
 
-export async function generateMetadata({ params: { lang } }: { params: { lang: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<any> }): Promise<Metadata> {
+  const { lang } = await params;
   const dict = await getDictionary(lang as any);
   return {
     title: `${dict.privacy.title} | M$A International`,
@@ -10,7 +11,8 @@ export async function generateMetadata({ params: { lang } }: { params: { lang: s
   };
 }
 
-export default async function PrivacyPolicyPage({ params: { lang } }: { params: { lang: string } }) {
+export default async function PrivacyPolicyPage({ params }: { params: Promise<any> }) {
+  const { lang } = await params;
   const dict = await getDictionary(lang as any);
   
   return (
