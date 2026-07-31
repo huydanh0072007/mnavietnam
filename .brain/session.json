@@ -1,29 +1,38 @@
 {
-  "updated_at": "2026-07-30T21:55:00Z",
+  "updated_at": "2026-07-30T22:50:00Z",
   "working_on": {
-    "feature": "Security Audit & Localization (i18n)",
-    "task": "Fixed SSRF False Positive & Confirmed Rate Limiting + Finished i18n synchronization",
+    "feature": "Admin Authentication & Session State",
+    "task": "Fixed serverless session loss (kicked out issue) on Vercel for Admin VDR page",
     "status": "completed",
     "files": [
-      "src/app/api/leads/route.ts",
-      "src/app/api/auth/login/route.ts",
-      "src/app/(frontend)/[lang]/ky-gui/page.tsx",
-      "src/app/(frontend)/[lang]/dieu-khoan-su-dung/page.tsx",
-      "src/dictionaries/vi.json",
-      "src/dictionaries/en.json",
-      "vbsec-reports/scan-2026-07-30-214400.md"
+      "src/app/(admin)/admin/vdr/page.tsx",
+      "src/app/(admin)/admin/leads/page.tsx",
+      "src/app/(admin)/admin/cai-dat/page.tsx",
+      "src/app/(admin)/admin/du-an/taomoi/CreateProjectClient.tsx",
+      "src/lib/auth.ts"
     ],
     "blockers": [],
-    "notes": "Đã sửa hoàn toàn tình trạng sót tiếng Việt khi giao diện ở ngôn ngữ tiếng Anh. Quét bảo mật toàn bộ source code không còn lỗi Critical/High/Medium, Rate Limit đã được bảo vệ đầy đủ."
+    "notes": "Đã chuyển từ in-memory session sang stateless session HMAC và bổ sung `credentials: 'include'` cho toàn bộ các fetch calls trong trang admin (đặc biệt là trang VDR) để trình duyệt truyền cookie xác thực chính xác lên Vercel."
   },
   "pending_tasks": [
     {
-      "task": "Review and Deploy to Vercel",
+      "task": "Wait for user confirmation on Vercel deployment",
       "priority": "high",
-      "notes": "Code is secure and localized. Ready for production."
+      "notes": "User is testing the admin VDR page to confirm they are no longer kicked out."
     }
   ],
   "recent_changes": [
+    {
+      "timestamp": "2026-07-30T22:45:00Z",
+      "type": "bugfix",
+      "description": "Bổ sung `credentials: 'include'` vào tất cả các `fetch` gọi API trong giao diện admin để hỗ trợ stateless auth cookie.",
+      "files": [
+        "src/app/(admin)/admin/vdr/page.tsx",
+        "src/app/(admin)/admin/leads/page.tsx",
+        "src/app/(admin)/admin/cai-dat/page.tsx",
+        "src/app/(admin)/admin/du-an/taomoi/CreateProjectClient.tsx"
+      ]
+    },
     {
       "timestamp": "2026-07-30T21:40:00Z",
       "type": "feature",
@@ -34,22 +43,19 @@
         "src/dictionaries/vi.json",
         "src/dictionaries/en.json"
       ]
-    },
-    {
-      "timestamp": "2026-07-30T21:44:00Z",
-      "type": "security",
-      "description": "Run vbsec scanner and confirm zero critical/high/medium vulnerabilities (SSRF safe, Rate limiting active). Updated .gitignore to exclude tmp files.",
-      "files": [
-        "vbsec-reports/scan-2026-07-30-214400.md",
-        ".gitignore"
-      ]
     }
   ],
-  "errors_encountered": [],
+  "errors_encountered": [
+    {
+      "error": "VDR Admin page kicks user out to login screen",
+      "solution": "Added `credentials: 'include'` to fetch calls so the session cookie is correctly sent to the API on Vercel serverless environment.",
+      "resolved": true
+    }
+  ],
   "decisions_made": [
     {
-      "decision": "Bỏ qua các file .vbsec-tmp khi commit",
-      "reason": "Đây là file rác tạm thời của tool quét bảo mật, đã đưa vào .gitignore"
+      "decision": "Use stateless HMAC signed session tokens via cookies",
+      "reason": "Vercel serverless functions drop in-memory rate-limiters and session maps between requests."
     }
   ]
 }

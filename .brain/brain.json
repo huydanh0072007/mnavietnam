@@ -38,12 +38,16 @@
   "features": [
     "Danh mục dự án M&A (Lọc theo loại giao dịch, tỉnh thành, loại BĐS)",
     "Hệ thống Ký gửi dự án BĐS (Bảo mật thông tin)",
-    "Admin Dashboard (Quản lý dự án, Quản lý Leads, Cài đặt hệ thống)",
+    "Admin Dashboard (Quản lý dự án, Quản lý Leads, Cài đặt hệ thống, VDR)",
     "Gửi email thông báo tự động (Nodemailer + Cấu hình động SMTP)"
   ],
   "knowledge_items": { 
-    "patterns": ["Supabase singleton row for global settings", "Radix UI Slot for Next.js Link nesting"], 
-    "gotchas": ["Cần gọi API logout để xóa cookie server thay vì chỉ redirect", "Tham số URL (search parameters) phải đồng bộ tuyệt đối giữa components Header/Footer và DanhMucClient"], 
+    "patterns": ["Supabase singleton row for global settings", "Radix UI Slot for Next.js Link nesting", "Stateless HMAC-signed cookies for admin session"], 
+    "gotchas": [
+      "Cần gọi API logout để xóa cookie server thay vì chỉ redirect", 
+      "Tham số URL (search parameters) phải đồng bộ tuyệt đối giữa components Header/Footer và DanhMucClient",
+      "Stateless session trên Vercel yêu cầu bổ sung `credentials: 'include'` cho toàn bộ các client-side fetch() API trong Admin Dashboard để truyền cookie xác thực."
+    ], 
     "conventions": ["Màu thương hiệu: Navy (#0A1628) và Gold (#C4A35A)"] 
   }
 }
