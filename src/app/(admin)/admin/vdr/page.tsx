@@ -50,9 +50,9 @@ export default function VDRManagementPage() {
   }, []);
 
   const filteredSignatures = signatures.filter(s => 
-    s.full_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    s.email.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    s.project_code.toLowerCase().includes(searchTerm.toLowerCase())
+    (s.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (s.email || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (s.project_code || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
