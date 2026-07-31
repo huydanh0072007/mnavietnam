@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Project } from '@/lib/types';
 import { toggleProjectFeatured, toggleProjectPublishStatus, actionHideProject } from './actions';
+import { formatDate } from '@/lib/utils';
 import { 
   Plus, 
   Search, 
@@ -26,6 +27,7 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'title_asc' | 'title_desc'>('newest');
 
   // Confirm Hide Modal State
   const [hideConfirmProject, setHideConfirmProject] = useState<Project | null>(null);
@@ -53,6 +55,48 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
     
     return matchSearch && matchDeal && matchStatus && matchDateRange;
   });
+
+  // Sort projects after filtering
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === 'newest') {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    }
+    if (sortBy === 'oldest') {
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    }
+    if (sortBy === 'title_asc') {
+      return a.title.localeCompare(b.title, 'vi');
+    }
+    if (sortBy === 'title_desc') {
+      return b.title.localeCompare(a.title, 'vi');
+    }
+    return 0;
+  });
+
+  const handleExportCSV = () => {
+    const headers = ['Mã Dự án', 'Tên Dự án', 'Hình thức Giao dịch', 'Tỉnh/Thành', 'Quy mô', 'Hiện trạng', 'Trạng thái', 'Ngày tạo'];
+    const rows = sorted.map(p => [
+      p.project_code,
+      `"${p.title.replace(/"/g, '""')}"`,
+      p.deal_type === 'buyout' ? 'Chuyển nhượng 100%' : 'Hợp tác đầu tư',
+      `"${p.province || ''}"`,
+      `"${(p.scale || '').replace(/"/g, '""')}"`,
+      `"${(p.current_status || '').replace(/"/g, '""')}"`,
+      p.publish_status === 'published' ? 'Public' : 'Hidden',
+      formatDate(p.created_at)
+    ]);
+
+    // Sử dụng \uFEFF ở đầu file CSV để Excel mở trực tiếp hiển thị Unicode tiếng Việt chuẩn
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `MNA_Projects_Export_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const toggleFeatured = async (id: string) => {
     const project = projects.find(p => p.id === id);
@@ -115,8 +159,8 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
 
       <main className="px-8 py-8 space-y-6 max-w-7xl">
         {/* Action Header */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-col xl:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
             {/* Search */}
             <div className="relative flex-1 sm:w-64">
               <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -152,6 +196,18 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
               <option value="hidden">Đã ẩn (Hidden)</option>
             </select>
 
+            {/* Sorting Dropdown */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#C4A35A]"
+            >
+              <option value="newest">Mới nhất (Newest)</option>
+              <option value="oldest">Cũ nhất (Oldest)</option>
+              <option value="title_asc">Tên A-Z</option>
+              <option value="title_desc">Tên Z-A</option>
+            </select>
+
             <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-700">
               <span className="text-gray-500 font-medium">Từ</span>
               <input
@@ -179,13 +235,23 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
             </div>
           </div>
 
-          <Link
-            href="/admin/du-an/taomoi"
-            className="bg-[#C4A35A] hover:bg-[#b09048] text-[#0A1628] font-bold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 transition-all shadow-md shrink-0 w-full sm:w-auto justify-center"
-          >
-            <Plus className="w-4 h-4" />
-            Đăng Dự án Mới
-          </Link>
+          <div className="flex items-center gap-3 w-full xl:w-auto shrink-0 justify-end">
+            <button
+              onClick={handleExportCSV}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-lg text-sm flex items-center gap-2 transition-all shadow-md shrink-0 w-full sm:w-auto justify-center"
+            >
+              <FileDown className="w-4 h-4" />
+              Xuất Excel (.CSV)
+            </button>
+
+            <Link
+              href="/admin/du-an/taomoi"
+              className="bg-[#C4A35A] hover:bg-[#b09048] text-[#0A1628] font-bold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 transition-all shadow-md shrink-0 w-full sm:w-auto justify-center"
+            >
+              <Plus className="w-4 h-4" />
+              Đăng Dự án Mới
+            </Link>
+          </div>
         </div>
 
         {/* Projects Table */}
@@ -204,7 +270,7 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filtered.map((project) => (
+                {sorted.map((project) => (
                   <tr key={project.id} className="hover:bg-gray-50/80 transition-colors">
                     {/* Featured Star Toggle */}
                     <td className="py-4 px-6">
@@ -336,7 +402,7 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
                     </td>
                   </tr>
                 ))}
-                {filtered.length === 0 && (
+                {sorted.length === 0 && (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-gray-400">
                       Không tìm thấy dự án phù hợp
