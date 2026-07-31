@@ -51,6 +51,9 @@ export default function AdminLeadsPage() {
   const [selectedLead, setSelectedLead] = useState<LeadItem | null>(null);
   const [typeFilter, setTypeFilter] = useState<'all' | 'interest' | 'submission'>('all');
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [monthFilter, setMonthFilter] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
   const [newNoteText, setNewNoteText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmittingNewLead, setIsSubmittingNewLead] = useState(false);
@@ -59,6 +62,15 @@ export default function AdminLeadsPage() {
   // Status Modal State
   const [statusModal, setStatusModal] = useState<{isOpen: boolean; leadId: string; newStatus: string; currentStatus: string} | null>(null);
   const [sendEmail, setSendEmail] = useState(true);
+
+  React.useEffect(() => {
+    setStatusFilter('all');
+    setCurrentPage(1);
+  }, [typeFilter]);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [search, statusFilter, monthFilter]);
 
   // Confirm Hide Modal State
   const [showHideConfirm, setShowHideConfirm] = useState(false);
@@ -105,13 +117,50 @@ export default function AdminLeadsPage() {
   // Filter out non-active leads first
   const activeLeadsOnly = leads.filter(l => l.is_active !== false);
 
+  const availableMonths = React.useMemo(() => {
+    const months = new Set<string>();
+    activeLeadsOnly.forEach(l => {
+      if (l.created_at) {
+        const date = new Date(l.created_at);
+        if (!isNaN(date.getTime())) {
+          const month = (date.getMonth() + 1).toString().padStart(2, '0');
+          const year = date.getFullYear();
+          months.add(`${month}/${year}`);
+        }
+      }
+    });
+    return Array.from(months).sort((a, b) => {
+      const [monthA, yearA] = a.split('/').map(Number);
+      const [monthB, yearB] = b.split('/').map(Number);
+      return yearB - yearA || monthB - monthA;
+    });
+  }, [activeLeadsOnly]);
+
   const filteredLeads = activeLeadsOnly.filter(l => {
     const matchType = typeFilter === 'all' || l.lead_type === typeFilter;
     const matchSearch = (l.full_name || '').toLowerCase().includes(search.toLowerCase()) ||
                         (l.organization || '').toLowerCase().includes(search.toLowerCase()) ||
                         (l.phone || '').includes(search);
-    return matchType && matchSearch;
+    const matchStatus = statusFilter === 'all' || l.status === statusFilter;
+    
+    let matchMonth = true;
+    if (monthFilter !== 'all') {
+      const date = new Date(l.created_at);
+      if (!isNaN(date.getTime())) {
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        matchMonth = `${month}/${year}` === monthFilter;
+      } else {
+        matchMonth = false;
+      }
+    }
+    
+    return matchType && matchSearch && matchStatus && matchMonth;
   });
+
+  const totalPages = Math.ceil(filteredLeads.length / 20) || 1;
+  const startIndex = (currentPage - 1) * 20;
+  const paginatedLeads = filteredLeads.slice(startIndex, startIndex + 20);
 
   const handleFileUpload = async (file: File) => {
     setIsUploadingFile(true);
@@ -360,8 +409,8 @@ export default function AdminLeadsPage() {
       />
 
       <main className="px-8 py-8 max-w-7xl space-y-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
             <div className="flex bg-gray-100 rounded-lg p-1 text-xs font-semibold">
               <button
                 onClick={() => setTypeFilter('all')}
@@ -393,6 +442,43 @@ export default function AdminLeadsPage() {
                 className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-[#C4A35A]"
               />
             </div>
+
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4A35A] min-w-[150px] text-gray-700"
+            >
+              <option value="all">Tất cả trạng thái</option>
+              {typeFilter === 'all' || typeFilter === 'interest' ? (
+                <optgroup label="Nhà đầu tư">
+                  <option value="new">Mới (New)</option>
+                  <option value="contacted">Đã liên hệ (Contacted)</option>
+                  <option value="nda_sent">Đang gửi NDA (NDA Sent)</option>
+                  <option value="due_diligence">Đang thẩm định (Due Diligence)</option>
+                  <option value="closed_won">Đóng deal (Closed Won)</option>
+                  <option value="closed_lost">Không thành công (Closed Lost)</option>
+                </optgroup>
+              ) : null}
+              {typeFilter === 'all' || typeFilter === 'submission' ? (
+                <optgroup label="Ký gửi dự án">
+                  <option value="draft_pending">Draft chờ thẩm định</option>
+                  <option value="in_progress">Đang làm việc offline</option>
+                  <option value="published">Đã lên bài (Published)</option>
+                  <option value="rejected">Từ chối ký gửi</option>
+                </optgroup>
+              ) : null}
+            </select>
+
+            <select
+              value={monthFilter}
+              onChange={(e) => setMonthFilter(e.target.value)}
+              className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4A35A] min-w-[150px] text-gray-700"
+            >
+              <option value="all">Tất cả tháng</option>
+              {availableMonths.map(m => (
+                <option key={m} value={m}>Tháng {m}</option>
+              ))}
+            </select>
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
@@ -424,10 +510,10 @@ export default function AdminLeadsPage() {
             <div className="max-h-[600px] overflow-y-auto divide-y divide-gray-100">
               {isLoading ? (
                 <div className="p-8 text-center text-gray-400">Đang tải danh sách...</div>
-              ) : filteredLeads.length === 0 ? (
+              ) : paginatedLeads.length === 0 ? (
                 <div className="p-8 text-center text-gray-400">Không có dữ liệu Lead</div>
               ) : (
-                filteredLeads.map((lead) => {
+                paginatedLeads.map((lead) => {
                   const isSelected = selectedLead?.id === lead.id;
                   return (
                     <div
@@ -469,6 +555,29 @@ export default function AdminLeadsPage() {
                 })
               )}
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-gray-500">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1.5 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Trang trước
+                </button>
+                <span>
+                  Trang {currentPage} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1.5 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Trang sau
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Lead Detail View */}

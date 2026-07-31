@@ -2,6 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { getProjects } from '@/lib/projects-store';
+import { getLeads } from '@/lib/leads-store';
+import { formatDate, getLeadStatusLabel } from '@/lib/utils';
 import { 
   Building2, 
   Users, 
@@ -22,7 +24,14 @@ export default async function AdminDashboardPage() {
   const publishedProjects = projects.filter(p => p.publish_status === 'published');
   const featuredProjects = projects.filter(p => p.is_featured);
 
-  // Mock lead statistics
+  const allLeads = await getLeads();
+  const activeLeads = allLeads.filter(l => l.is_active !== false);
+
+  const totalLeads = activeLeads.length;
+  const newLeadsCount = activeLeads.filter(l => l.status === 'new' || l.status === 'draft_pending').length;
+  const vdrCount = activeLeads.filter(l => ['nda_sent', 'due_diligence', 'closed_won'].includes(l.status)).length;
+
+  // Real statistics
   const stats = [
     {
       title: 'Tổng số Dự án',
@@ -33,14 +42,14 @@ export default async function AdminDashboardPage() {
     },
     {
       title: 'Tổng Lead thu thập',
-      value: 38,
-      sub: '+12% so với tháng trước',
+      value: totalLeads,
+      sub: 'Yêu cầu & Ký gửi',
       icon: Users,
       color: 'bg-[#C4A35A]/10 text-[#C4A35A]',
     },
     {
       title: 'Lead mới cần xử lý',
-      value: 5,
+      value: newLeadsCount,
       sub: 'Cần liên hệ trong 24h',
       icon: Clock,
       color: 'bg-amber-500/10 text-amber-600',
@@ -54,55 +63,14 @@ export default async function AdminDashboardPage() {
     },
     {
       title: 'Truy cập VDR',
-      value: 12,
+      value: vdrCount,
       sub: 'Đã ký NDA điện tử',
       icon: ShieldAlert,
       color: 'bg-purple-500/10 text-purple-600',
     },
   ];
 
-  const recentLeads = [
-    {
-      id: 'L-101',
-      name: 'Nguyễn Văn Minh',
-      org: 'Quỹ Đầu Tư VinaCapital',
-      type: 'Nhà đầu tư',
-      project: 'MNA-01 - Khu đô thị Bình Dương',
-      phone: '0903 123 456',
-      status: 'new',
-      time: '10 phút trước',
-    },
-    {
-      id: 'L-102',
-      name: 'Trần Thị Thu Trang',
-      org: 'Tập đoàn Địa ốc Hưng Thịnh',
-      type: 'Ký gửi dự án',
-      project: 'Dự án Đất sạch Phú Quốc 15ha',
-      phone: '0988 765 432',
-      status: 'draft_pending',
-      time: '1 giờ trước',
-    },
-    {
-      id: 'L-103',
-      name: 'Michael Chen',
-      org: 'CapitaLand Singapore',
-      type: 'Nhà đầu tư',
-      project: 'MNA-03 - Khu dân cư Quận 2',
-      phone: '0912 345 678',
-      status: 'contacted',
-      time: '3 giờ trước',
-    },
-    {
-      id: 'L-104',
-      name: 'Lê Hoàng Nam',
-      org: 'Công ty CP Đầu tư Nam Long',
-      type: 'Ký gửi dự án',
-      project: 'Khu dân cư Long An 8ha',
-      phone: '0934 567 890',
-      status: 'in_progress',
-      time: 'Hôm qua',
-    },
-  ];
+  const recentActiveLeads = activeLeads.slice(0, 5);
 
   return (
     <div className="flex-1 pb-16">
@@ -161,7 +129,7 @@ export default async function AdminDashboardPage() {
                 href="/admin/leads" 
                 className="text-xs font-bold text-[#C4A35A] hover:text-[#0A1628] flex items-center gap-1 transition-colors"
               >
-                Xem tất cả ({stats[1].value})
+                Xem tất cả ({totalLeads})
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -177,34 +145,40 @@ export default async function AdminDashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {recentLeads.map((lead) => (
-                    <tr key={lead.id} className="hover:bg-gray-50/80 transition-colors">
-                      <td className="py-3.5 px-4">
-                        <div className="font-semibold text-gray-900">{lead.name}</div>
-                        <div className="text-xs text-gray-400">{lead.org}</div>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span className={`inline-block px-2.5 py-0.5 rounded text-xs font-medium ${
-                          lead.type === 'Nhà đầu tư' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-purple-50 text-purple-700 border border-purple-200'
-                        }`}>
-                          {lead.type}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-xs font-medium text-gray-700 max-w-[200px] truncate">
-                        {lead.project}
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${
-                          lead.status === 'new' ? 'bg-amber-100 text-amber-800 animate-pulse' :
-                          lead.status === 'draft_pending' ? 'bg-purple-100 text-purple-800' :
-                          'bg-blue-100 text-blue-800'
-                        }`}>
-                          {lead.status === 'new' && <AlertCircle className="w-3 h-3 text-amber-600" />}
-                          {lead.status === 'new' ? 'Mới' : lead.status === 'draft_pending' ? 'Chờ thẩm định' : 'Đã liên hệ'}
-                        </span>
-                      </td>
+                  {recentActiveLeads.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="py-8 text-center text-gray-400">Không có lead nào gần đây.</td>
                     </tr>
-                  ))}
+                  ) : (
+                    recentActiveLeads.map((lead) => (
+                      <tr key={lead.id} className="hover:bg-gray-50/80 transition-colors">
+                        <td className="py-3.5 px-4">
+                          <div className="font-semibold text-gray-900">{lead.full_name}</div>
+                          <div className="text-xs text-gray-400">{lead.organization}</div>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span className={`inline-block px-2.5 py-0.5 rounded text-xs font-medium ${
+                            lead.lead_type === 'interest' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-purple-50 text-purple-700 border border-purple-200'
+                          }`}>
+                            {lead.lead_type === 'interest' ? 'Nhà đầu tư' : 'Ký gửi dự án'}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-xs font-medium text-gray-700 max-w-[200px] truncate">
+                          {lead.related_project_title || lead.project_name_location || 'Dự án chung'}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${
+                            lead.status === 'new' ? 'bg-amber-100 text-amber-800 animate-pulse' :
+                            lead.status === 'draft_pending' ? 'bg-purple-100 text-purple-800' :
+                            'bg-blue-100 text-blue-800'
+                          }`}>
+                            {lead.status === 'new' && <AlertCircle className="w-3 h-3 text-amber-600" />}
+                            {getLeadStatusLabel(lead.status)}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

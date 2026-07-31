@@ -17,43 +17,186 @@ interface NDASignature {
   signed_at: string;
   status: string;
   signature_url?: string;
+  internal_notes?: any[];
 }
 
 export default function VDRManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [signatures, setSignatures] = useState<NDASignature[]>([]);
+  const [projectFilter, setProjectFilter] = useState<string>('all');
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  // Modal States
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    sigId: string;
+    action: 'approve' | 'reject' | 'revoke';
+    fullName: string;
+  } | null>(null);
+
+  const [signatureModal, setSignatureModal] = useState<{
+    isOpen: boolean;
+    signatureUrl?: string;
+    fullName: string;
+  } | null>(null);
+
+  const fetchSignatures = () => {
     fetch('/api/leads', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (!data.error && Array.isArray(data)) {
-          // Map leads with signatures or specific status to NDA list
           const ndaList = data
-            .filter(l => l.lead_type === 'interest' && ['nda_sent', 'due_diligence', 'closed_won'].includes(l.status))
+            .filter(l => l.lead_type === 'interest' && ['nda_sent', 'due_diligence', 'closed_won', 'rejected'].includes(l.status))
             .map(l => ({
               id: l.id,
               project_code: l.related_project_title?.split(' ')[0] || 'Unknown',
               full_name: l.full_name,
               org: l.organization,
               email: l.email,
-              ip_address: 'Hidden for privacy',
-              user_agent: 'Hidden for privacy',
+              ip_address: l.ip_address || 'Hidden for privacy',
+              user_agent: l.user_agent || 'Hidden for privacy',
               agreed_to_pdpd: true,
               signed_at: l.created_at,
-              status: l.status === 'due_diligence' || l.status === 'closed_won' ? 'approved' : 'pending',
-              signature_url: l.signature_url
+              status: l.status === 'due_diligence' || l.status === 'closed_won' 
+                ? 'approved' 
+                : l.status === 'rejected' 
+                  ? 'rejected' 
+                  : 'pending',
+              signature_url: l.signature_url,
+              internal_notes: l.internal_notes || []
             }));
           setSignatures(ndaList);
         }
       });
+  };
+
+  React.useEffect(() => {
+    fetchSignatures();
   }, []);
 
-  const filteredSignatures = signatures.filter(s => 
-    (s.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-    (s.email || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-    (s.project_code || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const projectCodes = React.useMemo(() => {
+    const codes = new Set<string>();
+    signatures.forEach(s => {
+      if (s.project_code) codes.add(s.project_code);
+    });
+    return Array.from(codes).sort();
+  }, [signatures]);
+
+  const triggerUpdateStatus = (sigId: string, fullName: string, action: 'approve' | 'reject' | 'revoke') => {
+    setConfirmModal({
+      isOpen: true,
+      sigId,
+      action,
+      fullName
+    });
+  };
+
+  const handleConfirmUpdate = async () => {
+    if (!confirmModal) return;
+    const { sigId, action } = confirmModal;
+    setConfirmModal(null);
+    setUpdatingId(sigId);
+
+    const sig = signatures.find(s => s.id === sigId);
+    if (!sig) return;
+
+    let targetLeadStatus: string = 'nda_sent';
+    let actionText = '';
+    
+    if (action === 'approve') {
+      targetLeadStatus = 'due_diligence';
+      actionText = 'Duyệt quyền truy cập VDR';
+    } else if (action === 'reject') {
+      targetLeadStatus = 'rejected';
+      actionText = 'Từ chối quyền truy cập VDR';
+    } else if (action === 'revoke') {
+      targetLeadStatus = 'nda_sent';
+      actionText = 'Thu hồi quyền truy cập VDR';
+    }
+
+    const timestamp = new Date().toLocaleString('vi-VN');
+    const newNote = {
+      text: `Admin thực hiện: ${actionText} lúc ${timestamp}`,
+      author: 'Super Admin',
+      timestamp: new Date().toISOString().replace('T', ' ').slice(0, 16),
+    };
+
+    const updatedNotes = [...(sig.internal_notes || []), newNote];
+
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: sigId,
+          updates: {
+            status: targetLeadStatus,
+            internal_notes: updatedNotes
+          }
+        })
+      });
+
+      if (res.ok) {
+        setSignatures(prev => prev.map(s => {
+          if (s.id === sigId) {
+            return {
+              ...s,
+              status: action === 'approve' ? 'approved' : action === 'reject' ? 'rejected' : 'pending',
+              internal_notes: updatedNotes
+            };
+          }
+          return s;
+        }));
+      } else {
+        alert('Cập nhật trạng thái thất bại');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Có lỗi xảy ra khi cập nhật');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const openSignatureModal = (fullName: string, signatureUrl?: string) => {
+    setSignatureModal({
+      isOpen: true,
+      signatureUrl,
+      fullName
+    });
+  };
+
+  const handleExportAuditCSV = () => {
+    const headers = ['Mã Lead', 'Nhà đầu tư', 'Đơn vị', 'Email', 'Dự án yêu cầu', 'IP Address', 'Trạng thái', 'Thời gian ký'];
+    const rows = filteredSignatures.map(s => [
+      s.id,
+      `"${s.full_name}"`,
+      `"${s.org}"`,
+      s.email,
+      s.project_code,
+      s.ip_address,
+      s.status === 'approved' ? 'Đã cấp quyền' : s.status === 'rejected' ? 'Từ chối' : 'Chờ duyệt',
+      new Date(s.signed_at).toLocaleString('vi-VN')
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `VDR_Audit_Log_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const filteredSignatures = signatures.filter(s => {
+    const matchSearch = (s.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                        (s.email || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                        (s.project_code || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const matchProject = projectFilter === 'all' || s.project_code === projectFilter;
+    return matchSearch && matchProject;
+  });
 
   return (
     <div className="flex-1 pb-16 bg-gray-50 min-h-screen">
@@ -75,20 +218,37 @@ export default function VDRManagementPage() {
 
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <div className="relative w-full sm:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input 
-              type="text"
-              placeholder="Tìm kiếm theo Tên, Email hoặc Mã dự án..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C4A35A] focus:border-transparent text-sm"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            <div className="relative w-full sm:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input 
+                type="text"
+                placeholder="Tìm kiếm theo Tên, Email..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C4A35A] focus:border-transparent text-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <select
+              value={projectFilter}
+              onChange={(e) => setProjectFilter(e.target.value)}
+              className="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C4A35A] text-gray-700 w-full sm:w-auto min-w-[150px]"
+            >
+              <option value="all">Tất cả dự án</option>
+              {projectCodes.map(code => (
+                <option key={code} value={code}>{code}</option>
+              ))}
+            </select>
           </div>
-          <div className="flex gap-2">
-            <button className="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg text-sm flex items-center gap-2 hover:bg-gray-200 transition-colors">
-              <Download className="w-4 h-4" />
-              Xuất Log Kiểm toán (Audit)
+
+          <div className="flex gap-2 w-full sm:w-auto justify-end">
+            <button 
+              onClick={handleExportAuditCSV}
+              className="px-4 py-2 bg-[#0A1628] hover:bg-[#1E2D42] text-[#C4A35A] font-bold rounded-lg text-sm flex items-center gap-2 transition-colors shadow-sm"
+            >
+              <Download className="w-4 h-4 text-[#C4A35A]" />
+              Xuất Log Kiểm toán (CSV)
             </button>
           </div>
         </div>
@@ -156,9 +316,56 @@ export default function VDRManagementPage() {
                       )}
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <button className="p-2 text-gray-400 hover:text-[#C4A35A] transition-colors rounded-lg hover:bg-[#C4A35A]/10" title="Xem chữ ký tay">
-                        <FileSignature className="w-5 h-5" />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        {sig.status === 'pending' && (
+                          <>
+                            <button
+                              disabled={updatingId !== null}
+                              onClick={() => triggerUpdateStatus(sig.id, sig.full_name, 'approve')}
+                              className="px-2.5 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded text-xs font-semibold flex items-center gap-1 transition-colors disabled:opacity-50"
+                            >
+                              Duyệt
+                            </button>
+                            <button
+                              disabled={updatingId !== null}
+                              onClick={() => triggerUpdateStatus(sig.id, sig.full_name, 'reject')}
+                              className="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded text-xs font-semibold flex items-center gap-1 transition-colors disabled:opacity-50"
+                            >
+                              Từ chối
+                            </button>
+                          </>
+                        )}
+                        {sig.status === 'approved' && (
+                          <button
+                            disabled={updatingId !== null}
+                            onClick={() => triggerUpdateStatus(sig.id, sig.full_name, 'revoke')}
+                            className="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded text-xs font-semibold flex items-center gap-1 transition-colors disabled:opacity-50"
+                          >
+                            Thu hồi quyền
+                          </button>
+                        )}
+                        {sig.status === 'rejected' && (
+                          <button
+                            disabled={updatingId !== null}
+                            onClick={() => triggerUpdateStatus(sig.id, sig.full_name, 'approve')}
+                            className="px-2.5 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded text-xs font-semibold flex items-center gap-1 transition-colors disabled:opacity-50"
+                          >
+                            Cấp lại quyền
+                          </button>
+                        )}
+                        
+                        <button 
+                          onClick={() => openSignatureModal(sig.full_name, sig.signature_url)}
+                          className="p-2 text-gray-500 hover:text-[#C4A35A] transition-colors rounded-lg hover:bg-[#C4A35A]/10" 
+                          title="Xem chữ ký tay"
+                        >
+                          {updatingId === sig.id ? (
+                            <div className="w-5 h-5 border-2 border-[#C4A35A] border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <FileSignature className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -168,6 +375,88 @@ export default function VDRManagementPage() {
         </div>
 
       </main>
+
+      {/* CONFIRM ACTION MODAL */}
+      {confirmModal && confirmModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50">
+              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-[#C4A35A]" />
+                Xác nhận hành động VDR
+              </h3>
+              <button onClick={() => setConfirmModal(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-5">
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Bạn có chắc chắn muốn {
+                  confirmModal.action === 'approve' ? <strong className="text-green-700">Duyệt cấp quyền</strong> : 
+                  confirmModal.action === 'reject' ? <strong className="text-red-700">Từ chối quyền</strong> : 
+                  <strong className="text-amber-700">Thu hồi quyền</strong>
+                } truy cập hồ sơ mật VDR cho nhà đầu tư <strong className="text-gray-900">{confirmModal.fullName}</strong> không?
+              </p>
+            </div>
+            <div className="flex justify-end gap-3 p-4 border-t border-gray-100 bg-gray-50">
+              <button 
+                onClick={() => setConfirmModal(null)}
+                className="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                Hủy
+              </button>
+              <button 
+                onClick={handleConfirmUpdate}
+                className={`px-4 py-2 text-sm font-bold text-white rounded-lg transition-colors shadow-sm ${
+                  confirmModal.action === 'approve' ? 'bg-green-600 hover:bg-green-700' :
+                  confirmModal.action === 'reject' ? 'bg-red-600 hover:bg-red-700' :
+                  'bg-amber-600 hover:bg-amber-700'
+                }`}
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SIGNATURE HANDWRITTEN VIEW MODAL */}
+      {signatureModal && signatureModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50">
+              <h3 className="font-bold text-gray-900">Chữ ký tay của {signatureModal.fullName}</h3>
+              <button onClick={() => setSignatureModal(null)} className="text-gray-400 hover:text-gray-600">
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 flex flex-col items-center justify-center min-h-[200px]">
+              {signatureModal.signatureUrl ? (
+                <div className="border border-dashed border-gray-300 bg-gray-50 rounded-lg p-4 flex justify-center items-center w-full">
+                  <img 
+                    src={signatureModal.signatureUrl} 
+                    alt={`Chữ ký của ${signatureModal.fullName}`} 
+                    className="max-h-48 object-contain filter invert" 
+                  />
+                </div>
+              ) : (
+                <div className="text-center text-gray-400 py-8">
+                  <FileSignature className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                  Không tìm thấy chữ ký
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end p-4 border-t border-gray-100 bg-gray-50">
+              <button 
+                onClick={() => setSignatureModal(null)}
+                className="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

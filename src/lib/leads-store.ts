@@ -19,6 +19,7 @@ export interface LeadItem {
   assigned_admin: string;
   internal_notes: { text: string; author: string; timestamp: string }[];
   audit_logs?: { action: string; file_url?: string; timestamp: string }[];
+  is_active?: boolean;
   created_at: string;
 }
 
