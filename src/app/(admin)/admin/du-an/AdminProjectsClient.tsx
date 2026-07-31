@@ -23,6 +23,8 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
   const [search, setSearch] = useState('');
   const [dealTypeFilter, setDealTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
   // Confirm Hide Modal State
@@ -36,7 +38,20 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
                         (p.province || '').toLowerCase().includes(search.toLowerCase());
     const matchDeal = dealTypeFilter === 'all' || p.deal_type === dealTypeFilter;
     const matchStatus = statusFilter === 'all' || p.publish_status === statusFilter;
-    return matchSearch && matchDeal && matchStatus;
+    
+    let matchDateRange = true;
+    if (startDate || endDate) {
+      const date = new Date(p.created_at);
+      if (!isNaN(date.getTime())) {
+        const dateStr = date.toISOString().split('T')[0];
+        if (startDate && dateStr < startDate) matchDateRange = false;
+        if (endDate && dateStr > endDate) matchDateRange = false;
+      } else {
+        matchDateRange = false;
+      }
+    }
+    
+    return matchSearch && matchDeal && matchStatus && matchDateRange;
   });
 
   const toggleFeatured = async (id: string) => {
@@ -136,6 +151,32 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
               <option value="draft">Nháp (Draft)</option>
               <option value="hidden">Đã ẩn (Hidden)</option>
             </select>
+
+            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-700">
+              <span className="text-gray-500 font-medium">Từ</span>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="bg-transparent focus:outline-none text-gray-700 w-[115px]"
+              />
+              <span className="text-gray-500 font-medium">đến</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="bg-transparent focus:outline-none text-gray-700 w-[115px]"
+              />
+              {(startDate || endDate) && (
+                <button
+                  onClick={() => { setStartDate(''); setEndDate(''); }}
+                  className="text-red-500 hover:text-red-700 font-semibold ml-1 shrink-0"
+                  title="Xóa bộ lọc ngày"
+                >
+                  Xóa
+                </button>
+              )}
+            </div>
           </div>
 
           <Link

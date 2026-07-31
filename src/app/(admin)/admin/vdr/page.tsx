@@ -24,6 +24,8 @@ export default function VDRManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [signatures, setSignatures] = useState<NDASignature[]>([]);
   const [projectFilter, setProjectFilter] = useState<string>('all');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   // Modal States
@@ -195,7 +197,20 @@ export default function VDRManagementPage() {
                         (s.email || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
                         (s.project_code || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchProject = projectFilter === 'all' || s.project_code === projectFilter;
-    return matchSearch && matchProject;
+    
+    let matchDateRange = true;
+    if (startDate || endDate) {
+      const date = new Date(s.signed_at);
+      if (!isNaN(date.getTime())) {
+        const dateStr = date.toISOString().split('T')[0];
+        if (startDate && dateStr < startDate) matchDateRange = false;
+        if (endDate && dateStr > endDate) matchDateRange = false;
+      } else {
+        matchDateRange = false;
+      }
+    }
+    
+    return matchSearch && matchProject && matchDateRange;
   });
 
   return (
@@ -240,6 +255,32 @@ export default function VDRManagementPage() {
                 <option key={code} value={code}>{code}</option>
               ))}
             </select>
+
+            <div className="flex items-center gap-2 bg-gray-50 border border-gray-300 rounded-lg px-3 py-1.5 text-xs text-gray-700 w-full sm:w-auto">
+              <span className="text-gray-500 font-medium">Từ</span>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="bg-transparent focus:outline-none text-gray-700 w-[115px]"
+              />
+              <span className="text-gray-500 font-medium">đến</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="bg-transparent focus:outline-none text-gray-700 w-[115px]"
+              />
+              {(startDate || endDate) && (
+                <button
+                  onClick={() => { setStartDate(''); setEndDate(''); }}
+                  className="text-red-500 hover:text-red-700 font-semibold ml-1 shrink-0"
+                  title="Xóa bộ lọc ngày"
+                >
+                  Xóa
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="flex gap-2 w-full sm:w-auto justify-end">

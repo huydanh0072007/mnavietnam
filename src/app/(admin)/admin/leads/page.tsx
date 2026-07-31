@@ -53,6 +53,8 @@ export default function AdminLeadsPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [monthFilter, setMonthFilter] = useState<string>('all');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [newNoteText, setNewNoteText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -70,7 +72,7 @@ export default function AdminLeadsPage() {
 
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [search, statusFilter, monthFilter]);
+  }, [search, statusFilter, monthFilter, startDate, endDate]);
 
   // Confirm Hide Modal State
   const [showHideConfirm, setShowHideConfirm] = useState(false);
@@ -155,7 +157,19 @@ export default function AdminLeadsPage() {
       }
     }
     
-    return matchType && matchSearch && matchStatus && matchMonth;
+    let matchDateRange = true;
+    if (startDate || endDate) {
+      const date = new Date(l.created_at);
+      if (!isNaN(date.getTime())) {
+        const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
+        if (startDate && dateStr < startDate) matchDateRange = false;
+        if (endDate && dateStr > endDate) matchDateRange = false;
+      } else {
+        matchDateRange = false;
+      }
+    }
+    
+    return matchType && matchSearch && matchStatus && matchMonth && matchDateRange;
   });
 
   const totalPages = Math.ceil(filteredLeads.length / 20) || 1;
@@ -479,6 +493,32 @@ export default function AdminLeadsPage() {
                 <option key={m} value={m}>Tháng {m}</option>
               ))}
             </select>
+
+            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-700">
+              <span className="text-xs text-gray-500 font-medium">Từ</span>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="bg-transparent focus:outline-none text-xs text-gray-700 w-[115px]"
+              />
+              <span className="text-xs text-gray-500 font-medium">đến</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="bg-transparent focus:outline-none text-xs text-gray-700 w-[115px]"
+              />
+              {(startDate || endDate) && (
+                <button
+                  onClick={() => { setStartDate(''); setEndDate(''); }}
+                  className="text-red-500 hover:text-red-700 text-xs font-semibold ml-1 shrink-0"
+                  title="Xóa bộ lọc ngày"
+                >
+                  Xóa
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
