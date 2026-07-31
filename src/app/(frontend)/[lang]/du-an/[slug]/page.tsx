@@ -201,7 +201,7 @@ export default async function ProjectDetailPage({ params }: { params: PageParams
               <div className="space-y-4 mb-8">
                 <div className="flex justify-between py-3 border-b border-gray-100">
                   <span className="text-gray-500">{dict.project_detail.location}</span>
-                  <span className="font-medium text-right text-[#1A1A2E]">{project.district}, {project.province}</span>
+                  <span className="font-medium text-right text-[#1A1A2E]">{project.province}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-gray-100">
                   <span className="text-gray-500">{dict.project_detail.scale}</span>
