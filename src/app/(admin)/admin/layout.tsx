@@ -4,6 +4,7 @@ import '@/app/globals.css';
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { Toaster } from 'react-hot-toast';
 
 export default function AdminLayout({
   children,
@@ -53,7 +54,7 @@ export default function AdminLayout({
       <div className="min-h-screen bg-[#0A1628] flex items-center justify-center text-white">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-[#C4A35A] border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm text-gray-400 font-medium">Đang xác thực hệ thống CMS...</p>
+          <p className="text-sm text-gray-400 font-medium font-serif">Đang tải CMS...</p>
         </div>
       </div>
     );
@@ -73,6 +74,7 @@ export default function AdminLayout({
   return (
     <html lang="vi">
       <body className="antialiased">
+        <Toaster position="top-right" />
         {content}
       </body>
     </html>

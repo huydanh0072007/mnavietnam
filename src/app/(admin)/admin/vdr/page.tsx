@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { ShieldAlert, Search, FileSignature, CheckCircle2, XCircle, Download, Eye, AlertCircle } from 'lucide-react';
 
@@ -150,12 +151,13 @@ export default function VDRManagementPage() {
           }
           return s;
         }));
+        toast.success(`Đã ${action === 'approve' ? 'duyệt' : action === 'reject' ? 'từ chối' : 'thu hồi'} quyền truy cập VDR thành công!`);
       } else {
-        alert('Cập nhật trạng thái thất bại');
+        toast.error('Cập nhật trạng thái thất bại');
       }
     } catch (err) {
       console.error(err);
-      alert('Có lỗi xảy ra khi cập nhật');
+      toast.error('Có lỗi xảy ra khi cập nhật');
     } finally {
       setUpdatingId(null);
     }

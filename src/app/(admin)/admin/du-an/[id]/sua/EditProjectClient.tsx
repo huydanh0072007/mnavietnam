@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { updateProjectAction } from '../../actions';
 import { Project, DealType, ProjectType, PublishStatus } from '@/lib/types';
@@ -90,11 +91,11 @@ export function EditProjectClient({ initialProject, categories, provinces }: Edi
       if (data.success && data.url) {
         setTeaserPdfUrl(data.url);
       } else {
-        alert(data.error || 'Lỗi khi tải file PDF');
+        toast.error(data.error || 'Lỗi khi tải file PDF');
       }
     } catch (err) {
       console.error(err);
-      alert('Lỗi tải file');
+      toast.error('Lỗi tải file');
     } finally {
       setIsUploadingPdf(false);
     }
@@ -130,7 +131,7 @@ export function EditProjectClient({ initialProject, categories, provinces }: Edi
       }
     } catch (error) {
       console.error('Translation failed:', error);
-      alert('Không thể dịch tự động lúc này.');
+      toast.error('Không thể dịch tự động lúc này.');
     } finally {
       setIsTranslating(false);
     }
@@ -139,7 +140,7 @@ export function EditProjectClient({ initialProject, categories, provinces }: Edi
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      alert('Vui lòng nhập tên dự án');
+      toast.error('Vui lòng nhập tên dự án');
       return;
     }
 
@@ -177,11 +178,11 @@ export function EditProjectClient({ initialProject, categories, provinces }: Edi
 
     try {
       await updateProjectAction(initialProject.id, updatedProject);
-      alert('Cập nhật dự án thành công!');
+      toast.success('Cập nhật dự án thành công!');
       router.push('/admin/du-an');
     } catch (error) {
       console.error(error);
-      alert('Có lỗi xảy ra khi cập nhật dự án.');
+      toast.error('Có lỗi xảy ra khi cập nhật dự án.');
     } finally {
       setIsSubmitting(false);
     }

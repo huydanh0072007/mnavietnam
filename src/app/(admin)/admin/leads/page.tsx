@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { 
   Search, 
@@ -189,11 +190,11 @@ export default function AdminLeadsPage() {
       if (data.success && data.url) {
         setCreateForm(prev => ({ ...prev, attachment_url: data.url }));
       } else {
-        alert(data.error || 'Lỗi tải file');
+        toast.error(data.error || 'Lỗi tải file');
       }
     } catch (err) {
       console.error(err);
-      alert('Không thể tải file lên');
+      toast.error('Không thể tải file lên');
     } finally {
       setIsUploadingFile(false);
     }
@@ -202,7 +203,7 @@ export default function AdminLeadsPage() {
   const handleCreateLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!createForm.full_name.trim() || !createForm.organization.trim() || !createForm.phone.trim() || !createForm.email.trim()) {
-      alert('Vui lòng điền các trường bắt buộc (*)');
+      toast.error('Vui lòng điền các trường bắt buộc (*)');
       return;
     }
 
@@ -233,7 +234,7 @@ export default function AdminLeadsPage() {
 
       const data = await res.json();
       if (data.success) {
-        alert('Tạo Lead mới thành công!');
+        toast.success('Tạo Lead mới thành công!');
         setShowCreateModal(false);
         setCreateForm({
           lead_type: 'interest',
@@ -251,11 +252,11 @@ export default function AdminLeadsPage() {
         setSelectedFile(null);
         fetchLeads();
       } else {
-        alert(data.errors?.join(', ') || 'Không thể tạo Lead');
+        toast.error(data.errors?.join(', ') || 'Không thể tạo Lead');
       }
     } catch (err) {
       console.error(err);
-      alert('Có lỗi xảy ra khi gửi yêu cầu');
+      toast.error('Có lỗi xảy ra khi gửi yêu cầu');
     } finally {
       setIsSubmittingNewLead(false);
     }
@@ -281,11 +282,11 @@ export default function AdminLeadsPage() {
         setLeads(updatedList);
         setSelectedLead(updatedList.length > 0 ? updatedList[0] : null);
       } else {
-        alert('Không thể ẩn Lead này');
+        toast.error('Không thể ẩn Lead này');
       }
     } catch (err) {
       console.error(err);
-      alert('Lỗi khi xử lý ẩn Lead');
+      toast.error('Lỗi khi xử lý ẩn Lead');
     } finally {
       setIsHidingLead(false);
     }

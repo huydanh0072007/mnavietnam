@@ -2,6 +2,7 @@
 
 import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { createProjectAction } from '../actions';
 import { Project, DealType, ProjectType, PublishStatus } from '@/lib/types';
@@ -94,11 +95,11 @@ function CreateProjectForm({ categories, provinces }: CreateProjectClientProps) 
       if (data.success && data.url) {
         setTeaserPdfUrl(data.url);
       } else {
-        alert(data.error || 'Lỗi khi tải file PDF');
+        toast.error(data.error || 'Lỗi khi tải file PDF');
       }
     } catch (err) {
       console.error(err);
-      alert('Lỗi tải file');
+      toast.error('Lỗi tải file');
     } finally {
       setIsUploadingPdf(false);
     }
@@ -134,7 +135,7 @@ function CreateProjectForm({ categories, provinces }: CreateProjectClientProps) 
       }
     } catch (error) {
       console.error('Translation failed:', error);
-      alert('Không thể dịch tự động lúc này.');
+      toast.error('Không thể dịch tự động lúc này.');
     } finally {
       setIsTranslating(false);
     }
@@ -143,7 +144,7 @@ function CreateProjectForm({ categories, provinces }: CreateProjectClientProps) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      alert('Vui lòng nhập tên dự án');
+      toast.error('Vui lòng nhập tên dự án');
       return;
     }
 
@@ -187,11 +188,11 @@ function CreateProjectForm({ categories, provinces }: CreateProjectClientProps) 
 
     try {
       await createProjectAction(newProject);
-      alert('Đã thêm dự án thành công!');
+      toast.success('Đã thêm dự án thành công!');
       router.push('/admin/du-an');
     } catch (error) {
       console.error(error);
-      alert('Có lỗi xảy ra khi thêm dự án.');
+      toast.error('Có lỗi xảy ra khi thêm dự án.');
     } finally {
       setIsSubmitting(false);
     }

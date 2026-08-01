@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 import { MasterDataItem, MdProvince } from '@/lib/master-data-store';
 import { 
   actionSaveProvince, 
@@ -70,7 +71,7 @@ export function MasterDataClient({ initialCategories, initialProvinces }: Props)
       router.refresh();
     } catch (err) {
       console.error(err);
-      alert('Có lỗi xảy ra khi lưu Tỉnh/Thành');
+      toast.error('Có lỗi xảy ra khi lưu Tỉnh/Thành');
     } finally {
       setLoadingActionId(null);
     }
@@ -90,7 +91,7 @@ export function MasterDataClient({ initialCategories, initialProvinces }: Props)
       router.refresh();
     } catch (err) {
       console.error(err);
-      alert('Không thể cập nhật tên Tỉnh/Thành');
+      toast.error('Không thể cập nhật tên Tỉnh/Thành');
     } finally {
       setLoadingActionId(null);
     }
@@ -111,7 +112,7 @@ export function MasterDataClient({ initialCategories, initialProvinces }: Props)
             router.refresh();
           } catch (err) {
             console.error(err);
-            alert('Lỗi khi thay đổi trạng thái Tỉnh/Thành');
+            toast.error('Lỗi khi thay đổi trạng thái Tỉnh/Thành');
           } finally {
             setLoadingActionId(null);
             setConfirmDialog(null);
@@ -127,7 +128,7 @@ export function MasterDataClient({ initialCategories, initialProvinces }: Props)
           router.refresh();
         } catch (err) {
           console.error(err);
-          alert('Lỗi khi kích hoạt Tỉnh/Thành');
+          toast.error('Lỗi khi kích hoạt Tỉnh/Thành');
         } finally {
           setLoadingActionId(null);
         }
@@ -139,7 +140,7 @@ export function MasterDataClient({ initialCategories, initialProvinces }: Props)
 
   const handleAddItem = async (category: string) => {
     if (!newItemForm.key || !newItemForm.label) {
-      alert('Vui lòng điền đủ Mã (Key) và Tên hiển thị (Label)');
+      toast.error('Vui lòng điền đủ Mã (Key) và Tên hiển thị (Label)');
       return;
     }
     setLoadingActionId(`add_cat_${category}`);
@@ -150,7 +151,7 @@ export function MasterDataClient({ initialCategories, initialProvinces }: Props)
       router.refresh();
     } catch (err) {
       console.error(err);
-      alert('Không thể thêm mục mới');
+      toast.error('Không thể thêm mục mới');
     } finally {
       setLoadingActionId(null);
     }
@@ -170,7 +171,7 @@ export function MasterDataClient({ initialCategories, initialProvinces }: Props)
       router.refresh();
     } catch (err) {
       console.error(err);
-      alert('Không thể cập nhật tên mục');
+      toast.error('Không thể cập nhật tên mục');
     } finally {
       setLoadingActionId(null);
     }
@@ -190,7 +191,7 @@ export function MasterDataClient({ initialCategories, initialProvinces }: Props)
             router.refresh();
           } catch (err) {
             console.error(err);
-            alert('Lỗi khi ẩn mục danh mục');
+            toast.error('Lỗi khi ẩn mục danh mục');
           } finally {
             setLoadingActionId(null);
             setConfirmDialog(null);
@@ -205,7 +206,7 @@ export function MasterDataClient({ initialCategories, initialProvinces }: Props)
           router.refresh();
         } catch (err) {
           console.error(err);
-          alert('Lỗi khi hiện mục danh mục');
+          toast.error('Lỗi khi hiện mục danh mục');
         } finally {
           setLoadingActionId(null);
         }
@@ -249,14 +250,14 @@ export function MasterDataClient({ initialCategories, initialProvinces }: Props)
 
         if (newProvs.length > 0) {
           await actionBatchUpsertLocations(newProvs);
-          alert(`Đã import thành công ${newProvs.length} Tỉnh/Thành!`);
+          toast.success(`Đã import thành công ${newProvs.length} Tỉnh/Thành!`);
           router.refresh();
         } else {
-          alert('Không tìm thấy dữ liệu Tỉnh/Thành hợp lệ trong file Excel. Vui lòng kiểm tra lại tên cột ("Mã Tỉnh", "Tên Tỉnh").');
+          toast.error('Không tìm thấy dữ liệu Tỉnh/Thành hợp lệ trong file Excel. Vui lòng kiểm tra lại tên cột ("Mã Tỉnh", "Tên Tỉnh").');
         }
       } catch (err) {
         console.error(err);
-        alert('Có lỗi xảy ra khi đọc file Excel.');
+        toast.error('Có lỗi xảy ra khi đọc file Excel.');
       } finally {
         setIsUploading(false);
         if (fileInputRef.current) fileInputRef.current.value = '';

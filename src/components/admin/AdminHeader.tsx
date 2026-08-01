@@ -13,7 +13,7 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
   const [modalType, setModalType] = React.useState<'none' | 'profile' | 'password'>('none');
 
   return (
-    <header className="bg-white border-b border-gray-200 px-8 py-5 flex items-center justify-between sticky top-0 z-20">
+    <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-5 flex items-center justify-between sticky top-0 z-20 max-md:pl-16">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 font-serif">{title}</h1>
         {subtitle && <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>}

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import Link from 'next/link';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Project } from '@/lib/types';
@@ -16,7 +17,8 @@ import {
   FileDown,
   Loader2,
   AlertCircle,
-  X
+  X,
+  Trash2
 } from 'lucide-react';
 
 export default function AdminProjectsClient({ initialProjects }: { initialProjects: Project[] }) {
@@ -140,11 +142,12 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
     setLoadingId(`hide_${id}`);
     try {
       await actionHideProject(id);
+      toast.success('Đã ẩn dự án thành công!');
       setProjects(prev => prev.filter(p => p.id !== id));
       setHideConfirmProject(null);
     } catch (error) {
       console.error(error);
-      alert('Không thể ẩn dự án lúc này');
+      toast.error('Không thể ẩn dự án lúc này');
     } finally {
       setLoadingId(null);
     }
@@ -390,13 +393,13 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
                           <Eye className="w-4 h-4" />
                         </Link>
 
-                        {/* Hide Project Button (Soft Delete) */}
+                        {/* Hide Project Button (Soft Delete / Lưu trữ) */}
                         <button
                           onClick={() => setHideConfirmProject(project)}
-                          title="Ẩn dự án này"
+                          title="Xóa/Lưu trữ dự án"
                           className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
                         >
-                          <EyeOff className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -421,11 +424,11 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
             <div className="flex items-center gap-3 text-red-600 border-b border-gray-100 pb-3">
               <AlertCircle className="w-6 h-6 shrink-0" />
-              <h3 className="text-lg font-bold text-gray-900">Xác nhận Ẩn Dự án</h3>
+              <h3 className="text-lg font-bold text-gray-900">Xác nhận Xóa/Lưu trữ</h3>
             </div>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Bạn có chắc chắn muốn ẩn dự án <strong className="text-gray-900">"{hideConfirmProject.title}"</strong> ({hideConfirmProject.project_code}) không? 
-              Dự án sẽ chuyển sang trạng thái Ẩn và không hiển thị trên giao diện công khai.
+              Bạn có chắc chắn muốn xóa/lưu trữ dự án <strong className="text-gray-900">"{hideConfirmProject.title}"</strong> ({hideConfirmProject.project_code}) không? 
+              Dự án sẽ bị vô hiệu hóa hoàn toàn trong hệ thống và không thể xem trực tiếp.
             </p>
             <div className="flex justify-end gap-3 pt-2">
               <button 
@@ -442,9 +445,9 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
                 {loadingId === `hide_${hideConfirmProject.id}` ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <EyeOff className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" />
                 )}
-                Xác nhận Ẩn
+                Xác nhận Xóa
               </button>
             </div>
           </div>

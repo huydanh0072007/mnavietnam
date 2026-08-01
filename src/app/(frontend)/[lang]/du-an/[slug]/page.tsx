@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/Badge';
 import { ProjectCard } from '@/components/ui/ProjectCard';
 import { DonutChart, DonutSegment } from '@/components/ui/DonutChart';
 import { DataRoomUnlock } from '@/components/ui/DataRoomUnlock';
+import { ProjectGallery } from '@/components/ui/ProjectGallery';
 import viDict from '@/dictionaries/vi.json';
 import enDict from '@/dictionaries/en.json';
 import { getDictionary } from '@/lib/get-dictionary';
@@ -118,31 +119,7 @@ export default async function ProjectDetailPage({ params }: { params: PageParams
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-10">
             {/* Gallery */}
-            <div className="space-y-4">
-              <div className="relative h-[400px] md:h-[500px] rounded-lg overflow-hidden bg-gray-200">
-                <Image
-                  src={project.gallery_images[0]}
-                  alt={pTitle}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-              {project.gallery_images.length > 1 && (
-                <div className="grid grid-cols-4 gap-4">
-                  {project.gallery_images.slice(1).map((img, idx) => (
-                    <div key={idx} className="relative h-24 rounded-lg overflow-hidden cursor-pointer opacity-70 hover:opacity-100 transition-opacity">
-                      <Image
-                        src={img}
-                        alt={`${pTitle} thumbnail ${idx + 2}`}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <ProjectGallery images={project.gallery_images} title={pTitle} />
 
             {/* Description */}
             <section className="bg-white p-8 rounded-lg shadow-sm">

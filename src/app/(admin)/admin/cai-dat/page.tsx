@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { 
   Mail, 
@@ -135,20 +136,21 @@ export default function AdminSettingsPage() {
           setAiApiKey(data.ai_api_key || '');
           setSmtpPass(data.smtp_pass || '');
         }
+        toast.success('Đã lưu toàn bộ cấu hình hệ thống thành công!');
         setSavedSuccess(true);
         setTimeout(() => setSavedSuccess(false), 3000);
       } else {
-        alert('Lưu cấu hình thất bại.');
+        toast.error('Lưu cấu hình thất bại.');
       }
     } catch(err) {
       console.error(err);
-      alert('Có lỗi xảy ra khi lưu.');
+      toast.error('Có lỗi xảy ra khi lưu.');
     }
   };
 
   const handleTestEmail = async () => {
     if (!smtpUser || !smtpPass || !smtpHost) {
-      alert('Vui lòng điền đầy đủ Host, User và Password trước khi test.');
+      toast.error('Vui lòng điền đầy đủ Host, User và Password trước khi test.');
       return;
     }
     
@@ -169,13 +171,13 @@ export default function AdminSettingsPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        alert('Đã gửi email thử nghiệm thành công! Vui lòng kiểm tra hộp thư (kể cả mục Spam).');
+        toast.success('Đã gửi email thử nghiệm thành công! Vui lòng kiểm tra hộp thư (kể cả mục Spam).');
       } else {
-        alert(data.error || 'Lỗi cấu hình SMTP. Vui lòng kiểm tra lại mật khẩu ứng dụng và cổng.');
+        toast.error(data.error || 'Lỗi cấu hình SMTP. Vui lòng kiểm tra lại mật khẩu ứng dụng và cổng.');
       }
     } catch (err) {
       console.error(err);
-      alert('Có lỗi xảy ra khi gọi API gửi email.');
+      toast.error('Có lỗi xảy ra khi gọi API gửi email.');
     } finally {
       setIsTestingEmail(false);
     }

@@ -72,10 +72,10 @@ export const Header = ({ lang, dict }: { lang: string; dict: any }) => {
 
           <div className="flex gap-3 ml-4">
             <Button variant="ghost" size="sm" asChild>
-              <Link href={`/${lang}/danh-muc?deal_type=buyout`}>{lang === 'en' ? 'Buyout' : 'Chuyển nhượng'}</Link>
+              <Link href={`/${lang}/danh-muc?deal_type=buyout`}>{dict.projects.filter_buyout}</Link>
             </Button>
             <Button variant="primary" size="sm" asChild>
-              <Link href={`/${lang}/danh-muc?deal_type=joint_venture`}>{lang === 'en' ? 'Joint Venture' : 'Hợp tác đầu tư'}</Link>
+              <Link href={`/${lang}/danh-muc?deal_type=joint_venture`}>{dict.projects.filter_jv}</Link>
             </Button>
           </div>
         </nav>
@@ -112,10 +112,10 @@ export const Header = ({ lang, dict }: { lang: string; dict: any }) => {
             </ul>
             <div className="flex flex-col gap-4 mt-10">
               <Button variant="secondary" className="w-full border-[#C4A35A] text-[#C4A35A] hover:bg-[#C4A35A] hover:text-[#1A1A2E]" asChild onClick={() => setIsMobileMenuOpen(false)}>
-                <Link href="/danh-muc?deal_type=buyout">Chuyển nhượng</Link>
+                <Link href={`/${lang}/danh-muc?deal_type=buyout`}>{dict.projects.filter_buyout}</Link>
               </Button>
               <Button variant="primary" className="w-full" asChild onClick={() => setIsMobileMenuOpen(false)}>
-                <Link href="/danh-muc?deal_type=joint_venture">Hợp tác đầu tư</Link>
+                <Link href={`/${lang}/danh-muc?deal_type=joint_venture`}>{dict.projects.filter_jv}</Link>
               </Button>
             </div>
           </div>

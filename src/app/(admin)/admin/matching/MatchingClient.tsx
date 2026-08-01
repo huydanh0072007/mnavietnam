@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { 
   Sparkles, 
@@ -186,12 +187,13 @@ export default function MatchingClient({ initialLeads, initialProjects }: Matchi
         );
 
         if (res.success) {
+          toast.success('Giới thiệu dự án thành công!');
           router.refresh();
         } else {
-          alert('Không thể cập nhật lịch sử khớp lệnh: ' + res.error);
+          toast.error('Không thể cập nhật lịch sử khớp lệnh: ' + res.error);
         }
       } catch (err: any) {
-        alert('Lỗi xảy ra trong quá trình xử lý: ' + err.message);
+        toast.error('Lỗi xảy ra trong quá trình xử lý: ' + err.message);
       } finally {
         setLoadingProjectId(null);
       }

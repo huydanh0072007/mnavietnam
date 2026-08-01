@@ -32,33 +32,33 @@
   - **Completed**: 2026-08-01
   - **Evidence**: Created client component src/components/ui/ProjectGallery.tsx with image switching, zoom lightbox, navigation controls, and custom backdrop overlay. Integrated it into src/app/(frontend)/[lang]/du-an/[slug]/page.tsx.
 
-- [ ] **TASK-UIUX-H2**: Fix mobile menu i18n links + hardcode text
-  - **Status**: Pending
+- [x] **TASK-UIUX-H2**: Fix mobile menu i18n links + hardcode text
+  - **Status**: Completed
   - **Description**: Fix links on mobile menu to append `/${lang}` prefix and use translated dictionary texts.
-  - **Completed**: N/A
-  - **Evidence**: N/A
+  - **Completed**: 2026-08-01
+  - **Evidence**: Replaced hardcoded text with `dict.projects.filter_buyout` and `dict.projects.filter_jv` on both desktop and mobile CTA links. Prefixed mobile links with dynamic `/${lang}` router path.
 
-- [ ] **TASK-UIUX-H3**: Responsive sidebar (mobile drawer)
-  - **Status**: Pending
+- [x] **TASK-UIUX-H3**: Responsive sidebar (mobile drawer)
+  - **Status**: Completed
   - **Description**: Create mobile responsive drawer menu for sidebar on admin CMS.
-  - **Completed**: N/A
-  - **Evidence**: N/A
+  - **Completed**: 2026-08-01
+  - **Evidence**: Replaced static sidebar with responsive absolute drawer layout on mobile screens (`-translate-x-full md:translate-x-0`). Added responsive backdrop overlay and a floating mobile toggle button. Shifted `AdminHeader` padding on mobile (`max-md:pl-16`) to prevent overlap.
 
-- [ ] **TASK-UIUX-H4**: Replace all `alert()` with Toast notification system
-  - **Status**: Pending
+- [x] **TASK-UIUX-H4**: Replace all `alert()` with Toast notification system
+  - **Status**: Completed
   - **Description**: Replace native browser alert dialogs with a modern toast library (e.g. `sonner` or `react-hot-toast`).
-  - **Completed**: N/A
-  - **Evidence**: N/A
+  - **Completed**: 2026-08-01
+  - **Evidence**: Installed `react-hot-toast`, added `<Toaster />` container inside `AdminLayout` body, and replaced all native browser `alert()` popups with `toast.success` and `toast.error` across all admin control components: `MatchingClient.tsx`, `leads/page.tsx`, `AdminProjectsClient.tsx`, `CreateProjectClient.tsx`, `EditProjectClient.tsx`, `MasterDataClient.tsx`, `cai-dat/page.tsx`, and `vdr/page.tsx`.
 
-- [ ] **TASK-UIUX-H5**: Differentiate action icons in Projects table
-  - **Status**: Pending
+- [x] **TASK-UIUX-H5**: Differentiate action icons in Projects table
+  - **Status**: Completed
   - **Description**: Distinguish toggle visibility action icon from soft delete action icon in admin projects table.
-  - **Completed**: N/A
-  - **Evidence**: N/A
+  - **Completed**: 2026-08-01
+  - **Evidence**: Replaced the soft-delete/archive `EyeOff` action icon in the table column and confirmation dialog of `AdminProjectsClient.tsx` with a `Trash2` icon. Maintained `Eye` and `EyeOff` for publish status toggling to clearly separate actions.
 
-- [ ] **TASK-UIUX-H6**: Fix auth flash (loading skeleton matching bg)
-  - **Status**: Pending
+- [x] **TASK-UIUX-H6**: Fix auth flash (loading skeleton matching bg)
+  - **Status**: Completed
   - **Description**: Fix flash from dark theme to light theme during client-side auth validation.
-  - **Completed**: N/A
-  - **Evidence**: N/A
+  - **Completed**: 2026-08-01
+  - **Evidence**: Replaced light-flashing loading screens with a unified, dark loading template (`bg-[#0A1628]`) inside `AdminLayout` that matches the dark admin sidebar theme. Avoids client-side visual flashes during authentication checks.
 
