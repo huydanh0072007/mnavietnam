@@ -1,0 +1,292 @@
+openapi: 3.0.3
+info:
+  title: MNA Vietnam - API Portal
+  version: 2.0.0
+  description: OpenAPI documentation for backend APIs and Server endpoints of MNA Vietnam.
+servers:
+  - url: http://localhost:3000/api
+    description: Development Server
+  - url: https://mnavietnam.vercel.app/api
+    description: Staging / Production Server
+
+paths:
+  /auth/login:
+    post:
+      summary: Admin Login
+      description: Authenticates admin credentials and returns an HTTP-only stateless HMAC session cookie.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: admin@mnainternational.com
+                password:
+                  type: string
+                  format: password
+                  example: Admin@MNA2024!
+      responses:
+        '200':
+          description: Login successful.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: admin_session=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; Path=/; HttpOnly; Secure
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '401':
+          description: Unauthorized. Invalid credentials.
+        '500':
+          description: Server error.
+
+  /auth/logout:
+    post:
+      summary: Admin Logout
+      description: Destroys the admin session by clearing the session cookie.
+      responses:
+        '200':
+          description: Logout successful.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: admin_session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+  /auth/check:
+    get:
+      summary: Check Auth Status
+      description: Verifies if the request contains a valid admin_session cookie.
+      responses:
+        '200':
+          description: Authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authenticated:
+                    type: boolean
+                    example: true
+        '401':
+          description: Not authenticated.
+
+  /leads:
+    get:
+      summary: Get Leads List (Admin)
+      description: Retrieves active leads (is_active !== false) for the Admin panel.
+      responses:
+        '200':
+          description: A list of leads.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lead'
+        '401':
+          description: Unauthorized.
+    post:
+      summary: Create Lead
+      description: Submits a new lead (used by frontend Submission/Interest form and manually by Admin).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - lead_type
+                - full_name
+                - organization
+                - email
+                - phone
+              properties:
+                lead_type:
+                  type: string
+                  enum: [interest, submission]
+                full_name:
+                  type: string
+                organization:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+                role_title:
+                  type: string
+                message:
+                  type: string
+                project_name_location:
+                  type: string
+                preferred_deal_type:
+                  type: string
+                estimated_scale:
+                  type: string
+                attachment_url:
+                  type: string
+                related_project_id:
+                  type: string
+                  format: uuid
+                signature_url:
+                  type: string
+      responses:
+        '201':
+          description: Lead created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+    put:
+      summary: Update Lead (Admin)
+      description: Modifies lead fields, status, internal notes, or performs soft delete (is_active=false).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - updates
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                updates:
+                  type: object
+      responses:
+        '200':
+          description: Lead updated successfully.
+        '400':
+          description: Bad request.
+        '401':
+          description: Unauthorized.
+
+  /upload:
+    post:
+      summary: Upload Attachment
+      description: Uploads document attachments or digital signatures to Supabase Storage bucket ('attachments').
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: File uploaded successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    example: https://xyz.supabase.co/storage/v1/object/public/attachments/file_123.pdf
+        '400':
+          description: Missing file.
+        '500':
+          description: Upload failed.
+
+  /settings:
+    get:
+      summary: Get Global Settings (Admin)
+      description: Fetches dynamic SMTP and notification configurations.
+      responses:
+        '200':
+          description: Returns configuration.
+        '401':
+          description: Unauthorized.
+    put:
+      summary: Update Settings (Admin)
+      description: Updates SMTP credentials and default notification target emails.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Settings updated.
+        '401':
+          description: Unauthorized.
+
+components:
+  schemas:
+    Lead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        lead_type:
+          type: string
+          example: interest
+        full_name:
+          type: string
+          example: Nguyen Van A
+        organization:
+          type: string
+          example: MNA International
+        email:
+          type: string
+          format: email
+          example: investor@mna.com
+        phone:
+          type: string
+          example: "0901234567"
+        role_title:
+          type: string
+          example: Investment Director
+        message:
+          type: string
+          example: I am interested in this project.
+        status:
+          type: string
+          example: new
+        internal_notes:
+          type: array
+          items:
+            type: object
+            properties:
+              text:
+                type: string
+              author:
+                type: string
+              timestamp:
+                type: string
+        is_active:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time

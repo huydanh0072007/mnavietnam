@@ -5,49 +5,59 @@
     "frontend": {
       "framework": "Next.js 14/15 App Router",
       "styling": "Tailwind CSS",
-      "components": "Lucide React, Radix UI Slot"
+      "components": "Lucide React, Radix UI Slot, Canvas Signature Pad"
     }, 
     "backend": {
-      "framework": "Next.js API Routes",
+      "framework": "Next.js API Routes / Server Actions",
       "database": "Supabase PostgreSQL",
-      "email": "Nodemailer"
+      "storage": "Supabase Storage bucket (attachments)",
+      "email": "Nodemailer SMTP Client"
     }
   },
   "database_schema": { 
-    "summary": "Lưu trữ dự án M&A, Leads (người dùng ký gửi/liên hệ), và Cấu hình hệ thống (Settings)",
+    "summary": "Lưu trữ dự án M&A, Leads (người dùng ký gửi/liên hệ), Cấu hình hệ thống (Settings), Tỉnh thành, và Danh mục Master Data",
     "tables": [
-      {"name": "projects", "purpose": "Lưu thông tin dự án M&A"},
-      {"name": "leads", "purpose": "Lưu yêu cầu liên hệ hoặc ký gửi dự án từ khách hàng"},
-      {"name": "settings", "purpose": "Lưu cấu hình hệ thống (SMTP, API Keys) dạng global"}
+      {"name": "projects", "purpose": "Lưu thông tin dự án M&A, hỗ trợ soft delete qua is_active"},
+      {"name": "leads", "purpose": "Lưu yêu cầu liên hệ, ký gửi dự án, chữ ký tay VDR, nhật ký matching, hỗ trợ soft delete qua is_active"},
+      {"name": "settings", "purpose": "Lưu cấu hình hệ thống (SMTP, API Keys) dạng global"},
+      {"name": "master_data", "purpose": "Lưu các tùy chọn danh mục động cho bộ lọc"},
+      {"name": "md_provinces", "purpose": "Lưu danh sách 34 tỉnh thành sau sáp nhập"},
+      {"name": "md_districts", "purpose": "Đã loại bỏ/không sử dụng (Deprecated)"}
     ], 
-    "relationships_explained": "Projects có thể liên kết với Leads khi khách hàng quan tâm một dự án cụ thể."
+    "relationships_explained": "Leads liên kết với Projects khi nhà đầu tư quan tâm một dự án cụ thể. Leads lưu vết lịch sử matching và phê duyệt VDR vào internal_notes."
   },
   "api_endpoints": [
     { "path": "/api/auth/login", "explained": "Xử lý đăng nhập Admin, trả về session cookie" },
     { "path": "/api/auth/logout", "explained": "Xóa admin_session cookie" },
+    { "path": "/api/auth/check", "explained": "Kiểm tra phiên làm việc admin" },
     { "path": "/api/leads", "explained": "Tạo, lấy danh sách, và cập nhật trạng thái leads (ký gửi/liên hệ)" },
     { "path": "/api/leads/notify", "explained": "Gửi email thông báo tự động bằng SMTP khi trạng thái lead thay đổi" },
-    { "path": "/api/settings", "explained": "Lấy và cập nhật cấu hình hệ thống (giấu password/API key khi public)" },
-    { "path": "/api/settings/test-email", "explained": "Gửi email thử nghiệm để kiểm tra kết nối SMTP" }
+    { "path": "/api/settings", "explained": "Lấy và cập nhật cấu hình hệ thống" },
+    { "path": "/api/settings/test-email", "explained": "Gửi email thử nghiệm để kiểm tra kết nối SMTP" },
+    { "path": "/api/upload", "explained": "Upload tài liệu đính kèm và chữ ký tay lên Supabase Storage bucket 'attachments'" }
   ],
   "business_rules": [
     "Khách hàng xem dự án M&A công khai, liên hệ hoặc ký gửi.",
-    "Admin duyệt leads, cập nhật trạng thái qua UI và gửi email notify tự động.",
-    "Cấu hình SMTP động có thể chỉnh sửa trực tiếp trên Admin Dashboard."
+    "Bỏ hoàn toàn cấp Quận/Huyện, chỉ phân loại dự án theo 34 Tỉnh thành mới sau sáp nhập.",
+    "Áp dụng Soft Delete (is_active = false) đối với Dự án và Leads để đảm bảo toàn vẹn dữ liệu logs.",
+    "Khớp lệnh tự động (Smart Matching) tính điểm tương thích Deal Type (+50%) và địa bàn hoạt động trong Lời nhắn (+50%) để đề xuất dự án cho nhà đầu tư.",
+    "Duyệt VDR cập nhật trạng thái Lead thành 'due_diligence' (Đã duyệt), 'rejected' (Từ chối) hoặc reset về 'nda_sent' (Chờ duyệt).",
+    "Xuất file CSV chứa ký tự tiếng Việt có dấu bắt buộc phải chèn tiền tố UTF-8 BOM (\\uFEFF) ở đầu để tránh lỗi hiển thị trong Excel."
   ],
   "features": [
-    "Danh mục dự án M&A (Lọc theo loại giao dịch, tỉnh thành, loại BĐS)",
-    "Hệ thống Ký gửi dự án BĐS (Bảo mật thông tin)",
-    "Admin Dashboard (Quản lý dự án, Quản lý Leads, Cài đặt hệ thống, VDR)",
-    "Gửi email thông báo tự động (Nodemailer + Cấu hình động SMTP)"
+    "Danh mục dự án M&A (Lọc theo giao dịch, 34 tỉnh mới, loại hình BĐS, sắp xếp A-Z/mới nhất, xuất Excel CSV)",
+    "Hệ thống Ký gửi dự án BĐS (Hỗ trợ tải lên hồ sơ pháp lý)",
+    "Admin Dashboard (Kết nối số liệu thật, biểu đồ SVG lead theo tháng, live activity logs)",
+    "Hệ thống Leads & VDR (Phân trang, bộ lọc nâng cao, lọc khoảng ngày, zoom chữ ký, duyệt/từ chối/thu hồi VDR, xuất CSV logs)",
+    "Khớp lệnh Thông minh - Smart Matcher (Gợi ý và giới thiệu dự án cho nhà đầu tư, ghi nhận vào internal_notes)",
+    "Cấu hình SMTP động trực tiếp trên Dashboard và gửi email notify tự động"
   ],
   "knowledge_items": { 
-    "patterns": ["Supabase singleton row for global settings", "Radix UI Slot for Next.js Link nesting", "Stateless HMAC-signed cookies for admin session"], 
+    "patterns": ["Supabase Storage uploads from buffer API", "UTF-8 BOM file exports in Next.js", "Diacritics-normalized string matching", "Radix UI Slot for Next.js Link nesting", "Stateless HMAC-signed cookies for admin session"], 
     "gotchas": [
-      "Cần gọi API logout để xóa cookie server thay vì chỉ redirect", 
-      "Tham số URL (search parameters) phải đồng bộ tuyệt đối giữa components Header/Footer và DanhMucClient",
-      "Stateless session trên Vercel yêu cầu bổ sung `credentials: 'include'` cho toàn bộ các client-side fetch() API trong Admin Dashboard để truyền cookie xác thực."
+      "Trang Admin VDR và Leads yêu cầu `credentials: 'include'` trên các client fetch để truyền session cookie trên môi trường serverless Vercel.",
+      "Cấp hành chính quận/huyện đã bị xóa bỏ hoàn toàn ở database, APIs, Admin và Frontend."
     ], 
-    "conventions": ["Màu thương hiệu: Navy (#0A1628) và Gold (#C4A35A)"] 
+    "conventions": ["Màu thương hiệu: Navy (#0A1628) và Gold (#C4A35A), Emerald cho Excel Export"] 
   }
 }

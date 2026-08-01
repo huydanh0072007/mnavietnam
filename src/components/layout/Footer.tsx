@@ -22,7 +22,7 @@ export const Footer = ({ lang = 'vi', dict }: { lang?: string; dict?: any }) => 
                 <Image src="/logo.jpg" alt="M$A International Logo" width={40} height={40} className="object-cover" />
               </div>
               <span className="text-xl font-bold text-white font-serif tracking-wider">
-                Vietnam<span className="text-[#C4A35A]">.com</span>
+                M$A <span className="text-[#C4A35A]">International</span>
               </span>
             </Link>
             <p className="text-[#6B7280] text-sm leading-relaxed mb-6">
@@ -99,7 +99,7 @@ export const Footer = ({ lang = 'vi', dict }: { lang?: string; dict?: any }) => 
         </div>
 
         <div className="pt-8 border-t border-[#1e2f47] flex flex-col md:flex-row justify-between items-center text-xs text-[#6B7280]">
-          <p>&copy; {new Date().getFullYear()} M$AVietnam.com. {dict.footer.rights}</p>
+          <p>&copy; {new Date().getFullYear()} M$A International. {dict.footer.rights}</p>
           <div className="flex gap-4 mt-4 md:mt-0">
             <Link href={`/${lang}/dieu-khoan-su-dung`} className="hover:text-white transition-colors">{dict.footer.terms}</Link>
             <Link href={`/${lang}/chinh-sach-bao-mat`} className="hover:text-white transition-colors">{dict.footer.privacy}</Link>

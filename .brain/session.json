@@ -1,61 +1,92 @@
 {
-  "updated_at": "2026-07-30T22:50:00Z",
+  "updated_at": "2026-07-31T16:40:00Z",
   "working_on": {
-    "feature": "Admin Authentication & Session State",
-    "task": "Fixed serverless session loss (kicked out issue) on Vercel for Admin VDR page",
+    "feature": "Nâng cấp CMS Admin Portal & Khớp lệnh Thông minh",
+    "task": "Hoàn thiện Sprint 1-4 nâng cấp CMS Portal cho dự án MNA Vietnam",
     "status": "completed",
     "files": [
-      "src/app/(admin)/admin/vdr/page.tsx",
+      "src/app/(admin)/admin/matching/page.tsx",
+      "src/app/(admin)/admin/matching/MatchingClient.tsx",
+      "src/app/(admin)/admin/matching/actions.ts",
       "src/app/(admin)/admin/leads/page.tsx",
-      "src/app/(admin)/admin/cai-dat/page.tsx",
-      "src/app/(admin)/admin/du-an/taomoi/CreateProjectClient.tsx",
-      "src/lib/auth.ts"
+      "src/app/(admin)/admin/du-an/AdminProjectsClient.tsx",
+      "src/app/(admin)/admin/du-an/[id]/sua/page.tsx",
+      "src/app/(admin)/admin/du-an/[id]/sua/EditProjectClient.tsx",
+      "src/app/(admin)/admin/du-an/actions.ts",
+      "src/app/(admin)/admin/page.tsx",
+      "src/app/(admin)/admin/vdr/page.tsx",
+      "src/app/(admin)/admin/master-data/MasterDataClient.tsx",
+      "src/app/(admin)/admin/master-data/actions.ts",
+      "src/app/(frontend)/[lang]/du-an/[slug]/page.tsx",
+      "src/app/api/upload/route.ts"
     ],
     "blockers": [],
-    "notes": "Đã chuyển từ in-memory session sang stateless session HMAC và bổ sung `credentials: 'include'` cho toàn bộ các fetch calls trong trang admin (đặc biệt là trang VDR) để trình duyệt truyền cookie xác thực chính xác lên Vercel."
+    "notes": "Đã hoàn thành toàn bộ 4 Sprint nâng cấp quản trị CMS, kết nối số liệu thật Supabase PostgreSQL + Storage, phân trang lọc khoảng ngày, khớp lệnh Matching tự động và hoàn thiện VDR."
   },
   "pending_tasks": [
     {
-      "task": "Wait for user confirmation on Vercel deployment",
-      "priority": "high",
-      "notes": "User is testing the admin VDR page to confirm they are no longer kicked out."
+      "task": "Deploy lên Production và bàn giao cho khách hàng nghiệm thu",
+      "priority": "medium",
+      "notes": "User thực hiện lệnh `git push` để Vercel tự động build và deploy bản mới nhất."
     }
   ],
   "recent_changes": [
     {
-      "timestamp": "2026-07-30T22:45:00Z",
-      "type": "bugfix",
-      "description": "Bổ sung `credentials: 'include'` vào tất cả các `fetch` gọi API trong giao diện admin để hỗ trợ stateless auth cookie.",
+      "timestamp": "2026-07-31T16:30:00Z",
+      "type": "feature",
+      "description": "Xây dựng Phân hệ Khớp lệnh Thông minh Matching Client & Server gợi ý dự án tương thích và ghi log tự động vào Lead internal_notes.",
       "files": [
-        "src/app/(admin)/admin/vdr/page.tsx",
-        "src/app/(admin)/admin/leads/page.tsx",
-        "src/app/(admin)/admin/cai-dat/page.tsx",
-        "src/app/(admin)/admin/du-an/taomoi/CreateProjectClient.tsx"
+        "src/app/(admin)/admin/matching/page.tsx",
+        "src/app/(admin)/admin/matching/MatchingClient.tsx",
+        "src/app/(admin)/admin/matching/actions.ts",
+        "src/app/(frontend)/[lang]/du-an/[slug]/page.tsx"
       ]
     },
     {
-      "timestamp": "2026-07-30T21:40:00Z",
+      "timestamp": "2026-07-31T12:00:00Z",
       "type": "feature",
-      "description": "Đồng bộ hóa 100% tiếng Anh cho trang Điều khoản sử dụng và thông báo lỗi ở trang Ký gửi.",
+      "description": "Nâng cấp Dashboard biểu đồ SVG động, xuất CSV Dự án UTF-8 BOM, thêm bộ lọc Ngày dương lịch bắt đầu - kết thúc ở trang Leads, Projects, VDR.",
       "files": [
-        "src/app/(frontend)/[lang]/ky-gui/KyGuiClient.tsx",
-        "src/app/(frontend)/[lang]/dieu-khoan-su-dung/page.tsx",
-        "src/dictionaries/vi.json",
-        "src/dictionaries/en.json"
+        "src/app/(admin)/admin/du-an/AdminProjectsClient.tsx",
+        "src/app/(admin)/admin/page.tsx",
+        "src/app/(admin)/admin/vdr/page.tsx",
+        "src/app/(admin)/admin/leads/page.tsx"
+      ]
+    },
+    {
+      "timestamp": "2026-07-31T09:00:00Z",
+      "type": "feature",
+      "description": "Triển khai Sprint 1: Bỏ hoàn toàn Quận/Huyện, inline edit 34 Tỉnh mới, Tạo Lead thủ công + upload tài liệu lên Supabase Storage qua API /api/upload.",
+      "files": [
+        "src/app/(admin)/admin/master-data/MasterDataClient.tsx",
+        "src/app/(admin)/admin/master-data/actions.ts",
+        "src/app/(admin)/admin/leads/page.tsx",
+        "src/app/api/upload/route.ts",
+        "src/app/(admin)/admin/du-an/[id]/sua/page.tsx",
+        "src/app/(admin)/admin/du-an/[id]/sua/EditProjectClient.tsx"
       ]
     }
   ],
   "errors_encountered": [
     {
-      "error": "VDR Admin page kicks user out to login screen",
-      "solution": "Added `credentials: 'include'` to fetch calls so the session cookie is correctly sent to the API on Vercel serverless environment.",
+      "error": "Lỗi font chữ tiếng Việt có dấu khi mở file xuất CSV trên Microsoft Excel",
+      "solution": "Thêm ký tự Byte Order Mark (\\uFEFF) vào đầu nội dung CSV trước khi tải về client.",
+      "resolved": true
+    },
+    {
+      "error": "Admin bị logout liên tục khi thao tác trên Vercel do serverless container làm mất session map trong memory",
+      "solution": "Chuyển sang stateless HMAC cookies và thêm credentials: 'include' vào tất cả client fetch calls.",
       "resolved": true
     }
   ],
   "decisions_made": [
     {
-      "decision": "Use stateless HMAC signed session tokens via cookies",
-      "reason": "Vercel serverless functions drop in-memory rate-limiters and session maps between requests."
+      "decision": "Loại bỏ hoàn toàn Quận/Huyện hành chính",
+      "reason": "Chủ đầu tư yêu cầu rút gọn quản lý địa danh hành chính chỉ theo 34 Tỉnh mới sáp nhập, huyện thị gây rườm rà giao diện."
+    },
+    {
+      "decision": "Lưu nhật ký Matching và VDR trực tiếp vào internal_notes của Lead",
+      "reason": "Giúp lưu vết tập trung dòng thời gian tương tác của một nhà đầu tư cụ thể thay vì chia nhỏ bảng."
     }
   ]
 }

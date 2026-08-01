@@ -40,7 +40,7 @@ const defaultSettings: GlobalSettings = {
   smtp_secure: false,
   smtp_user: "",
   smtp_pass: "",
-  smtp_from_name: "MNA International",
+  smtp_from_name: "M$A International",
   smtp_from_email: "noreply@mnainternational.com"
 };
 

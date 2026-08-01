@@ -53,7 +53,7 @@ export default function AdminSettingsPage() {
   const [smtpSecure, setSmtpSecure] = useState(false);
   const [smtpUser, setSmtpUser] = useState('');
   const [smtpPass, setSmtpPass] = useState('');
-  const [smtpFromName, setSmtpFromName] = useState('MNA International');
+  const [smtpFromName, setSmtpFromName] = useState('M$A International');
   const [smtpFromEmail, setSmtpFromEmail] = useState('noreply@mnainternational.com');
   const [isTestingEmail, setIsTestingEmail] = useState(false);
 
@@ -82,7 +82,7 @@ export default function AdminSettingsPage() {
           setSmtpSecure(data.smtp_secure || false);
           setSmtpUser(data.smtp_user || '');
           setSmtpPass(data.smtp_pass || '');
-          setSmtpFromName(data.smtp_from_name || 'MNA International');
+          setSmtpFromName(data.smtp_from_name || 'M$A International');
           setSmtpFromEmail(data.smtp_from_email || 'noreply@mnainternational.com');
         }
         setIsLoading(false);
@@ -96,7 +96,7 @@ export default function AdminSettingsPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetch('/api/settings', {
+      const res = await fetch('/api/settings', {
         method: 'POST',
         credentials: 'include',
         headers: { 
@@ -128,8 +128,18 @@ export default function AdminSettingsPage() {
           smtp_from_email: smtpFromEmail
         })
       });
-      setSavedSuccess(true);
-      setTimeout(() => setSavedSuccess(false), 3000);
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (data) {
+          setAiApiKey(data.ai_api_key || '');
+          setSmtpPass(data.smtp_pass || '');
+        }
+        setSavedSuccess(true);
+        setTimeout(() => setSavedSuccess(false), 3000);
+      } else {
+        alert('Lưu cấu hình thất bại.');
+      }
     } catch(err) {
       console.error(err);
       alert('Có lỗi xảy ra khi lưu.');
@@ -567,7 +577,7 @@ export default function AdminSettingsPage() {
                     type="text"
                     value={smtpFromName}
                     onChange={(e) => setSmtpFromName(e.target.value)}
-                    placeholder="MNA International"
+                    placeholder="M$A International"
                     className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
                   />
                 </div>

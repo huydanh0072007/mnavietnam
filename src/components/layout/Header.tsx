@@ -45,7 +45,7 @@ export const Header = ({ lang, dict }: { lang: string; dict: any }) => {
             <Image src="/logo.jpg" alt="M$A International Logo" width={40} height={40} className="object-cover" priority />
           </div>
           <span className="text-xl font-bold text-white font-serif tracking-wider">
-            Vietnam<span className="text-[#C4A35A]">.com</span>
+            M$A <span className="text-[#C4A35A]">International</span>
           </span>
         </Link>
 

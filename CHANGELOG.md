@@ -1,5 +1,29 @@
 # Changelog
 
+## [2026-07-31]
+### Added
+- **Sprint 1 (CRUD Cốt lõi):**
+  - Quản lý Master Data: hỗ trợ sửa tên và ẩn/hiện 34 Tỉnh mới, CRUD danh mục chung.
+  - Quản lý Dự án: Trang Sửa dự án (`du-an/[id]/sua`) và nút Ẩn dự án.
+  - Quản lý Lead: Modal Tạo Lead mới thủ công hỗ trợ upload tài liệu pháp lý lên Supabase Storage và ẩn Lead.
+- **Sprint 2 (Nâng cấp UX & VDR):**
+  - Leads panel: Phân trang (20 items/page), bộ lọc trạng thái và tháng tạo nâng cao.
+  - Dashboard: Kết nối dữ liệu thật từ Supabase DB.
+  - Phân hệ VDR: Workflows Duyệt/Từ chối/Thu hồi quyền VDR, xem Zoom chữ ký tay, lọc theo dự án và xuất logs VDR ra CSV.
+- **Sprint 3 (Tiện ích & Thống kê):**
+  - Sắp xếp danh mục dự án, nút xuất Excel (.CSV) dự án có UTF-8 BOM chống lỗi font tiếng Việt.
+  - Dashboard SVG bar chart 6 tháng động có hover tooltip, danh sách Hoạt động Gần đây (live activity logs).
+- **Sprint 4 (Khớp lệnh - Matching):**
+  - Phân hệ Khớp lệnh Thông minh (`admin/matching`) tính điểm tương thích (+50% Deal Type, +50% Province diacritics-normalized).
+  - Nút "Giới thiệu Dự án" tự động ghi nhật ký vào `internal_notes` của Lead, vô hiệu hóa các dự án đã gửi.
+- **Tính năng lọc khoảng ngày:** Bộ lọc lịch đôi "Từ ngày" - "Đến ngày" đồng bộ trên cả 3 trang Leads, Projects và VDR.
+
+### Changed
+- Loại bỏ hoàn toàn hiển thị cấp hành chính Quận/Huyện trên toàn hệ thống (cả trang quản trị và giao diện chi tiết dự án ngoài frontend).
+
+### Fixed
+- Sửa lỗi TypeScript build và đảm bảo đồng bộ layout CSS ở các trang sửa đổi.
+
 ## [2026-07-30]
 ### Added
 - Thêm file `.gitignore` để loại trừ các file `.vbsec-tmp` sinh ra từ phần mềm quét bảo mật.

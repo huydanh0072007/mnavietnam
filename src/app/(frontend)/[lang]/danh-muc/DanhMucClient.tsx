@@ -87,19 +87,19 @@ export function DanhMucContent({ initialProjects, categories, provinces, dict, l
             <div className="flex bg-gray-100 rounded-md p-1">
               <button
                 className={`px-6 py-2 text-sm font-medium rounded-sm transition-colors ${dealTypeFilter === 'all' ? 'bg-white shadow-sm text-[#1A1A2E]' : 'text-gray-500 hover:text-[#1A1A2E]'}`}
-                onClick={() => updateFilter('type', 'all')}
+                onClick={() => updateFilter('deal_type', 'all')}
               >
                 {dict.projects.filter_all}
               </button>
               <button
                 className={`px-6 py-2 text-sm font-medium rounded-sm transition-colors ${dealTypeFilter === 'buyout' ? 'bg-[#DC2626] text-white shadow-sm' : 'text-gray-500 hover:text-[#1A1A2E]'}`}
-                onClick={() => updateFilter('type', 'buyout')}
+                onClick={() => updateFilter('deal_type', 'buyout')}
               >
                 {dict.projects.filter_buyout}
               </button>
               <button
                 className={`px-6 py-2 text-sm font-medium rounded-sm transition-colors ${dealTypeFilter === 'joint_venture' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-500 hover:text-[#1A1A2E]'}`}
-                onClick={() => updateFilter('type', 'joint_venture')}
+                onClick={() => updateFilter('deal_type', 'joint_venture')}
               >
                 {dict.projects.filter_jv}
               </button>

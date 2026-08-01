@@ -40,12 +40,12 @@ export async function sendTestEmail(toEmail: string) {
   const mailOptions = {
     from,
     to: toEmail,
-    subject: 'MNA International - Kiểm tra kết nối SMTP',
+    subject: 'M$A International - Kiểm tra kết nối SMTP',
     text: 'Cấu hình SMTP của bạn đã hoạt động thành công!',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
         <h2 style="color: #0A1628;">Kết nối SMTP Thành Công!</h2>
-        <p>Hệ thống gửi email tự động từ MNA International đã được cấu hình chính xác.</p>
+        <p>Hệ thống gửi email tự động từ M$A International đã được cấu hình chính xác.</p>
         <p>Bây giờ bạn có thể nhận thông báo Lead mới và gửi cập nhật tiến độ cho khách hàng.</p>
         <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
         <p style="font-size: 12px; color: #888;">Đây là email tự động, vui lòng không trả lời.</p>
@@ -103,17 +103,17 @@ export async function sendStatusUpdateToClient(clientEmail: string, clientName: 
   const mailOptions = {
     from,
     to: clientEmail,
-    subject: `[MNA International] Cập nhật trạng thái dự án: ${projectName}`,
+    subject: `[M$A International] Cập nhật trạng thái dự án: ${projectName}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
         <h2 style="color: #0A1628;">Xin chào ${clientName},</h2>
-        <p>Hệ thống MNA International xin thông báo trạng thái yêu cầu của bạn đối với dự án <strong>${projectName}</strong> đã được cập nhật thành:</p>
+        <p>Hệ thống M$A International xin thông báo trạng thái yêu cầu của bạn đối với dự án <strong>${projectName}</strong> đã được cập nhật thành:</p>
         <p style="padding: 12px; background-color: #f8f9fa; border-left: 4px solid #C4A35A; font-size: 16px; font-weight: bold; color: #0A1628;">
           ${newStatusLabel}
         </p>
         <p>Chuyên viên của chúng tôi sẽ sớm liên hệ với bạn để trao đổi các bước tiếp theo.</p>
         <br/>
-        <p>Trân trọng,<br/><strong>Đội ngũ MNA International</strong></p>
+        <p>Trân trọng,<br/><strong>Đội ngũ M$A International</strong></p>
       </div>
     `,
   };

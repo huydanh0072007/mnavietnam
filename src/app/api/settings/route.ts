@@ -14,6 +14,14 @@ export async function GET(request: NextRequest) {
     if (!isAdmin) {
       safeSettings.ai_api_key = ''; // Hide secret from public
       safeSettings.smtp_pass = ''; // Hide secret from public
+    } else {
+      // Mask secret API keys/passwords for admins in UI response
+      if (safeSettings.ai_api_key) {
+        safeSettings.ai_api_key = '••••••••';
+      }
+      if (safeSettings.smtp_pass) {
+        safeSettings.smtp_pass = '••••••••';
+      }
     }
     
     return NextResponse.json(safeSettings);
@@ -37,8 +45,24 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
+    
+    // Restore original credentials if mask value received
+    const currentSettings = await getSettings();
+    if (body.ai_api_key === '••••••••') {
+      body.ai_api_key = currentSettings.ai_api_key;
+    }
+    if (body.smtp_pass === '••••••••') {
+      body.smtp_pass = currentSettings.smtp_pass;
+    }
+
     const updatedSettings = await saveSettings(body);
-    return NextResponse.json(updatedSettings);
+    
+    // Return safe settings (with masks)
+    const safeSettings = { ...updatedSettings };
+    if (safeSettings.ai_api_key) safeSettings.ai_api_key = '••••••••';
+    if (safeSettings.smtp_pass) safeSettings.smtp_pass = '••••••••';
+    
+    return NextResponse.json(safeSettings);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to save settings' }, { status: 500 });
   }
