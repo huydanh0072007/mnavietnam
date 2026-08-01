@@ -1,8 +1,20 @@
 # Changelog
 
+## [2026-08-01]
+### Added
+- **Sprint 5 (Advanced Features):**
+  - Hệ thống thông báo admin thời gian thực: bell dropdown panel động, Polling 30s, đếm số lượng chưa đọc, tự động lưu thông báo mới khi có lead/VDR signature.
+  - Chọn & Thao tác hàng loạt (Bulk actions): check/select-all, thanh Bulk actions nổi, batch API xử lý array ids.
+  - Cấu hình tùy chọn nhận thông báo: Tần suất gửi (ngay lập tức / hàng giờ / hàng ngày) đồng bộ qua API settings.
+
+### Fixed
+- **Bảo mật (Security Fix):** Vá lỗ hổng Broken Access Control ở toàn bộ Next.js Server Actions trong `actions.ts` bằng cách tích hợp xác thực cookie phiên admin.
+- Sửa lỗi kiểu dữ liệu TypeScript trong `SettingsContext.tsx` khi thiếu các thuộc tính cài đặt thông báo mới.
+
 ## [2026-07-31]
 ### Added
 - **Sprint 1 (CRUD Cốt lõi):**
+  - Quản lý Master Data: hỗ trợ sửa tên và ẩn/hiện 34 Tỉnh mới, CRUD danh mục chung.
   - Quản lý Master Data: hỗ trợ sửa tên và ẩn/hiện 34 Tỉnh mới, CRUD danh mục chung.
   - Quản lý Dự án: Trang Sửa dự án (`du-an/[id]/sua`) và nút Ẩn dự án.
   - Quản lý Lead: Modal Tạo Lead mới thủ công hỗ trợ upload tài liệu pháp lý lên Supabase Storage và ẩn Lead.

@@ -173,28 +173,26 @@
   - **Evidence**: Added `showPassword` toggle logic and Lucide `Eye`/`EyeOff` buttons inside the login password input field in `login/page.tsx`.
 
 ## Sprint 5: Advanced Features
-- [ ] **TASK-UIUX-A1**: Admin Notification System
-  - **Status**: Pending
+- [x] **TASK-UIUX-A1**: Admin Notification System
+  - **Status**: Completed
   - **Description**: Real-time notification system badge and panel on AdminHeader.
-  - **Completed**: N/A
-  - **Evidence**: N/A
-
-- [ ] **TASK-UIUX-A2**: Bulk Select & Actions for Leads table
-  - **Status**: Pending
+  - **Completed**: 2026-08-01
+  - **Evidence**: Created notifications-store.ts and API route under /api/admin/notifications. Added real dropdown list and badge with 30s polling inside AdminHeader.tsx.
+- [x] **TASK-UIUX-A2**: Bulk Select & Actions for Leads table
+  - **Status**: Completed
   - **Description**: Implement select-all checkbox and actions to bulk publish/hide/archive leads.
-  - **Completed**: N/A
-  - **Evidence**: N/A
-
-- [ ] **TASK-UIUX-A3**: Bulk Select & Actions for Projects table
-  - **Status**: Pending
+  - **Completed**: 2026-08-01
+  - **Evidence**: Added checkbox selections and floating amber bulk actions bar inside leads/page.tsx. Updated API PUT /api/leads to process array of ids.
+- [x] **TASK-UIUX-A3**: Bulk Select & Actions for Projects table
+  - **Status**: Completed
   - **Description**: Implement select-all checkbox and actions to bulk archive/delete projects.
-  - **Completed**: N/A
-  - **Evidence**: N/A
-
-- [ ] **TASK-UIUX-A4**: Notification preferences for Admin Settings
-  - **Status**: Pending
+  - **Completed**: 2026-08-01
+  - **Evidence**: Added checkboxes table column, select-all controls, bulk action panel inside AdminProjectsClient.tsx and added bulk Server Actions in actions.ts.
+- [x] **TASK-UIUX-A4**: Notification preferences for Admin Settings
+  - **Status**: Completed
   - **Description**: Add settings options for email alerts on new leads/VDR updates.
-  - **Completed**: N/A
-  - **Evidence**: N/A
+  - **Completed**: 2026-08-01
+  - **Evidence**: Extended GlobalSettings schema inside config-store.ts and SettingsContext.tsx. Created email settings dropdown controls inside cai-dat/page.tsx bound to API.
+
 
 
