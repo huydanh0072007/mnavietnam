@@ -29,6 +29,14 @@ export default function VDRManagementPage() {
   const [endDate, setEndDate] = useState<string>('');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, projectFilter, startDate, endDate]);
+
   // Modal States
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -215,6 +223,9 @@ export default function VDRManagementPage() {
     return matchSearch && matchProject && matchDateRange;
   });
 
+  const totalPages = Math.ceil(filteredSignatures.length / itemsPerPage);
+  const paginatedSignatures = filteredSignatures.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   return (
     <div className="flex-1 pb-16 bg-gray-50 min-h-screen">
       <AdminHeader 
@@ -314,7 +325,7 @@ export default function VDRManagementPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {filteredSignatures.map((sig) => (
+                {paginatedSignatures.map((sig) => (
                   <tr key={sig.id} className="hover:bg-gray-50 transition-colors group">
                     <td className="px-5 py-4">
                       <div className="font-medium text-gray-900">{sig.full_name}</div>
@@ -415,6 +426,29 @@ export default function VDRManagementPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-t border-gray-100 text-sm text-gray-500">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+              >
+                Trang trước
+              </button>
+              <span className="font-semibold">
+                Trang {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1.5 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+              >
+                Trang sau
+              </button>
+            </div>
+          )}
         </div>
 
       </main>
@@ -479,7 +513,7 @@ export default function VDRManagementPage() {
                   <img 
                     src={signatureModal.signatureUrl} 
                     alt={`Chữ ký của ${signatureModal.fullName}`} 
-                    className="max-h-48 object-contain filter invert" 
+                    className="max-h-48 object-contain" 
                   />
                 </div>
               ) : (

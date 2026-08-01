@@ -19,6 +19,8 @@ import { GlowButton } from '@/components/animations/GlowButton';
 export default function HomeClient({ featuredProjects, lang, dict }: { featuredProjects: Project[], lang: string, dict: any }) {
   const { settings, isLoading } = useSettings();
   const isEn = lang === 'en';
+  const projectsUrl = lang === 'en' ? '/en/projects' : `/${lang}/danh-muc`;
+  const submitUrl = lang === 'en' ? '/en/submit' : `/${lang}/ky-gui`;
 
   const heroTitle = isEn && dict.home.hero_title ? dict.home.hero_title : settings.hero_title;
   const heroSubtitle = isEn && dict.home.hero_subtitle ? dict.home.hero_subtitle : settings.hero_subtitle;
@@ -82,12 +84,12 @@ export default function HomeClient({ featuredProjects, lang, dict }: { featuredP
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <GlowButton>
                 <Button size="lg" asChild>
-                  <Link href={`/${lang}/danh-muc`}>{dict.home.explore_btn}</Link>
+                  <Link href={projectsUrl}>{dict.home.explore_btn}</Link>
                 </Button>
               </GlowButton>
               <GlowButton>
                 <Button size="lg" variant="secondary" className="border-[#C4A35A] text-[#C4A35A] hover:bg-[#C4A35A] hover:!text-[#1A1A2E]" asChild>
-                  <Link href={`/${lang}/ky-gui`}>{dict.home.submit_btn}</Link>
+                  <Link href={submitUrl}>{dict.home.submit_btn}</Link>
                 </Button>
               </GlowButton>
             </div>
@@ -155,7 +157,7 @@ export default function HomeClient({ featuredProjects, lang, dict }: { featuredP
           <ScrollReveal direction="fade" delay={600} duration={800}>
             <div className="text-center mt-12">
               <Button variant="secondary" size="lg" className="border-[#1A1A2E] text-[#1A1A2E] hover:bg-[#1A1A2E] hover:text-[#C4A35A]" asChild>
-                <Link href={`/${lang}/danh-muc`}>{dict.home.view_all_deals}</Link>
+                <Link href={projectsUrl}>{dict.home.view_all_deals}</Link>
               </Button>
             </div>
           </ScrollReveal>

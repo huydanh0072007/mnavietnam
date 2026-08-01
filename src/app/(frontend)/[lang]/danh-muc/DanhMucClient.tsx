@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ProjectCard } from '@/components/ui/ProjectCard';
 import { Project } from '@/lib/types';
-import { SearchX } from 'lucide-react';
+import { SearchX, SlidersHorizontal } from 'lucide-react';
 
 // Helper components
 import { ScrollReveal } from '@/components/animations/ScrollReveal';
@@ -29,6 +29,7 @@ export function DanhMucContent({ initialProjects, categories, provinces, dict, l
   const provinceFilter = searchParams.get('province') || 'all';
   
   const [localSearch, setLocalSearch] = useState(searchParams.get('q') || '');
+  const [showFiltersMobile, setShowFiltersMobile] = useState(false);
 
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -80,8 +81,19 @@ export function DanhMucContent({ initialProjects, categories, provinces, dict, l
           </p>
         </div>
 
+        {/* Mobile Filter Toggle Button */}
+        <div className="lg:hidden mb-4">
+          <button 
+            onClick={() => setShowFiltersMobile(!showFiltersMobile)}
+            className="w-full flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-lg p-3 text-sm font-semibold text-[#1A1A2E] shadow-sm active:bg-gray-50 cursor-pointer"
+          >
+            <SlidersHorizontal className="w-4 h-4 text-[#C4A35A]" />
+            {showFiltersMobile ? 'Ẩn bộ lọc' : 'Hiện bộ lọc'}
+          </button>
+        </div>
+
         {/* Filters */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-10 sticky top-24 z-30">
+        <div className={`bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-10 sticky top-24 z-30 lg:block ${showFiltersMobile ? 'block' : 'hidden'}`}>
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Deal Type Toggle */}
             <div className="flex bg-gray-100 rounded-md p-1">

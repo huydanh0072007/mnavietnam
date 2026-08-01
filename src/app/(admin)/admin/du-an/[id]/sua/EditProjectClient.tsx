@@ -63,6 +63,7 @@ export function EditProjectClient({ initialProject, categories, provinces }: Edi
   const [isTranslating, setIsTranslating] = useState(false);
   
   const [publishStatus, setPublishStatus] = useState<PublishStatus>(initialProject.publish_status || 'published');
+  const [formTab, setFormTab] = useState<'vi' | 'en'>('vi');
 
   const handleAddHighlight = () => {
     if (newHighlight.trim()) {
@@ -241,6 +242,32 @@ export function EditProjectClient({ initialProject, categories, provinces }: Edi
           {/* Form Sections */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
+              {/* Tab Selector */}
+              <div className="flex border border-gray-200 bg-white rounded-xl shadow-sm overflow-hidden p-1">
+                <button
+                  type="button"
+                  onClick={() => setFormTab('vi')}
+                  className={`flex-1 py-2.5 text-sm font-bold text-center rounded-lg transition-colors ${
+                    formTab === 'vi' 
+                      ? 'bg-[#C4A35A] text-[#0A1628]' 
+                      : 'text-gray-500 hover:text-gray-800'
+                  }`}
+                >
+                  Nội dung tiếng Việt (VI)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormTab('en')}
+                  className={`flex-1 py-2.5 text-sm font-bold text-center rounded-lg transition-colors ${
+                    formTab === 'en' 
+                      ? 'bg-[#C4A35A] text-[#0A1628]' 
+                      : 'text-gray-500 hover:text-gray-800'
+                  }`}
+                >
+                  Nội dung tiếng Anh (EN)
+                </button>
+              </div>
+
               {/* Basic Information */}
               <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
                 <h2 className="text-lg font-bold text-gray-900 font-serif border-b border-gray-100 pb-3">Thông tin Cơ bản</h2>
@@ -272,54 +299,7 @@ export function EditProjectClient({ initialProject, categories, provinces }: Edi
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tên Dự án (VI)</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="VD: Khu đô thị sinh thái Long Thành"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tên Dự án (EN)</label>
-                    <input
-                      type="text"
-                      placeholder="VD: Long Thanh Eco City"
-                      value={titleEn}
-                      onChange={(e) => setTitleEn(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Nhãn Trạng thái (VI)</label>
-                    <input
-                      type="text"
-                      placeholder="VD: Sẵn Sàng Giao Dịch"
-                      value={statusLabel}
-                      onChange={(e) => setStatusLabel(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Nhãn Trạng thái (EN)</label>
-                    <input
-                      type="text"
-                      placeholder="VD: Ready for Transaction"
-                      value={statusLabelEn}
-                      onChange={(e) => setStatusLabelEn(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Loại hình BĐS</label>
                     <select
@@ -348,107 +328,165 @@ export function EditProjectClient({ initialProject, categories, provinces }: Edi
                       ))}
                     </select>
                   </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Quy mô (VI)</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="VD: 50 ha"
-                      value={scale}
-                      onChange={(e) => setScale(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A] mb-2"
-                    />
-                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Quy mô (EN)</label>
-                    <input
-                      type="text"
-                      placeholder="VD: 50 hectares"
-                      value={scaleEn}
-                      onChange={(e) => setScaleEn(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                    />
-                  </div>
                 </div>
+
+                {/* Tabbed Basic Fields */}
+                {formTab === 'vi' ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-150">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tên Dự án (VI)</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="VD: Khu đô thị sinh thái Long Thành"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Nhãn Trạng thái (VI)</label>
+                      <input
+                        type="text"
+                        placeholder="VD: Sẵn Sàng Giao Dịch"
+                        value={statusLabel}
+                        onChange={(e) => setStatusLabel(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Quy mô (VI)</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="VD: 50 ha"
+                        value={scale}
+                        onChange={(e) => setScale(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-150">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tên Dự án (EN)</label>
+                      <input
+                        type="text"
+                        placeholder="VD: Long Thanh Eco City"
+                        value={titleEn}
+                        onChange={(e) => setTitleEn(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Nhãn Trạng thái (EN)</label>
+                      <input
+                        type="text"
+                        placeholder="VD: Ready for Transaction"
+                        value={statusLabelEn}
+                        onChange={(e) => setStatusLabelEn(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Quy mô (EN)</label>
+                      <input
+                        type="text"
+                        placeholder="VD: 50 hectares"
+                        value={scaleEn}
+                        onChange={(e) => setScaleEn(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Technical Specifications */}
               <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
                 <h2 className="text-lg font-bold text-gray-900 font-serif border-b border-gray-100 pb-3">Pháp lý & Hiện trạng</h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tình trạng Pháp lý (VI)</label>
-                    <select
-                      value={legalStatus}
-                      onChange={(e) => setLegalStatus(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                    >
-                      <option value="">Chọn tình trạng pháp lý...</option>
-                      {categories.filter(c => c.category === 'legal_status').map(c => (
-                        <option key={c.key} value={c.label}>{c.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tình trạng Pháp lý (EN)</label>
-                    <input
-                      type="text"
-                      value={legalStatusEn}
-                      onChange={(e) => setLegalStatusEn(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                      placeholder="Legal Status EN"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Hiện trạng Thực tế (VI)</label>
-                    <select
-                      value={currentStatus}
-                      onChange={(e) => setCurrentStatus(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                    >
-                      <option value="">Chọn hiện trạng...</option>
-                      {categories.filter(c => c.category === 'project_status').map(c => (
-                        <option key={c.key} value={c.label}>{c.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Hiện trạng Thực tế (EN)</label>
-                    <input
-                      type="text"
-                      value={currentStatusEn}
-                      onChange={(e) => setCurrentStatusEn(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                      placeholder="Current Status EN"
-                    />
-                  </div>
-                </div>
-
-                {dealType === 'joint_venture' && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Cơ cấu Vốn Kêu gọi Tổng quan (VI)</label>
-                      <input
-                        type="text"
-                        value={capitalStructure}
-                        onChange={(e) => setCapitalStructure(e.target.value)}
-                        placeholder="VD: Mời chào 49% cổ phần, Capex 500 Tỷ"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                      />
+                {formTab === 'vi' ? (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tình trạng Pháp lý (VI)</label>
+                        <select
+                          value={legalStatus}
+                          onChange={(e) => setLegalStatus(e.target.value)}
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                        >
+                          <option value="">Chọn tình trạng pháp lý...</option>
+                          {categories.filter(c => c.category === 'legal_status').map(c => (
+                            <option key={c.key} value={c.label}>{c.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Hiện trạng Thực tế (VI)</label>
+                        <select
+                          value={currentStatus}
+                          onChange={(e) => setCurrentStatus(e.target.value)}
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                        >
+                          <option value="">Chọn hiện trạng...</option>
+                          {categories.filter(c => c.category === 'project_status').map(c => (
+                            <option key={c.key} value={c.label}>{c.label}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Cơ cấu Vốn Kêu gọi Tổng quan (EN)</label>
-                      <input
-                        type="text"
-                        value={capitalStructureEn}
-                        onChange={(e) => setCapitalStructureEn(e.target.value)}
-                        placeholder="VD: Offering 49% shares, Capex 500 Billion"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
-                      />
+
+                    {dealType === 'joint_venture' && (
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Cơ cấu Vốn Kêu gọi Tổng quan (VI)</label>
+                        <input
+                          type="text"
+                          value={capitalStructure}
+                          onChange={(e) => setCapitalStructure(e.target.value)}
+                          placeholder="VD: Mời chào 49% cổ phần, Capex 500 Tỷ"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Tình trạng Pháp lý (EN)</label>
+                        <input
+                          type="text"
+                          value={legalStatusEn}
+                          onChange={(e) => setLegalStatusEn(e.target.value)}
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                          placeholder="Legal Status EN"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Hiện trạng Thực tế (EN)</label>
+                        <input
+                          type="text"
+                          value={currentStatusEn}
+                          onChange={(e) => setCurrentStatusEn(e.target.value)}
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                          placeholder="Current Status EN"
+                        />
+                      </div>
                     </div>
+
+                    {dealType === 'joint_venture' && (
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Cơ cấu Vốn Kêu gọi Tổng quan (EN)</label>
+                        <input
+                          type="text"
+                          value={capitalStructureEn}
+                          onChange={(e) => setCapitalStructureEn(e.target.value)}
+                          placeholder="VD: Offering 49% shares, Capex 500 Billion"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -457,8 +495,8 @@ export function EditProjectClient({ initialProject, categories, provinces }: Edi
               <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
                 <h2 className="text-lg font-bold text-gray-900 font-serif border-b border-gray-100 pb-3">Tổng quan dự án</h2>
 
-                <div className="grid grid-cols-1 gap-4">
-                  <div>
+                {formTab === 'vi' ? (
+                  <div className="animate-in fade-in duration-200">
                     <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Mô tả chi tiết (VI)</label>
                     <textarea
                       rows={4}
@@ -468,7 +506,8 @@ export function EditProjectClient({ initialProject, categories, provinces }: Edi
                       className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
                     />
                   </div>
-                  <div>
+                ) : (
+                  <div className="animate-in fade-in duration-200">
                     <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Mô tả chi tiết (EN)</label>
                     <textarea
                       rows={4}
@@ -478,7 +517,7 @@ export function EditProjectClient({ initialProject, categories, provinces }: Edi
                       className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
                     />
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Highlights */}
@@ -487,7 +526,7 @@ export function EditProjectClient({ initialProject, categories, provinces }: Edi
 
                 <div className="space-y-4">
                   {highlights.map((item, idx) => (
-                    <div key={idx} className="flex flex-col gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100 text-sm text-gray-800">
+                    <div key={idx} className="flex flex-col gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100 text-sm text-gray-800 animate-in fade-in duration-200">
                       <div className="flex items-center justify-between">
                         <span className="font-semibold">Điểm nhấn {idx + 1}</span>
                         <button
@@ -498,28 +537,31 @@ export function EditProjectClient({ initialProject, categories, provinces }: Edi
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
-                      <input
-                        type="text"
-                        value={item}
-                        onChange={(e) => {
-                          const newHL = [...highlights];
-                          newHL[idx] = e.target.value;
-                          setHighlights(newHL);
-                        }}
-                        className="w-full bg-white border border-gray-200 rounded-md px-3 py-1.5 text-sm"
-                        placeholder="VI"
-                      />
-                      <input
-                        type="text"
-                        value={highlightsEn[idx] || ''}
-                        onChange={(e) => {
-                          const newHL = [...highlightsEn];
-                          newHL[idx] = e.target.value;
-                          setHighlightsEn(newHL);
-                        }}
-                        className="w-full bg-white border border-gray-200 rounded-md px-3 py-1.5 text-sm"
-                        placeholder="EN"
-                      />
+                      {formTab === 'vi' ? (
+                        <input
+                          type="text"
+                          value={item}
+                          onChange={(e) => {
+                            const newHL = [...highlights];
+                            newHL[idx] = e.target.value;
+                            setHighlights(newHL);
+                          }}
+                          className="w-full bg-white border border-gray-200 rounded-md px-3 py-1.5 text-sm"
+                          placeholder="Nhập điểm nhấn tiếng Việt..."
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          value={highlightsEn[idx] || ''}
+                          onChange={(e) => {
+                            const newHL = [...highlightsEn];
+                            newHL[idx] = e.target.value;
+                            setHighlightsEn(newHL);
+                          }}
+                          className="w-full bg-white border border-gray-200 rounded-md px-3 py-1.5 text-sm"
+                          placeholder="Enter English highlight..."
+                        />
+                      )}
                     </div>
                   ))}
                 </div>

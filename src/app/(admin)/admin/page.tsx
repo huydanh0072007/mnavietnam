@@ -268,7 +268,7 @@ export default async function AdminDashboardPage() {
 
             <div className="flex items-end justify-between h-56 pt-6 pb-2 px-4 border-b border-gray-100 relative">
               {monthlyLeads.map((item, idx) => {
-                const heightPercent = item.count > 0 ? (item.count / maxCount) * 100 : 4;
+                const heightPercent = item.count > 0 ? (item.count / maxCount) * 100 : 0;
                 return (
                   <div key={idx} className="flex flex-col items-center flex-1 group relative h-full justify-end">
                     {/* Tooltip */}

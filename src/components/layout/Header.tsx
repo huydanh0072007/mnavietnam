@@ -1,12 +1,13 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '../ui/Button';
 
 export const Header = ({ lang, dict }: { lang: string; dict: any }) => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   // Do pathname bắt đầu bằng /vi hoặc /en, trang chủ sẽ là /vi hoặc /en
@@ -20,17 +21,41 @@ export const Header = ({ lang, dict }: { lang: string; dict: any }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const urlTranslations: Record<string, string> = {
+    'about': 'gioi-thieu',
+    'gioi-thieu': 'about',
+    'projects': 'danh-muc',
+    'danh-muc': 'projects',
+    'submit': 'ky-gui',
+    'ky-gui': 'submit',
+    'terms': 'dieu-khoan-su-dung',
+    'dieu-khoan-su-dung': 'terms',
+    'privacy': 'chinh-sach-bao-mat',
+    'chinh-sach-bao-mat': 'privacy',
+    'project': 'du-an',
+    'du-an': 'project'
+  };
+
+  const projectsUrl = lang === 'en' ? '/en/projects' : `/${lang}/danh-muc`;
+
   const navLinks = [
     { name: dict.navigation.home, href: `/${lang}` },
-    { name: dict.navigation.projects, href: `/${lang}/danh-muc` },
-    { name: dict.navigation.submit, href: `/${lang}/ky-gui` },
-    { name: dict.navigation.about, href: `/${lang}/gioi-thieu` },
+    { name: dict.navigation.projects, href: projectsUrl },
+    { name: dict.navigation.submit, href: lang === 'en' ? '/en/submit' : `/${lang}/ky-gui` },
+    { name: dict.navigation.about, href: lang === 'en' ? '/en/about' : `/${lang}/gioi-thieu` },
   ];
 
   const switchLangUrl = (targetLang: string) => {
     if (!pathname) return `/${targetLang}`;
-    const pathWithoutLang = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/');
-    return `/${targetLang}${pathWithoutLang.startsWith('/') ? '' : '/'}${pathWithoutLang}`;
+    const segments = pathname.split('/').filter(Boolean);
+    if (segments.length > 0 && (segments[0] === 'vi' || segments[0] === 'en')) {
+      segments.shift();
+    }
+    const translatedSegments = segments.map(segment => urlTranslations[segment] || segment);
+    const newPath = '/' + translatedSegments.join('/');
+    const queryString = searchParams?.toString();
+    const queryPrefix = queryString ? `?${queryString}` : '';
+    return `/${targetLang}${newPath === '/' ? '' : newPath}${queryPrefix}`;
   };
 
   return (
@@ -72,10 +97,10 @@ export const Header = ({ lang, dict }: { lang: string; dict: any }) => {
 
           <div className="flex gap-3 ml-4">
             <Button variant="ghost" size="sm" asChild>
-              <Link href={`/${lang}/danh-muc?deal_type=buyout`}>{dict.projects.filter_buyout}</Link>
+              <Link href={`${projectsUrl}?deal_type=buyout`}>{dict.projects.filter_buyout}</Link>
             </Button>
             <Button variant="primary" size="sm" asChild>
-              <Link href={`/${lang}/danh-muc?deal_type=joint_venture`}>{dict.projects.filter_jv}</Link>
+              <Link href={`${projectsUrl}?deal_type=joint_venture`}>{dict.projects.filter_jv}</Link>
             </Button>
           </div>
         </nav>
@@ -112,10 +137,10 @@ export const Header = ({ lang, dict }: { lang: string; dict: any }) => {
             </ul>
             <div className="flex flex-col gap-4 mt-10">
               <Button variant="secondary" className="w-full border-[#C4A35A] text-[#C4A35A] hover:bg-[#C4A35A] hover:text-[#1A1A2E]" asChild onClick={() => setIsMobileMenuOpen(false)}>
-                <Link href={`/${lang}/danh-muc?deal_type=buyout`}>{dict.projects.filter_buyout}</Link>
+                <Link href={`${projectsUrl}?deal_type=buyout`}>{dict.projects.filter_buyout}</Link>
               </Button>
               <Button variant="primary" className="w-full" asChild onClick={() => setIsMobileMenuOpen(false)}>
-                <Link href={`/${lang}/danh-muc?deal_type=joint_venture`}>{dict.projects.filter_jv}</Link>
+                <Link href={`${projectsUrl}?deal_type=joint_venture`}>{dict.projects.filter_jv}</Link>
               </Button>
             </div>
           </div>

@@ -110,7 +110,7 @@ export default async function ProjectDetailPage({ params }: { params: PageParams
         <div className="text-sm text-[#6B7280] mb-8">
           <Link href={`/${lang}`} className="hover:text-[#1A1A2E]">{dict.navigation.home}</Link>
           <span className="mx-2">/</span> 
-          <Link href={`/${lang}/danh-muc`} className="hover:text-[#1A1A2E]">{dict.navigation.projects}</Link>
+          <Link href={lang === 'en' ? '/en/projects' : `/${lang}/danh-muc`} className="hover:text-[#1A1A2E]">{dict.navigation.projects}</Link>
           <span className="mx-2">/</span> 
           <span className="text-[#1A1A2E] font-medium">{project.project_code}</span>
         </div>

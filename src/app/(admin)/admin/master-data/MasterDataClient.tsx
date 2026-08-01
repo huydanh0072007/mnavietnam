@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { MasterDataItem, MdProvince } from '@/lib/master-data-store';
 import { 
@@ -24,7 +24,21 @@ interface Props {
 
 export function MasterDataClient({ initialCategories, initialProvinces }: Props) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'locations' | 'categories'>('locations');
+  const searchParams = useSearchParams();
+  const queryTab = searchParams.get('tab');
+  const initialTab = queryTab === 'categories' ? 'categories' : 'locations';
+  const [activeTab, setActiveTab] = useState<'locations' | 'categories'>(initialTab);
+
+  React.useEffect(() => {
+    if (queryTab === 'categories' || queryTab === 'locations') {
+      setActiveTab(queryTab);
+    }
+  }, [queryTab]);
+
+  const handleTabChange = (tab: 'locations' | 'categories') => {
+    setActiveTab(tab);
+    router.replace(`/admin/master-data?tab=${tab}`);
+  };
   const [isUploading, setIsUploading] = useState(false);
   const [loadingActionId, setLoadingActionId] = useState<string | null>(null);
 
@@ -277,14 +291,14 @@ export function MasterDataClient({ initialCategories, initialProvinces }: Props)
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative">
       <div className="flex border-b border-gray-200 bg-gray-50/50">
         <button
-          onClick={() => setActiveTab('locations')}
-          className={`flex-1 py-4 text-sm font-semibold text-center border-b-2 transition-colors ${activeTab === 'locations' ? 'border-[#C4A35A] text-[#1A1A2E]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+          onClick={() => handleTabChange('locations')}
+          className={`flex-1 py-4 text-sm font-semibold text-center border-b-2 transition-colors ${activeTab === 'locations' ? 'border-[#C4A35A] text-[#1A1A2E]' : 'border-transparent text-gray-500 hover:text-gray-700'} cursor-pointer`}
         >
           Địa giới Hành chính (34 Tỉnh/Thành)
         </button>
         <button
-          onClick={() => setActiveTab('categories')}
-          className={`flex-1 py-4 text-sm font-semibold text-center border-b-2 transition-colors ${activeTab === 'categories' ? 'border-[#C4A35A] text-[#1A1A2E]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+          onClick={() => handleTabChange('categories')}
+          className={`flex-1 py-4 text-sm font-semibold text-center border-b-2 transition-colors ${activeTab === 'categories' ? 'border-[#C4A35A] text-[#1A1A2E]' : 'border-transparent text-gray-500 hover:text-gray-700'} cursor-pointer`}
         >
           Danh mục chung
         </button>

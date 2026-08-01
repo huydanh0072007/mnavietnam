@@ -141,6 +141,12 @@ export function KyGuiClient({ categories, dict, lang }: { categories: MasterData
                 </div>
 
                 <div className="pt-6">
+                  <div className="flex items-start gap-3 mb-6">
+                    <input type="checkbox" required id="consent" className="mt-1 w-4 h-4 text-[#C4A35A] bg-[#0A1628] border-gray-700 rounded focus:ring-[#C4A35A]" />
+                    <label htmlFor="consent" className="text-sm text-gray-300">
+                      {dict.submit.form_consent} <Link href={`/${lang}/dieu-khoan-su-dung`} className="text-[#C4A35A] hover:underline">{dict.submit.form_consent_terms}</Link> {dict.submit.form_consent_and} <Link href={`/${lang}/chinh-sach-bao-mat`} className="text-[#C4A35A] hover:underline">{dict.submit.form_consent_privacy}</Link>{dict.submit.form_consent_commit}
+                    </label>
+                  </div>
                   <Button type="submit" size="lg" className="w-full md:w-auto text-[#0A1628] font-bold" disabled={isSubmitting}>
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">
@@ -151,12 +157,6 @@ export function KyGuiClient({ categories, dict, lang }: { categories: MasterData
                       dict.submit.form_submit_btn
                     )}
                   </Button>
-                  <div className="flex items-start gap-3 mt-6">
-                    <input type="checkbox" required id="consent" className="mt-1 w-4 h-4 text-[#C4A35A] bg-[#0A1628] border-gray-700 rounded focus:ring-[#C4A35A]" />
-                    <label htmlFor="consent" className="text-sm text-gray-300">
-                      {dict.submit.form_consent} <Link href={`/${lang}/dieu-khoan-su-dung`} className="text-[#C4A35A] hover:underline">{dict.submit.form_consent_terms}</Link> {dict.submit.form_consent_and} <Link href={`/${lang}/chinh-sach-bao-mat`} className="text-[#C4A35A] hover:underline">{dict.submit.form_consent_privacy}</Link>{dict.submit.form_consent_commit}
-                    </label>
-                  </div>
                 </div>
               </form>
             </div>

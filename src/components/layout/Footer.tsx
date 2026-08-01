@@ -9,6 +9,10 @@ import { useSettings } from '@/lib/contexts/SettingsContext';
 export const Footer = ({ lang = 'vi', dict }: { lang?: string; dict?: any }) => {
   const { settings, isLoading } = useSettings();
 
+  const projectsUrl = lang === 'en' ? '/en/projects' : `/${lang}/danh-muc`;
+  const submitUrl = lang === 'en' ? '/en/submit' : `/${lang}/ky-gui`;
+  const aboutUrl = lang === 'en' ? '/en/about' : `/${lang}/gioi-thieu`;
+
   if (!dict) return null;
 
   return (
@@ -25,7 +29,7 @@ export const Footer = ({ lang = 'vi', dict }: { lang?: string; dict?: any }) => 
                 M$A <span className="text-[#C4A35A]">International</span>
               </span>
             </Link>
-            <p className="text-[#6B7280] text-sm leading-relaxed mb-6">
+            <p className="text-gray-400 text-sm leading-relaxed mb-6">
               {dict.footer.description}
               <br/><br/>
               <strong className="text-[#C4A35A] font-serif font-medium tracking-wide">{dict.footer.slogan}</strong>
@@ -35,19 +39,19 @@ export const Footer = ({ lang = 'vi', dict }: { lang?: string; dict?: any }) => 
           {/* Col 2 */}
           <div>
             <h4 className="text-white font-serif font-bold mb-6 uppercase tracking-wider text-sm">{dict.footer.quickLinks}</h4>
-            <ul className="space-y-3 text-sm text-[#6B7280]">
-              <li><Link href={`/${lang}/danh-muc`} className="hover:text-[#C4A35A] transition-colors">{dict.navigation.projects}</Link></li>
-              <li><Link href={`/${lang}/ky-gui`} className="hover:text-[#C4A35A] transition-colors">{dict.navigation.submit}</Link></li>
-              <li><Link href={`/${lang}/gioi-thieu`} className="hover:text-[#C4A35A] transition-colors">{dict.navigation.about}</Link></li>
+            <ul className="space-y-3 text-sm text-gray-400">
+              <li><Link href={projectsUrl} className="hover:text-[#C4A35A] transition-colors">{dict.navigation.projects}</Link></li>
+              <li><Link href={submitUrl} className="hover:text-[#C4A35A] transition-colors">{dict.navigation.submit}</Link></li>
+              <li><Link href={aboutUrl} className="hover:text-[#C4A35A] transition-colors">{dict.navigation.about}</Link></li>
             </ul>
           </div>
 
           {/* Col 3 */}
           <div>
             <h4 className="text-white font-serif font-bold mb-6 uppercase tracking-wider text-sm">{dict.footer.services}</h4>
-            <ul className="space-y-3 text-sm text-[#6B7280]">
-              <li><Link href={`/${lang}/danh-muc?deal_type=buyout`} className="hover:text-[#C4A35A] transition-colors">{dict.footer.service_buyout}</Link></li>
-              <li><Link href={`/${lang}/danh-muc?deal_type=joint_venture`} className="hover:text-[#C4A35A] transition-colors">{dict.footer.service_jv}</Link></li>
+            <ul className="space-y-3 text-sm text-gray-400">
+              <li><Link href={`${projectsUrl}?deal_type=buyout`} className="hover:text-[#C4A35A] transition-colors">{dict.footer.service_buyout}</Link></li>
+              <li><Link href={`${projectsUrl}?deal_type=joint_venture`} className="hover:text-[#C4A35A] transition-colors">{dict.footer.service_jv}</Link></li>
               <li><a href="#" className="hover:text-[#C4A35A] transition-colors">{dict.footer.service_eval}</a></li>
               <li><a href="#" className="hover:text-[#C4A35A] transition-colors">{dict.footer.service_legal}</a></li>
             </ul>
@@ -56,7 +60,7 @@ export const Footer = ({ lang = 'vi', dict }: { lang?: string; dict?: any }) => 
           {/* Col 4 */}
           <div>
             <h4 className="text-white font-serif font-bold mb-6 uppercase tracking-wider text-sm">{dict.footer.contact}</h4>
-            <ul className="space-y-4 text-sm text-[#6B7280]">
+            <ul className="space-y-4 text-sm text-gray-400">
               <li className="flex items-start gap-3">
                 <span className="text-[#C4A35A] mt-1">📍</span>
                 <span>{dict.footer.address}</span>
@@ -98,7 +102,7 @@ export const Footer = ({ lang = 'vi', dict }: { lang?: string; dict?: any }) => 
           </div>
         </div>
 
-        <div className="pt-8 border-t border-[#1e2f47] flex flex-col md:flex-row justify-between items-center text-xs text-[#6B7280]">
+        <div className="pt-8 border-t border-[#1e2f47] flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
           <p>&copy; {new Date().getFullYear()} M$A International. {dict.footer.rights}</p>
           <div className="flex gap-4 mt-4 md:mt-0">
             <Link href={`/${lang}/dieu-khoan-su-dung`} className="hover:text-white transition-colors">{dict.footer.terms}</Link>

@@ -34,6 +34,14 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
   // Confirm Hide Modal State
   const [hideConfirmProject, setHideConfirmProject] = useState<Project | null>(null);
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [search, dealTypeFilter, statusFilter, startDate, endDate, sortBy]);
+
   // Filter projects (also filter out is_active === false)
   const filtered = projects.filter(p => {
     if (p.is_active === false) return false;
@@ -74,6 +82,9 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
     }
     return 0;
   });
+
+  const totalPages = Math.ceil(sorted.length / itemsPerPage);
+  const paginatedProjects = sorted.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const handleExportCSV = () => {
     const headers = ['Mã Dự án', 'Tên Dự án', 'Hình thức Giao dịch', 'Tỉnh/Thành', 'Quy mô', 'Hiện trạng', 'Trạng thái', 'Ngày tạo'];
@@ -273,7 +284,7 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {sorted.map((project) => (
+                 {paginatedProjects.map((project) => (
                   <tr key={project.id} className="hover:bg-gray-50/80 transition-colors">
                     {/* Featured Star Toggle */}
                     <td className="py-4 px-6">
@@ -404,8 +415,8 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
                       </div>
                     </td>
                   </tr>
-                ))}
-                {sorted.length === 0 && (
+                 ))}
+                {paginatedProjects.length === 0 && (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-gray-400">
                       Không tìm thấy dự án phù hợp
@@ -415,6 +426,29 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
               </tbody>
             </table>
           </div>
+          
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-t border-gray-100 text-sm text-gray-500">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+              >
+                Trang trước
+              </button>
+              <span className="font-medium">
+                Trang {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1.5 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+              >
+                Trang sau
+              </button>
+            </div>
+          )}
         </div>
       </main>
 

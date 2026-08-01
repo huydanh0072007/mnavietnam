@@ -48,7 +48,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, lang = 'vi' }
           <h3 className="text-xl font-serif font-bold text-[#E8E6E1] mb-3 line-clamp-2 group-hover:text-[#C4A35A] transition-colors">
             {displayTitle}
           </h3>
-          <div className="text-[#6B7280] text-sm mb-4 space-y-2 flex-grow">
+          <div className="text-gray-400 text-sm mb-4 space-y-2 flex-grow">
             <p><strong>{scaleLabel}:</strong> {displayScale}</p>
             {displayHighlights[0] && (
               <p className="line-clamp-2">

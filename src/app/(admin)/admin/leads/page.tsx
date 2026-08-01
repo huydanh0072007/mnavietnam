@@ -50,6 +50,7 @@ export default function AdminLeadsPage() {
   const router = useRouter();
   const [leads, setLeads] = useState<LeadItem[]>([]);
   const [selectedLead, setSelectedLead] = useState<LeadItem | null>(null);
+  const [mobileView, setMobileView] = useState<'list' | 'detail'>('list');
   const [typeFilter, setTypeFilter] = useState<'all' | 'interest' | 'submission'>('all');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -543,7 +544,7 @@ export default function AdminLeadsPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Leads List */}
-          <div className="lg:col-span-5 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden divide-y divide-gray-100">
+          <div className={`lg:col-span-5 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden divide-y divide-gray-100 ${mobileView === 'detail' ? 'hidden lg:block' : 'block'}`}>
             <div className="p-4 bg-gray-50/80 border-b border-gray-200 text-xs font-bold uppercase text-gray-500 tracking-wider">
               Danh sách Lead ({filteredLeads.length})
             </div>
@@ -559,7 +560,10 @@ export default function AdminLeadsPage() {
                   return (
                     <div
                       key={lead.id}
-                      onClick={() => setSelectedLead(lead)}
+                      onClick={() => {
+                        setSelectedLead(lead);
+                        setMobileView('detail');
+                      }}
                       className={`p-4 cursor-pointer transition-all hover:bg-gray-50 ${
                         isSelected ? 'bg-amber-50/70 border-l-4 border-[#C4A35A]' : ''
                       }`}
@@ -621,10 +625,16 @@ export default function AdminLeadsPage() {
             )}
           </div>
 
-          {/* Lead Detail View */}
-          <div className="lg:col-span-7 bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-6">
+          <div className={`lg:col-span-7 bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-6 ${mobileView === 'list' ? 'hidden lg:block' : 'block'}`}>
             {selectedLead ? (
               <>
+                {/* Back button on mobile */}
+                <button
+                  onClick={() => setMobileView('list')}
+                  className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-900 border border-gray-200 rounded-md px-3 py-1.5 bg-white lg:hidden mb-4 shadow-sm"
+                >
+                  ← Quay lại danh sách
+                </button>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-100 pb-5">
                   <div>
                     <div className="flex items-center gap-2 mb-1">

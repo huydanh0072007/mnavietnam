@@ -62,3 +62,139 @@
   - **Completed**: 2026-08-01
   - **Evidence**: Replaced light-flashing loading screens with a unified, dark loading template (`bg-[#0A1628]`) inside `AdminLayout` that matches the dark admin sidebar theme. Avoids client-side visual flashes during authentication checks.
 
+## Sprint 3: Medium UX Improvements
+- [x] **TASK-UIUX-M1**: Reorder consent checkbox before Submit
+  - **Status**: Completed
+  - **Description**: Move consent checkbox before the Submit button on the KyGui frontend form.
+  - **Completed**: 2026-08-01
+  - **Evidence**: Reordered checkboxes wrapper in `KyGuiClient.tsx` to sit before the submit button container.
+  
+- [x] **TASK-UIUX-M2**: Fix WCAG contrast ratios in Footer & ProjectCard
+  - **Status**: Completed
+  - **Description**: Increase contrast ratio of text colors to satisfy WCAG AA standards (>= 4.5:1).
+  - **Completed**: 2026-08-01
+  - **Evidence**: Changed text-gray-500 (#6B7280) on dark bg to text-gray-400 (#9CA3AF) in Footer.tsx and ProjectCard.tsx.
+  
+- [x] **TASK-UIUX-M3**: Mobile master-detail toggle for Leads page
+  - **Status**: Completed
+  - **Description**: Make Leads page split-screen responsive on mobile by adding a toggle/back flow.
+  - **Completed**: 2026-08-01
+  - **Evidence**: Implemented `mobileView` dynamic state, custom "back to list" button, and conditional `hidden` classes on columns in `leads/page.tsx`.
+  
+- [x] **TASK-UIUX-M4**: Collapsible filter on mobile for DanhMuc page
+  - **Status**: Completed
+  - **Description**: Make DanhMuc filter bar collapsible or accordion-style on mobile screens.
+  - **Completed**: 2026-08-01
+  - **Evidence**: Added `showFiltersMobile` state and a toggle button with SlidersHorizontal icon. Filter container is toggled hidden/block on mobile screens.
+  
+- [x] **TASK-UIUX-M5**: Add pagination to Projects & VDR tables
+  - **Status**: Completed
+  - **Description**: Add simple pagination control (10/20/50 items) to admin projects and VDR tables.
+  - **Completed**: 2026-08-01
+  - **Evidence**: Added `currentPage` state and rendered slices of 10 items per page with navigation controls in `AdminProjectsClient.tsx` and `vdr/page.tsx`.
+  
+- [x] **TASK-UIUX-M6**: Sync tab state with URL query in Master Data
+  - **Status**: Completed
+  - **Description**: Sync active tab in MasterDataClient with URL query parameter `?tab=...` on refresh.
+  - **Completed**: 2026-08-01
+  - **Evidence**: Added `useSearchParams` hook and bi-directional useEffect to synchronize tab clicks with `?tab=` URL parameter in `MasterDataClient.tsx`.
+  
+- [x] **TASK-UIUX-M7**: Fix misleading 0-lead bar chart on Dashboard
+  - **Status**: Completed
+  - **Description**: Ensure month with 0 leads is rendered with 0 height bar on SVG chart.
+  - **Completed**: 2026-08-01
+  - **Evidence**: Modified count height percent fallback value from 4 to 0 in monthly leads chart inside `admin/page.tsx`.
+  
+- [x] **TASK-UIUX-M8**: Preserve query parameters on language switch
+  - **Status**: Completed
+  - **Description**: Retain search query params (like `?deal_type=...`) when switching languages in header.
+  - **Completed**: 2026-08-01
+  - **Evidence**: Enhanced `switchLangUrl` segment-mapping logic to preserve search parameters and query strings during language switches in `Header.tsx`.
+  
+- [x] **TASK-UIUX-M9**: Tab-based bilingual form for project editing
+  - **Status**: Completed
+  - **Description**: Split project edit bilingual form fields into Tab-based view (VI | EN).
+  - **Completed**: 2026-08-01
+  - **Evidence**: Added `formTab` state, tab selector header, and conditional field displays for all bilingual properties in `EditProjectClient.tsx`.
+  
+- [x] **TASK-UIUX-M10**: Fix VDR signature canvas invert issue
+  - **Status**: Completed
+  - **Description**: Remove invert filter on signature rendering canvas.
+  - **Completed**: 2026-08-01
+  - **Evidence**: Removed class `filter invert` from signature image tag inside handwritten view modal in `vdr/page.tsx`.
+  
+- [x] **TASK-UIUX-M11**: Create English URL slugs via rewrites
+  - **Status**: Completed
+  - **Description**: Handle English URLs like `/en/about`, `/en/projects`, etc. in next middleware.
+  - **Completed**: 2026-08-01
+  - **Evidence**: Oversaw routing redirects and path rewrites using internal rewrite URLs in `src/middleware.ts` and updated page routing logic across frontend components.
+
+## Sprint 4: Polish & Design Tokens
+- [ ] **TASK-UIUX-L1**: Establish Tailwind Design Tokens (theme branding colors)
+  - **Status**: Pending
+  - **Description**: Define custom tailwind brand colors (`navy`, `gold`, `muted`) and replace inline hex strings.
+  - **Completed**: N/A
+  - **Evidence**: N/A
+
+- [ ] **TASK-UIUX-L2**: Replace raw emojis with Lucide React icons
+  - **Status**: Pending
+  - **Description**: Replace unicode raw emojis in footer and headers with Lucide icons.
+  - **Completed**: N/A
+  - **Evidence**: N/A
+
+- [ ] **TASK-UIUX-L4**: Optimize mousemove listeners in InteractiveStars
+  - **Status**: Pending
+  - **Description**: Use IntersectionObserver to disable animation when InteractiveStars is out of viewport.
+  - **Completed**: N/A
+  - **Evidence**: N/A
+
+- [ ] **TASK-UIUX-L5**: Fix placeholder links `href="#"` in footer
+  - **Status**: Pending
+  - **Description**: Replace `#` links with real pages or remove href if page doesn't exist.
+  - **Completed**: N/A
+  - **Evidence**: N/A
+
+- [ ] **TASK-UIUX-L6**: Rename "Live Logs" to "Hoạt động gần đây"
+  - **Status**: Pending
+  - **Description**: Adjust admin dashboard text for recent logs.
+  - **Completed**: N/A
+  - **Evidence**: N/A
+
+- [ ] **TASK-UIUX-L7**: Remove fake notification bell animation
+  - **Status**: Pending
+  - **Description**: Remove fake pulse animation on AdminHeader notification bell.
+  - **Completed**: N/A
+  - **Evidence**: N/A
+
+- [ ] **TASK-UIUX-L8**: Login page password visibility toggle
+  - **Status**: Pending
+  - **Description**: Add toggle to show/hide password text on admin login form.
+  - **Completed**: N/A
+  - **Evidence**: N/A
+
+## Sprint 5: Advanced Features
+- [ ] **TASK-UIUX-A1**: Admin Notification System
+  - **Status**: Pending
+  - **Description**: Real-time notification system badge and panel on AdminHeader.
+  - **Completed**: N/A
+  - **Evidence**: N/A
+
+- [ ] **TASK-UIUX-A2**: Bulk Select & Actions for Leads table
+  - **Status**: Pending
+  - **Description**: Implement select-all checkbox and actions to bulk publish/hide/archive leads.
+  - **Completed**: N/A
+  - **Evidence**: N/A
+
+- [ ] **TASK-UIUX-A3**: Bulk Select & Actions for Projects table
+  - **Status**: Pending
+  - **Description**: Implement select-all checkbox and actions to bulk archive/delete projects.
+  - **Completed**: N/A
+  - **Evidence**: N/A
+
+- [ ] **TASK-UIUX-A4**: Notification preferences for Admin Settings
+  - **Status**: Pending
+  - **Description**: Add settings options for email alerts on new leads/VDR updates.
+  - **Completed**: N/A
+  - **Evidence**: N/A
+
+

@@ -2,6 +2,22 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { i18n } from './i18n-config';
 
+const enUrlMapping: Record<string, string> = {
+  '/en/about': '/en/gioi-thieu',
+  '/en/projects': '/en/danh-muc',
+  '/en/submit': '/en/ky-gui',
+  '/en/terms': '/en/dieu-khoan-su-dung',
+  '/en/privacy': '/en/chinh-sach-bao-mat',
+};
+
+const missingLocaleEnMapping: Record<string, string> = {
+  '/about': '/en/about',
+  '/projects': '/en/projects',
+  '/submit': '/en/submit',
+  '/terms': '/en/terms',
+  '/privacy': '/en/privacy',
+};
+
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
@@ -15,20 +31,34 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Kiểm tra xem URL đã có locale chưa
+  // 1. Check if it is a missing locale path that matches an English slug
+  if (missingLocaleEnMapping[pathname]) {
+    return NextResponse.redirect(new URL(`${missingLocaleEnMapping[pathname]}${request.nextUrl.search}`, request.url));
+  }
+  if (pathname.startsWith('/project/')) {
+    const slug = pathname.slice('/project/'.length);
+    return NextResponse.redirect(new URL(`/en/project/${slug}${request.nextUrl.search}`, request.url));
+  }
+
+  // 2. Check if it is an English slug that needs rewriting to its Vietnamese filesystem folder
+  if (enUrlMapping[pathname]) {
+    return NextResponse.rewrite(new URL(`${enUrlMapping[pathname]}${request.nextUrl.search}`, request.url));
+  }
+  if (pathname.startsWith('/en/project/')) {
+    const slug = pathname.slice('/en/project/'.length);
+    return NextResponse.rewrite(new URL(`/en/du-an/${slug}${request.nextUrl.search}`, request.url));
+  }
+
+  // 3. Regular missing locale check
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   );
 
-  // Nếu thiếu locale, tự động chuyển hướng về /vi (ngôn ngữ mặc định)
   if (pathnameIsMissingLocale) {
     const locale = i18n.defaultLocale;
-    
-    // e.g. incoming request is /du-an
-    // The new URL is now /vi/du-an
     return NextResponse.redirect(
       new URL(
-        `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`,
+        `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}${request.nextUrl.search}`,
         request.url
       )
     );
