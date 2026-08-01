@@ -19,7 +19,8 @@ import {
   PlusCircle,
   EyeOff,
   Loader2,
-  Upload
+  Upload,
+  Trash2
 } from 'lucide-react';
 import { formatDate, getLeadStatusLabel } from '@/lib/utils';
 
@@ -177,6 +178,79 @@ export default function AdminLeadsPage() {
   const totalPages = Math.ceil(filteredLeads.length / 20) || 1;
   const startIndex = (currentPage - 1) * 20;
   const paginatedLeads = filteredLeads.slice(startIndex, startIndex + 20);
+
+  // Bulk Actions states & handlers
+  const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([]);
+
+  const handleToggleSelectLead = (id: string, checked: boolean) => {
+    setSelectedLeadIds(prev => checked ? [...prev, id] : prev.filter(item => item !== id));
+  };
+
+  const handleSelectAllChange = (checked: boolean) => {
+    if (checked) {
+      const pageIds = paginatedLeads.map(l => l.id);
+      setSelectedLeadIds(prev => Array.from(new Set([...prev, ...pageIds])));
+    } else {
+      const pageIds = paginatedLeads.map(l => l.id);
+      setSelectedLeadIds(prev => prev.filter(id => !pageIds.includes(id)));
+    }
+  };
+
+  const handleBulkUpdateStatus = async (newStatus: string) => {
+    if (selectedLeadIds.length === 0) return;
+    if (!window.confirm(`Xác nhận đổi trạng thái của ${selectedLeadIds.length} lead đã chọn sang "${getLeadStatusLabel(newStatus)}"?`)) return;
+
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ids: selectedLeadIds,
+          updates: { status: newStatus }
+        })
+      });
+
+      if (res.ok) {
+        toast.success(`Đã đổi trạng thái cho ${selectedLeadIds.length} lead thành công!`);
+        setSelectedLeadIds([]);
+        fetchLeads();
+      } else {
+        toast.error('Có lỗi xảy ra khi cập nhật hàng loạt.');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Không thể kết nối đến máy chủ.');
+    }
+  };
+
+  const handleBulkArchive = async () => {
+    if (selectedLeadIds.length === 0) return;
+    if (!window.confirm(`Bạn có chắc chắn muốn ẩn/lưu trữ ${selectedLeadIds.length} lead đã chọn không?`)) return;
+
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ids: selectedLeadIds,
+          updates: { is_active: false }
+        })
+      });
+
+      if (res.ok) {
+        toast.success(`Đã ẩn ${selectedLeadIds.length} lead thành công!`);
+        setSelectedLeadIds([]);
+        fetchLeads();
+      } else {
+        toast.error('Có lỗi xảy ra khi ẩn hàng loạt.');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Không thể kết nối đến máy chủ.');
+    }
+  };
 
   const handleFileUpload = async (file: File) => {
     setIsUploadingFile(true);
@@ -542,11 +616,94 @@ export default function AdminLeadsPage() {
           </div>
         </div>
 
+        {/* Floating Bulk Actions Bar */}
+        {selectedLeadIds.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-amber-50/80 border border-amber-200 p-4 rounded-xl shadow-sm animate-fadeIn">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-amber-800">
+                Đã chọn {selectedLeadIds.length} lead
+              </span>
+              <button
+                onClick={() => setSelectedLeadIds([])}
+                className="text-xs text-gray-500 hover:text-gray-700 underline font-semibold"
+              >
+                Bỏ chọn
+              </button>
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+              <select
+                onChange={(e) => {
+                  if (e.target.value) {
+                    handleBulkUpdateStatus(e.target.value);
+                    e.target.value = '';
+                  }
+                }}
+                value=""
+                className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#C4A35A] text-gray-700 font-semibold cursor-pointer"
+              >
+                <option value="" disabled>Đổi trạng thái hàng loạt...</option>
+                {typeFilter === 'interest' ? (
+                  <>
+                    <option value="new">Mới tiếp nhận (New)</option>
+                    <option value="contacted">Đã liên hệ</option>
+                    <option value="nda_sent">Đã ký NDA</option>
+                    <option value="due_diligence">Đang thẩm định</option>
+                    <option value="closed_won">Giao dịch thành công</option>
+                    <option value="closed_lost">Không thành công</option>
+                  </>
+                ) : typeFilter === 'submission' ? (
+                  <>
+                    <option value="draft_pending">Chờ duyệt</option>
+                    <option value="in_progress">Đang xử lý / Đánh giá</option>
+                    <option value="published">Đã xuất bản (Live)</option>
+                    <option value="rejected">Từ chối</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="new">Mới tiếp nhận (New)</option>
+                    <option value="contacted">Đã liên hệ</option>
+                    <option value="nda_sent">Đã ký NDA</option>
+                    <option value="due_diligence">Đang thẩm định</option>
+                    <option value="closed_won">Giao dịch thành công</option>
+                    <option value="closed_lost">Không thành công</option>
+                    <option value="draft_pending">Chờ duyệt (Ký gửi)</option>
+                    <option value="in_progress">Đang xử lý (Ký gửi)</option>
+                    <option value="published">Đã xuất bản (Ký gửi)</option>
+                    <option value="rejected">Từ chối (Ký gửi)</option>
+                  </>
+                )}
+              </select>
+
+              <button
+                onClick={handleBulkArchive}
+                className="bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 transition-all border border-red-200"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Ẩn hàng loạt
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Leads List */}
           <div className={`lg:col-span-5 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden divide-y divide-gray-100 ${mobileView === 'detail' ? 'hidden lg:block' : 'block'}`}>
-            <div className="p-4 bg-gray-50/80 border-b border-gray-200 text-xs font-bold uppercase text-gray-500 tracking-wider">
-              Danh sách Lead ({filteredLeads.length})
+            <div className="p-4 bg-gray-50/80 border-b border-gray-200 text-xs font-bold uppercase text-gray-500 tracking-wider flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={paginatedLeads.length > 0 && paginatedLeads.every(l => selectedLeadIds.includes(l.id))}
+                  onChange={(e) => handleSelectAllChange(e.target.checked)}
+                  className="w-4 h-4 text-[#C4A35A] rounded border-gray-300 focus:ring-[#C4A35A] cursor-pointer"
+                />
+                <span>Danh sách Lead ({filteredLeads.length})</span>
+              </div>
+              {selectedLeadIds.length > 0 && (
+                <span className="text-[10px] bg-[#C4A35A]/20 text-[#C4A35A] px-2 py-0.5 rounded font-mono">
+                  Đang chọn {selectedLeadIds.length}
+                </span>
+              )}
             </div>
 
             <div className="max-h-[600px] overflow-y-auto divide-y divide-gray-100">
@@ -570,6 +727,13 @@ export default function AdminLeadsPage() {
                     >
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedLeadIds.includes(lead.id)}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => handleToggleSelectLead(lead.id, e.target.checked)}
+                            className="w-4 h-4 text-[#C4A35A] rounded border-gray-300 focus:ring-[#C4A35A] cursor-pointer mr-0.5"
+                          />
                           <span className="font-mono text-xs font-bold text-gray-500">{lead.id}</span>
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                             lead.lead_type === 'interest' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'

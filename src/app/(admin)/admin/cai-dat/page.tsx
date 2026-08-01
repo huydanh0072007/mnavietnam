@@ -28,6 +28,7 @@ export default function AdminSettingsPage() {
   const [enableTurnstile, setEnableTurnstile] = useState(true);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [notificationFrequency, setNotificationFrequency] = useState('immediate');
 
   // Dynamic Settings
   const [phone, setPhone] = useState('090 123 4567');
@@ -85,6 +86,9 @@ export default function AdminSettingsPage() {
           setSmtpPass(data.smtp_pass || '');
           setSmtpFromName(data.smtp_from_name || 'M$A International');
           setSmtpFromEmail(data.smtp_from_email || 'noreply@mnainternational.com');
+          setEnableEmailNotif(data.enable_email_notif !== undefined ? data.enable_email_notif : true);
+          setNotificationEmail(data.notification_email_recipients || 'admin@mnainternational.com, legal@mnainternational.com');
+          setNotificationFrequency(data.notification_frequency || 'immediate');
         }
         setIsLoading(false);
       })
@@ -126,7 +130,10 @@ export default function AdminSettingsPage() {
           smtp_user: smtpUser,
           smtp_pass: smtpPass,
           smtp_from_name: smtpFromName,
-          smtp_from_email: smtpFromEmail
+          smtp_from_email: smtpFromEmail,
+          enable_email_notif: enableEmailNotif,
+          notification_email_recipients: notificationEmail,
+          notification_frequency: notificationFrequency
         })
       });
       
@@ -632,6 +639,20 @@ export default function AdminSettingsPage() {
                     onChange={(e) => setNotificationEmail(e.target.value)}
                     className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
                   />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">
+                    Tần suất nhận thông báo email
+                  </label>
+                  <select
+                    value={notificationFrequency}
+                    onChange={(e) => setNotificationFrequency(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#C4A35A] cursor-pointer"
+                  >
+                    <option value="immediate">Ngay lập tức</option>
+                    <option value="hourly">Hàng giờ (Tổng hợp)</option>
+                    <option value="daily">Hàng ngày (Tổng hợp)</option>
+                  </select>
                 </div>
               </div>
             )}

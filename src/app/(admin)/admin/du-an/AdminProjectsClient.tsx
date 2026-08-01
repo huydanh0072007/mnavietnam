@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast';
 import Link from 'next/link';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Project } from '@/lib/types';
-import { toggleProjectFeatured, toggleProjectPublishStatus, actionHideProject } from './actions';
+import { toggleProjectFeatured, toggleProjectPublishStatus, actionHideProject, bulkUpdateProjectPublishStatus, bulkHideProjects } from './actions';
 import { formatDate } from '@/lib/utils';
 import { 
   Plus, 
@@ -85,6 +85,62 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
 
   const totalPages = Math.ceil(sorted.length / itemsPerPage);
   const paginatedProjects = sorted.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  // Bulk Actions states & handlers
+  const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([]);
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+
+  const handleToggleSelectProject = (id: string, checked: boolean) => {
+    setSelectedProjectIds(prev => checked ? [...prev, id] : prev.filter(item => item !== id));
+  };
+
+  const handleSelectAllProjects = (checked: boolean) => {
+    if (checked) {
+      const pageIds = paginatedProjects.map(p => p.id);
+      setSelectedProjectIds(prev => Array.from(new Set([...prev, ...pageIds])));
+    } else {
+      const pageIds = paginatedProjects.map(p => p.id);
+      setSelectedProjectIds(prev => prev.filter(id => !pageIds.includes(id)));
+    }
+  };
+
+  const handleBulkUpdatePublishStatus = async (newStatus: 'published' | 'hidden') => {
+    if (selectedProjectIds.length === 0) return;
+    if (!window.confirm(`Xác nhận đổi trạng thái hiển thị của ${selectedProjectIds.length} dự án đã chọn sang "${newStatus === 'published' ? 'Công khai' : 'Bị ẩn'}"?`)) return;
+
+    setIsBulkProcessing(true);
+    try {
+      await bulkUpdateProjectPublishStatus(selectedProjectIds, newStatus);
+      toast.success(`Đã cập nhật trạng thái hiển thị cho ${selectedProjectIds.length} dự án thành công!`);
+      setSelectedProjectIds([]);
+      // Update local state directly
+      setProjects(prev => prev.map(p => selectedProjectIds.includes(p.id) ? { ...p, publish_status: newStatus } : p));
+    } catch (err) {
+      console.error(err);
+      toast.error('Có lỗi xảy ra khi cập nhật hàng loạt.');
+    } finally {
+      setIsBulkProcessing(false);
+    }
+  };
+
+  const handleBulkHideProjects = async () => {
+    if (selectedProjectIds.length === 0) return;
+    if (!window.confirm(`Xác nhận ẩn/lưu trữ hàng loạt ${selectedProjectIds.length} dự án đã chọn?`)) return;
+
+    setIsBulkProcessing(true);
+    try {
+      await bulkHideProjects(selectedProjectIds);
+      toast.success(`Đã ẩn ${selectedProjectIds.length} dự án thành công!`);
+      setSelectedProjectIds([]);
+      // Update local state directly
+      setProjects(prev => prev.map(p => selectedProjectIds.includes(p.id) ? { ...p, is_active: false, publish_status: 'hidden' as any } : p));
+    } catch (err) {
+      console.error(err);
+      toast.error('Có lỗi xảy ra khi ẩn hàng loạt.');
+    } finally {
+      setIsBulkProcessing(false);
+    }
+  };
 
   const handleExportCSV = () => {
     const headers = ['Mã Dự án', 'Tên Dự án', 'Hình thức Giao dịch', 'Tỉnh/Thành', 'Quy mô', 'Hiện trạng', 'Trạng thái', 'Ngày tạo'];
@@ -268,12 +324,70 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
           </div>
         </div>
 
+        {/* Floating Bulk Actions Bar */}
+        {selectedProjectIds.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-amber-50/80 border border-amber-200 p-4 rounded-xl shadow-sm animate-fadeIn mb-6">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-amber-800">
+                Đã chọn {selectedProjectIds.length} dự án
+              </span>
+              <button
+                onClick={() => setSelectedProjectIds([])}
+                className="text-xs text-gray-500 hover:text-gray-700 underline font-semibold"
+              >
+                Bỏ chọn
+              </button>
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+              {isBulkProcessing && (
+                <div className="flex items-center gap-1.5 text-xs text-amber-600 font-semibold mr-2 animate-pulse">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Đang xử lý...
+                </div>
+              )}
+              <button
+                onClick={() => handleBulkUpdatePublishStatus('published')}
+                disabled={isBulkProcessing}
+                className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 border border-emerald-200 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 transition-all disabled:opacity-50"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                Công khai hàng loạt
+              </button>
+              <button
+                onClick={() => handleBulkUpdatePublishStatus('hidden')}
+                disabled={isBulkProcessing}
+                className="bg-gray-50 text-gray-700 hover:bg-gray-100 hover:text-gray-800 border border-gray-200 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 transition-all disabled:opacity-50"
+              >
+                <EyeOff className="w-3.5 h-3.5" />
+                Ẩn hiển thị hàng loạt
+              </button>
+              <button
+                onClick={handleBulkHideProjects}
+                disabled={isBulkProcessing}
+                className="bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 border border-red-200 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 transition-all disabled:opacity-50"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Ẩn & Lưu trữ hàng loạt
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Projects Table */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-gray-600">
               <thead className="bg-gray-50 text-xs font-semibold uppercase text-gray-500 border-b border-gray-200">
                 <tr>
+                  <th className="py-4 px-6 w-12 text-center">
+                    <input
+                      type="checkbox"
+                      checked={paginatedProjects.length > 0 && paginatedProjects.every(p => selectedProjectIds.includes(p.id))}
+                      onChange={(e) => handleSelectAllProjects(e.target.checked)}
+                      className="w-4 h-4 text-[#C4A35A] rounded border-gray-300 focus:ring-[#C4A35A] cursor-pointer"
+                    />
+                  </th>
                   <th className="py-4 px-6">Tâm điểm</th>
                   <th className="py-4 px-6">Mã & Tên Dự án</th>
                   <th className="py-4 px-6">Loại Giao dịch</th>
@@ -284,10 +398,18 @@ export default function AdminProjectsClient({ initialProjects }: { initialProjec
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                 {paginatedProjects.map((project) => (
-                  <tr key={project.id} className="hover:bg-gray-50/80 transition-colors">
-                    {/* Featured Star Toggle */}
-                    <td className="py-4 px-6">
+                  {paginatedProjects.map((project) => (
+                    <tr key={project.id} className="hover:bg-gray-50/80 transition-colors">
+                      <td className="py-4 px-6 w-12 text-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedProjectIds.includes(project.id)}
+                          onChange={(e) => handleToggleSelectProject(project.id, e.target.checked)}
+                          className="w-4 h-4 text-[#C4A35A] rounded border-gray-300 focus:ring-[#C4A35A] cursor-pointer"
+                        />
+                      </td>
+                      {/* Featured Star Toggle */}
+                      <td className="py-4 px-6">
                       <button
                         onClick={() => toggleFeatured(project.id)}
                         disabled={loadingId === `featured_${project.id}`}

@@ -1,16 +1,109 @@
 'use client';
 
-import React from 'react';
-import { Bell, ShieldCheck, UserCheck, ChevronDown, User, Lock, LogOut, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, ShieldCheck, UserCheck, ChevronDown, User, Lock, LogOut, X, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface AdminHeaderProps {
   title: string;
   subtitle?: string;
 }
 
+interface NotificationItem {
+  id: string;
+  title: string;
+  content?: string;
+  type: string;
+  link?: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+function formatTimeAgo(dateStr: string) {
+  try {
+    const now = new Date();
+    const date = new Date(dateStr);
+    const diffMs = now.getTime() - date.getTime();
+    if (isNaN(diffMs)) return 'Vừa xong';
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 60) return `${diffMins} phút trước`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours} giờ trước`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return 'Hôm qua';
+    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+  } catch {
+    return 'Vừa xong';
+  }
+}
+
 export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
+  const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const [modalType, setModalType] = React.useState<'none' | 'profile' | 'password'>('none');
+  
+  // Notifications States
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await fetch('/api/admin/notifications', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data);
+        setUnreadCount(data.filter((n: NotificationItem) => !n.is_read).length);
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    // Poll every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleMarkAllRead = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const res = await fetch('/api/admin/notifications', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ markAllRead: true })
+      });
+      if (res.ok) {
+        fetchNotifications();
+      }
+    } catch (err) {
+      console.error('Error marking all as read:', err);
+    }
+  };
+
+  const handleNotificationClick = async (notif: NotificationItem) => {
+    setIsNotificationsOpen(false);
+    if (!notif.is_read) {
+      try {
+        await fetch('/api/admin/notifications', {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: notif.id })
+        });
+        fetchNotifications();
+      } catch (err) {
+        console.error('Error marking notification as read:', err);
+      }
+    }
+    if (notif.link) {
+      router.push(notif.link);
+    }
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-5 flex items-center justify-between sticky top-0 z-20 max-md:pl-16">
@@ -20,9 +113,62 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
       </div>
 
       <div className="flex items-center gap-6">
-        {/* Quick notification indicator */}
-        <div className="relative cursor-pointer p-2 text-gray-400 hover:text-gray-600 transition-colors">
-          <Bell className="w-5 h-5" />
+        {/* Real notification indicator */}
+        <div className="relative">
+          <button
+            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+            className="relative p-2 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none rounded-lg hover:bg-gray-100"
+          >
+            <Bell className="w-5 h-5" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white font-bold text-[9px] rounded-full flex items-center justify-center border border-white animate-pulse">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+
+          {isNotificationsOpen && (
+            <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden animate-fadeIn max-h-96 flex flex-col">
+              <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                <span className="font-serif font-bold text-gray-900 text-sm">Thông báo ({unreadCount})</span>
+                {unreadCount > 0 && (
+                  <button
+                    onClick={handleMarkAllRead}
+                    className="text-[10px] text-blue-600 hover:underline font-semibold"
+                  >
+                    Đọc tất cả
+                  </button>
+                )}
+              </div>
+              <div className="divide-y divide-gray-100 overflow-y-auto flex-1 max-h-80">
+                {notifications.length === 0 ? (
+                  <div className="p-6 text-center text-xs text-gray-400">Không có thông báo mới</div>
+                ) : (
+                  notifications.map((notif) => (
+                    <div
+                      key={notif.id}
+                      onClick={() => handleNotificationClick(notif)}
+                      className={`p-3 text-left cursor-pointer transition-colors hover:bg-gray-50 flex gap-2.5 items-start ${
+                        !notif.is_read ? 'bg-blue-50/40 border-l-2 border-blue-500' : ''
+                      }`}
+                    >
+                      <div className={`p-1.5 rounded-lg shrink-0 ${
+                        notif.type === 'new_lead' ? 'bg-purple-50 text-purple-600' :
+                        notif.type === 'vdr_sign' ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-500'
+                      }`}>
+                        {notif.type === 'new_lead' ? <UserCheck className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
+                      </div>
+                      <div className="space-y-0.5 flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-gray-900 truncate">{notif.title}</p>
+                        {notif.content && <p className="text-[10px] text-gray-500 truncate">{notif.content}</p>}
+                        <p className="text-[9px] text-gray-400">{formatTimeAgo(notif.created_at)}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* User Info Badge (Clickable) */}

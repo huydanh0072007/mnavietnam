@@ -41,7 +41,10 @@ const defaultSettings: GlobalSettings = {
   smtp_user: "",
   smtp_pass: "",
   smtp_from_name: "M$A International",
-  smtp_from_email: "noreply@mnainternational.com"
+  smtp_from_email: "noreply@mnainternational.com",
+  enable_email_notif: true,
+  notification_email_recipients: "admin@mnainternational.com, legal@mnainternational.com",
+  notification_frequency: "immediate"
 };
 
 const SettingsContext = createContext<SettingsContextType>({

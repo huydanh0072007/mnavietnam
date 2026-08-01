@@ -38,3 +38,21 @@ export async function actionHideProject(id: string) {
   revalidatePath('/danh-muc');
   revalidatePath('/');
 }
+
+export async function bulkUpdateProjectPublishStatus(ids: string[], publish_status: string) {
+  for (const id of ids) {
+    await updateProject(id, { publish_status: publish_status as any });
+  }
+  revalidatePath('/admin/du-an');
+  revalidatePath('/danh-muc');
+  revalidatePath('/');
+}
+
+export async function bulkHideProjects(ids: string[]) {
+  for (const id of ids) {
+    await updateProject(id, { is_active: false, publish_status: 'hidden' });
+  }
+  revalidatePath('/admin/du-an');
+  revalidatePath('/danh-muc');
+  revalidatePath('/');
+}

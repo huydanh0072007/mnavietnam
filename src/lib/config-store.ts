@@ -27,6 +27,11 @@ export interface GlobalSettings {
   smtp_pass: string;
   smtp_from_name: string;
   smtp_from_email: string;
+
+  // Notification Config
+  enable_email_notif: boolean;
+  notification_email_recipients: string;
+  notification_frequency: string;
 }
 
 const defaultSettings: GlobalSettings = {
@@ -62,7 +67,10 @@ const defaultSettings: GlobalSettings = {
   smtp_user: "",
   smtp_pass: "",
   smtp_from_name: "M$A International",
-  smtp_from_email: "noreply@mnainternational.com"
+  smtp_from_email: "noreply@mnainternational.com",
+  enable_email_notif: true,
+  notification_email_recipients: "admin@mnainternational.com, legal@mnainternational.com",
+  notification_frequency: "immediate"
 };
 
 export async function getSettings(): Promise<GlobalSettings> {

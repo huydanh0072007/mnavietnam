@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, getClientIP, sanitizeInput, validateSession, SESSION_COOKIE_NAME } from '@/lib/auth';
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import { getLeads, addLead, updateLead } from '@/lib/leads-store';
+import { addNotification } from '@/lib/notifications-store';
 import { sendLeadNotificationToAdmin } from '@/lib/email-service';
 import { writeFile } from 'fs/promises';
 import path from 'path';
@@ -86,12 +87,21 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, updates } = body;
-    if (!id || !updates) {
-      return NextResponse.json({ error: 'Missing id or updates' }, { status: 400 });
+    const { id, ids, updates } = body;
+    if ((!id && !ids) || !updates) {
+      return NextResponse.json({ error: 'Missing id/ids or updates' }, { status: 400 });
     }
 
-    const updated = await updateLead(id, updates);
+    if (ids && Array.isArray(ids)) {
+      const results = [];
+      for (const singleId of ids) {
+        const updated = await updateLead(singleId, updates);
+        if (updated) results.push(updated);
+      }
+      return NextResponse.json({ success: true, count: results.length, data: results });
+    }
+
+    const updated = await updateLead(id!, updates);
     if (!updated) {
       return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
     }
@@ -209,6 +219,19 @@ export async function POST(request: NextRequest) {
     // Try to send email notification to admin (non-blocking)
     sendLeadNotificationToAdmin(newLead).catch((err) => {
       console.error('Failed to send admin notification email:', err);
+    });
+
+    // In-app Notification (non-blocking)
+    const title = newLead.lead_type === 'submission'
+      ? `Ký gửi dự án mới từ ${newLead.full_name}`
+      : `Yêu cầu VDR mới từ ${newLead.full_name}`;
+    const content = newLead.organization ? `${newLead.organization}` : '';
+    const link = newLead.lead_type === 'submission' 
+      ? `/admin/leads?id=${newLead.id}` 
+      : `/admin/vdr?id=${newLead.id}`;
+    
+    addNotification(title, content, newLead.lead_type === 'submission' ? 'new_lead' : 'vdr_sign', link).catch((err: any) => {
+      console.error('Failed to create in-app notification:', err);
     });
 
     return NextResponse.json({
