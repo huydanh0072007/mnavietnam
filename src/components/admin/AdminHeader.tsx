@@ -23,8 +23,6 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
         {/* Quick notification indicator */}
         <div className="relative cursor-pointer p-2 text-gray-400 hover:text-gray-600 transition-colors">
           <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
         </div>
 
         {/* User Info Badge (Clickable) */}

@@ -302,7 +302,7 @@ export default async function AdminDashboardPage() {
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-bold text-gray-900 font-serif">Hoạt động Gần đây</h3>
                 <span className="text-[9px] font-bold uppercase bg-amber-50 text-[#C4A35A] px-2 py-0.5 rounded border border-[#C4A35A]/20 tracking-wider">
-                  Live Logs
+                  Hoạt động gần đây
                 </span>
               </div>
 

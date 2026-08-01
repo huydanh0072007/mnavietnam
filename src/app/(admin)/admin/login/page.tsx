@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShieldCheck, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import Image from 'next/image';
 
 export default function AdminLoginPage() {
@@ -11,6 +11,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,18 +42,18 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A1628] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-navy flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Decorative Blur */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#C4A35A]/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="w-full max-w-md bg-[#0F1D2F] border border-[#1E2D42] rounded-xl p-8 shadow-2xl relative z-10">
+      <div className="w-full max-w-md bg-dark-surface border border-[#1E2D42] rounded-xl p-8 shadow-2xl relative z-10">
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 mx-auto mb-4 shadow-lg shadow-[#C4A35A]/20">
+          <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 mx-auto mb-4 shadow-lg shadow-gold/20">
             <Image src="/logo.jpg" alt="M$A International Logo" width={56} height={56} className="object-cover" />
           </div>
           <h1 className="text-2xl font-bold font-serif text-white tracking-wide">M$A INTERNATIONAL</h1>
-          <p className="text-xs text-[#C4A35A] uppercase tracking-widest mt-1 font-semibold">Bảng điều khiển Quản trị</p>
+          <p className="text-xs text-gold uppercase tracking-widest mt-1 font-semibold">Bảng điều khiển Quản trị</p>
         </div>
 
         {error && (
@@ -76,7 +77,7 @@ export default function AdminLoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@mnainternational.com"
                 autoComplete="email"
-                className="w-full bg-[#0A1628] border border-[#1E2D42] rounded-lg py-3 pl-11 pr-4 text-white text-sm focus:outline-none focus:border-[#C4A35A] transition-colors placeholder:text-gray-600"
+                className="w-full bg-navy border border-[#1E2D42] rounded-lg py-3 pl-11 pr-4 text-white text-sm focus:outline-none focus:border-gold transition-colors placeholder:text-gray-600"
               />
             </div>
           </div>
@@ -88,21 +89,29 @@ export default function AdminLoginPage() {
             <div className="relative">
               <Lock className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete="current-password"
-                className="w-full bg-[#0A1628] border border-[#1E2D42] rounded-lg py-3 pl-11 pr-4 text-white text-sm focus:outline-none focus:border-[#C4A35A] transition-colors placeholder:text-gray-600"
+                className="w-full bg-navy border border-[#1E2D42] rounded-lg py-3 pl-11 pr-12 text-white text-sm focus:outline-none focus:border-gold transition-colors placeholder:text-gray-600"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
+                title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#C4A35A] hover:bg-[#b09048] text-[#0A1628] font-bold py-3.5 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-[#C4A35A]/20 disabled:opacity-50 mt-2"
+            className="w-full bg-gold hover:bg-[#b09048] text-navy font-bold py-3.5 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-gold/20 disabled:opacity-50 mt-2"
           >
             {loading ? (
               <span>Đang xác thực...</span>
@@ -117,7 +126,7 @@ export default function AdminLoginPage() {
 
         <div className="mt-8 pt-6 border-t border-[#1E2D42] text-center text-xs text-gray-500">
           <div className="flex items-center justify-center gap-1 mb-1 text-gray-400">
-            <ShieldCheck className="w-4 h-4 text-[#C4A35A]" />
+            <ShieldCheck className="w-4 h-4 text-gold" />
             Hệ thống bảo mật nội bộ M$A International
           </div>
           <span>Liên hệ quản trị viên để nhận thông tin đăng nhập</span>

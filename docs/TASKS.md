@@ -130,47 +130,47 @@
   - **Evidence**: Oversaw routing redirects and path rewrites using internal rewrite URLs in `src/middleware.ts` and updated page routing logic across frontend components.
 
 ## Sprint 4: Polish & Design Tokens
-- [ ] **TASK-UIUX-L1**: Establish Tailwind Design Tokens (theme branding colors)
-  - **Status**: Pending
+- [x] **TASK-UIUX-L1**: Establish Tailwind Design Tokens (theme branding colors)
+  - **Status**: Completed
   - **Description**: Define custom tailwind brand colors (`navy`, `gold`, `muted`) and replace inline hex strings.
-  - **Completed**: N/A
-  - **Evidence**: N/A
-
-- [ ] **TASK-UIUX-L2**: Replace raw emojis with Lucide React icons
-  - **Status**: Pending
+  - **Completed**: 2026-08-01
+  - **Evidence**: Added `--color-muted: #9CA3AF;` in `globals.css` @theme, replaced inline hex values like `bg-[#0A1628]` and `text-[#C4A35A]` with `bg-navy` and `text-gold` in `layout.tsx`, `Footer.tsx`, `ProjectCard.tsx` and `login/page.tsx`.
+  
+- [x] **TASK-UIUX-L2**: Replace raw emojis with Lucide React icons
+  - **Status**: Completed
   - **Description**: Replace unicode raw emojis in footer and headers with Lucide icons.
-  - **Completed**: N/A
-  - **Evidence**: N/A
-
-- [ ] **TASK-UIUX-L4**: Optimize mousemove listeners in InteractiveStars
-  - **Status**: Pending
+  - **Completed**: 2026-08-01
+  - **Evidence**: Replaced raw symbols (📍, 📞, ✉️, ✓, →) with `MapPin`, `Phone`, `Mail`, `Check`, and `ArrowRight` icons in `Footer.tsx`, `ProjectCard.tsx`, and project details `page.tsx`.
+  
+- [x] **TASK-UIUX-L4**: Optimize mousemove listeners in InteractiveStars
+  - **Status**: Completed
   - **Description**: Use IntersectionObserver to disable animation when InteractiveStars is out of viewport.
-  - **Completed**: N/A
-  - **Evidence**: N/A
-
-- [ ] **TASK-UIUX-L5**: Fix placeholder links `href="#"` in footer
-  - **Status**: Pending
+  - **Completed**: 2026-08-01
+  - **Evidence**: Implemented `IntersectionObserver` in `InteractiveStars.tsx` to stop requestAnimationFrame rendering loop and bypass mousemove logic when the container is scrolled out of viewport.
+  
+- [x] **TASK-UIUX-L5**: Fix placeholder links `href="#"` in footer
+  - **Status**: Completed
   - **Description**: Replace `#` links with real pages or remove href if page doesn't exist.
-  - **Completed**: N/A
-  - **Evidence**: N/A
-
-- [ ] **TASK-UIUX-L6**: Rename "Live Logs" to "Hoạt động gần đây"
-  - **Status**: Pending
+  - **Completed**: 2026-08-01
+  - **Evidence**: Replaced placeholder links in `Footer.tsx` with non-clickable `span` tags with appropriate pointer styles, and mapped the terms & privacy links dynamically to clean English paths (`/en/terms` & `/en/privacy`).
+  
+- [x] **TASK-UIUX-L6**: Rename "Live Logs" to "Hoạt động gần đây"
+  - **Status**: Completed
   - **Description**: Adjust admin dashboard text for recent logs.
-  - **Completed**: N/A
-  - **Evidence**: N/A
-
-- [ ] **TASK-UIUX-L7**: Remove fake notification bell animation
-  - **Status**: Pending
+  - **Completed**: 2026-08-01
+  - **Evidence**: Renamed the "Live Logs" badge to "Hoạt động gần đây" in `admin/page.tsx`.
+  
+- [x] **TASK-UIUX-L7**: Remove fake notification bell animation
+  - **Status**: Completed
   - **Description**: Remove fake pulse animation on AdminHeader notification bell.
-  - **Completed**: N/A
-  - **Evidence**: N/A
-
-- [ ] **TASK-UIUX-L8**: Login page password visibility toggle
-  - **Status**: Pending
+  - **Completed**: 2026-08-01
+  - **Evidence**: Deleted the pulsing indicator and static red dot element tags inside `AdminHeader.tsx`.
+  
+- [x] **TASK-UIUX-L8**: Login page password visibility toggle
+  - **Status**: Completed
   - **Description**: Add toggle to show/hide password text on admin login form.
-  - **Completed**: N/A
-  - **Evidence**: N/A
+  - **Completed**: 2026-08-01
+  - **Evidence**: Added `showPassword` toggle logic and Lucide `Eye`/`EyeOff` buttons inside the login password input field in `login/page.tsx`.
 
 ## Sprint 5: Advanced Features
 - [ ] **TASK-UIUX-A1**: Admin Notification System

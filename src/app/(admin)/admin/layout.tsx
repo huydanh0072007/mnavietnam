@@ -48,12 +48,12 @@ export default function AdminLayout({
   // Render logic inside stable body
   let content;
   if (pathname === '/admin/login') {
-    content = <div className="min-h-screen bg-[#0A1628]">{children}</div>;
+    content = <div className="min-h-screen bg-navy">{children}</div>;
   } else if (isAuthenticated === null) {
     content = (
-      <div className="min-h-screen bg-[#0A1628] flex items-center justify-center text-white">
+      <div className="min-h-screen bg-navy flex items-center justify-center text-white">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-[#C4A35A] border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-10 h-10 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
           <p className="text-sm text-gray-400 font-medium font-serif">Đang tải CMS...</p>
         </div>
       </div>

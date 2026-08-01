@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { Check } from 'lucide-react';
 import { getProjects, getProjectBySlug } from '@/lib/projects-store';
 import { Badge } from '@/components/ui/Badge';
 import { ProjectCard } from '@/components/ui/ProjectCard';
@@ -139,7 +140,7 @@ export default async function ProjectDetailPage({ params }: { params: PageParams
               <ul className="space-y-4">
                 {pHighlights.map((highlight, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <span className="text-[#C4A35A] mt-1 text-xl">✓</span>
+                    <Check className="w-5 h-5 text-gold shrink-0 mt-1" />
                     <span className="text-gray-700">{highlight}</span>
                   </li>
                 ))}

@@ -46,8 +46,22 @@ export const InteractiveStars: React.FC<InteractiveStarsProps> = ({
     if (!ctx) return;
 
     let animationFrameId: number;
+    let isVisible = true;
     const stars: Star[] = [];
     const sparkles: Sparkle[] = [];
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const wasVisible = isVisible;
+          isVisible = entry.isIntersecting;
+          if (isVisible && !wasVisible) {
+            render();
+          }
+        });
+      },
+      { threshold: 0.01 }
+    );
 
     // Resize handler
     const resizeCanvas = () => {
@@ -82,6 +96,7 @@ export const InteractiveStars: React.FC<InteractiveStarsProps> = ({
 
     // Mouse events
     const handleMouseMove = (e: MouseEvent) => {
+      if (!isVisible) return;
       const rect = canvas.getBoundingClientRect();
       const newX = e.clientX - rect.left;
       const newY = e.clientY - rect.top;
@@ -123,8 +138,13 @@ export const InteractiveStars: React.FC<InteractiveStarsProps> = ({
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
     // Animation Loop
     const render = () => {
+      if (!isVisible) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Smooth mouse interpolation (ease/damping)
@@ -242,6 +262,7 @@ export const InteractiveStars: React.FC<InteractiveStarsProps> = ({
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', resizeCanvas);
       cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
     };
   }, [starCount]);
 
