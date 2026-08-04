@@ -65,7 +65,11 @@ export const Footer = ({ lang = 'vi', dict }: { lang?: string; dict?: any }) => 
             <ul className="space-y-4 text-sm text-gray-400">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-gold shrink-0 mt-0.5" />
-                <span>{dict.footer.address}</span>
+                {isLoading ? (
+                  <span className="w-40 h-4 bg-gray-800 animate-pulse rounded"></span>
+                ) : (
+                  <span>{settings?.address || dict.footer.address}</span>
+                )}
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-gold shrink-0 mt-0.5" />

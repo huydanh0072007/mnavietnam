@@ -2,6 +2,8 @@ import { NextResponse, NextRequest } from 'next/server';
 import { getSettings, saveSettings } from '@/lib/config-store';
 import { validateSession, SESSION_COOKIE_NAME } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const settings = await getSettings();
@@ -24,7 +26,11 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    return NextResponse.json(safeSettings);
+    return NextResponse.json(safeSettings, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      },
+    });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to read settings' }, { status: 500 });
   }

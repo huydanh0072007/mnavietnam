@@ -11,6 +11,7 @@ interface SettingsContextType {
 const defaultSettings: GlobalSettings = {
   phone: '090 123 4567',
   email: 'contact@mnainternational.com',
+  address: 'Tầng 12, Tòa nhà MNA, Quận 1, TP.HCM',
   zalo_url: 'https://zalo.me/',
   facebook_url: 'https://facebook.com/',
   linkedin_url: 'https://linkedin.com/',
@@ -57,7 +58,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/settings')
+    fetch('/api/settings', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if (data) setSettings(data);

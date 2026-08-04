@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS public.settings (
     id TEXT PRIMARY KEY DEFAULT 'global',
     phone TEXT NOT NULL DEFAULT '090 123 4567',
     email TEXT NOT NULL DEFAULT 'contact@mnavietnam.com',
+    address TEXT NOT NULL DEFAULT 'Tầng 12, Tòa nhà MNA, Quận 1, TP.HCM',
     zalo_url TEXT NOT NULL DEFAULT 'https://zalo.me/',
     facebook_url TEXT NOT NULL DEFAULT 'https://facebook.com/',
     linkedin_url TEXT NOT NULL DEFAULT 'https://linkedin.com/',

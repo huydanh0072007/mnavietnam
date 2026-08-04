@@ -33,6 +33,7 @@ export default function AdminSettingsPage() {
   // Dynamic Settings
   const [phone, setPhone] = useState('090 123 4567');
   const [email, setEmail] = useState('contact@mnainternational.com');
+  const [address, setAddress] = useState('Tầng 12, Tòa nhà MNA, Quận 1, TP.HCM');
   const [zaloUrl, setZaloUrl] = useState('https://zalo.me/');
   const [facebookUrl, setFacebookUrl] = useState('https://facebook.com/');
   const [linkedinUrl, setLinkedinUrl] = useState('https://linkedin.com/');
@@ -66,6 +67,7 @@ export default function AdminSettingsPage() {
         if(data) {
           setPhone(data.phone || '090 123 4567');
           setEmail(data.email || 'contact@mnainternational.com');
+          setAddress(data.address || 'Tầng 12, Tòa nhà MNA, Quận 1, TP.HCM');
           setZaloUrl(data.zalo_url || 'https://zalo.me/');
           setFacebookUrl(data.facebook_url || 'https://facebook.com/');
           setLinkedinUrl(data.linkedin_url || 'https://linkedin.com/');
@@ -111,6 +113,7 @@ export default function AdminSettingsPage() {
         body: JSON.stringify({
           phone,
           email,
+          address,
           zalo_url: zaloUrl,
           facebook_url: facebookUrl,
           linkedin_url: linkedinUrl,
@@ -247,6 +250,19 @@ export default function AdminSettingsPage() {
                     className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">
+                  Địa chỉ Văn phòng
+                </label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Ví dụ: Tầng 12, Tòa nhà MNA, Quận 1, TP.HCM"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#C4A35A]"
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

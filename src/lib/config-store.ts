@@ -3,6 +3,7 @@ import { getSupabaseServerClient, isSupabaseConfigured } from './supabase/server
 export interface GlobalSettings {
   phone: string;
   email: string;
+  address: string;
   zalo_url: string;
   facebook_url: string;
   linkedin_url: string;
@@ -37,6 +38,7 @@ export interface GlobalSettings {
 const defaultSettings: GlobalSettings = {
   phone: "090 123 4567",
   email: "contact@mnainternational.com",
+  address: "Tầng 12, Tòa nhà MNA, Quận 1, TP.HCM",
   zalo_url: "https://zalo.me/",
   facebook_url: "https://facebook.com/",
   linkedin_url: "https://linkedin.com/",
