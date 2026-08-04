@@ -96,7 +96,9 @@ export async function getSettings(): Promise<GlobalSettings> {
 }
 
 export async function saveSettings(newSettings: Partial<GlobalSettings>): Promise<GlobalSettings> {
-  if (!isSupabaseConfigured()) return defaultSettings;
+  if (!isSupabaseConfigured()) {
+    throw new Error('Supabase is not configured! Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in environment variables.');
+  }
 
   const currentSettings = await getSettings();
   const mergedSettings = { ...currentSettings, ...newSettings };
@@ -141,7 +143,7 @@ export async function saveSettings(newSettings: Partial<GlobalSettings>): Promis
 
   if (error) {
     console.error('Error updating settings:', error);
-    throw new Error('Failed to save settings.');
+    throw new Error(`Failed to save settings: ${error.message}`);
   }
 
   return mergedSettings;
