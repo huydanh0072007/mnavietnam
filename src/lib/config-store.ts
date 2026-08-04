@@ -76,7 +76,7 @@ const defaultSettings: GlobalSettings = {
 };
 
 export async function getSettings(): Promise<GlobalSettings> {
-  if (!isSupabaseConfigured) {
+  if (!isSupabaseConfigured()) {
     return defaultSettings;
   }
 
@@ -96,15 +96,47 @@ export async function getSettings(): Promise<GlobalSettings> {
 }
 
 export async function saveSettings(newSettings: Partial<GlobalSettings>): Promise<GlobalSettings> {
-  if (!isSupabaseConfigured) return defaultSettings;
+  if (!isSupabaseConfigured()) return defaultSettings;
 
   const currentSettings = await getSettings();
   const mergedSettings = { ...currentSettings, ...newSettings };
   
+  // Only send known DB columns to Supabase (exclude id, updated_at, and any non-column fields)
+  const dbPayload: Record<string, unknown> = {
+    phone: mergedSettings.phone,
+    email: mergedSettings.email,
+    address: mergedSettings.address,
+    zalo_url: mergedSettings.zalo_url,
+    facebook_url: mergedSettings.facebook_url,
+    linkedin_url: mergedSettings.linkedin_url,
+    hero_title: mergedSettings.hero_title,
+    hero_subtitle: mergedSettings.hero_subtitle,
+    ai_provider: mergedSettings.ai_provider,
+    ai_api_key: mergedSettings.ai_api_key,
+    ai_model: mergedSettings.ai_model,
+    about_hero_title: mergedSettings.about_hero_title,
+    about_hero_subtitle: mergedSettings.about_hero_subtitle,
+    about_vision_title: mergedSettings.about_vision_title,
+    about_vision_desc_1: mergedSettings.about_vision_desc_1,
+    about_vision_desc_2: mergedSettings.about_vision_desc_2,
+    about_stats: mergedSettings.about_stats,
+    about_values: mergedSettings.about_values,
+    smtp_host: mergedSettings.smtp_host,
+    smtp_port: mergedSettings.smtp_port,
+    smtp_secure: mergedSettings.smtp_secure,
+    smtp_user: mergedSettings.smtp_user,
+    smtp_pass: mergedSettings.smtp_pass,
+    smtp_from_name: mergedSettings.smtp_from_name,
+    smtp_from_email: mergedSettings.smtp_from_email,
+    enable_email_notif: mergedSettings.enable_email_notif,
+    notification_email_recipients: mergedSettings.notification_email_recipients,
+    notification_frequency: mergedSettings.notification_frequency,
+  };
+
   const supabase = getSupabaseServerClient();
   const { error } = await supabase
     .from('settings')
-    .update(mergedSettings)
+    .update(dbPayload)
     .eq('id', 'global');
 
   if (error) {

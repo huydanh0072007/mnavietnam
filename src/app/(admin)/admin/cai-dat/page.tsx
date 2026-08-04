@@ -150,7 +150,8 @@ export default function AdminSettingsPage() {
         setSavedSuccess(true);
         setTimeout(() => setSavedSuccess(false), 3000);
       } else {
-        toast.error('Lưu cấu hình thất bại.');
+        const errData = await res.json().catch(() => ({}));
+        toast.error(`Lưu cấu hình thất bại: ${errData.error || res.statusText}`);
       }
     } catch(err) {
       console.error(err);

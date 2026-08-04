@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const uniqueFilename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
 
     // Try Supabase Storage 'attachments' bucket if configured
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured()) {
       try {
         const supabase = getSupabaseServerClient();
         const { data, error } = await supabase.storage

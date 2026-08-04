@@ -196,7 +196,7 @@ export async function deleteMasterData(id: string) {
 // === Locations ===
 
 export async function getProvinces(all: boolean = false): Promise<MdProvince[]> {
-  if (!isSupabaseConfigured) return all ? FALLBACK_PROVINCES : FALLBACK_PROVINCES.filter(p => p.is_active);
+  if (!isSupabaseConfigured()) return all ? FALLBACK_PROVINCES : FALLBACK_PROVINCES.filter(p => p.is_active);
   try {
     let query = supabaseAdmin
       .from('md_provinces')
@@ -325,7 +325,7 @@ export async function deleteDistrict(code: string) {
 
 export async function batchUpsertLocations(provinces: Partial<MdProvince>[], districts: Partial<MdDistrict>[] = []) {
   // Upsert Provinces first
-  if (provinces.length > 0 && isSupabaseConfigured) {
+  if (provinces.length > 0 && isSupabaseConfigured()) {
     const { error: provError } = await supabaseAdmin
       .from('md_provinces')
       .upsert(provinces, { onConflict: 'code' });
