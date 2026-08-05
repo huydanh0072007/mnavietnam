@@ -65,7 +65,12 @@ async function saveUploadedFile(file: File): Promise<string> {
       const { data: publicUrlData } = supabase.storage.from('attachments').getPublicUrl(data.path);
       return publicUrlData.publicUrl;
     }
-    console.warn('Supabase storage upload error, falling back to local:', error);
+    console.warn('Supabase storage upload error:', error);
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Không thể tải lên file (Supabase Error). Vui lòng cấu hình đúng Storage.');
+    }
+  } else if (process.env.NODE_ENV === 'production') {
+    throw new Error('Supabase chưa được cấu hình. Hệ thống không thể lưu file trên máy chủ thực tế.');
   }
   
   const uploadDir = path.join(process.cwd(), 'public', 'uploads');
@@ -96,7 +101,12 @@ async function saveBase64Image(base64Str: string, prefix: string): Promise<strin
       const { data: publicUrlData } = supabase.storage.from('attachments').getPublicUrl(data.path);
       return publicUrlData.publicUrl;
     }
-    console.warn('Supabase signature upload error, falling back to local:', error);
+    console.warn('Supabase signature upload error:', error);
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Không thể tải lên chữ ký (Supabase Error).');
+    }
+  } else if (process.env.NODE_ENV === 'production') {
+    throw new Error('Supabase chưa được cấu hình. Hệ thống không thể lưu chữ ký trên máy chủ thực tế.');
   }
 
   const uploadDir = path.join(process.cwd(), 'public', 'uploads');
@@ -278,9 +288,10 @@ export async function POST(request: NextRequest) {
       message: 'Thông tin đã được ghi nhận thành công.',
       lead_id: newLead.id,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Lead submission error:', error);
-    return NextResponse.json({ success: false, errors: ['Đã có lỗi xảy ra. Vui lòng thử lại sau.'] }, { status: 500 });
+    const message = error?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
+    return NextResponse.json({ success: false, errors: [message] }, { status: 500 });
   }
 }
 
