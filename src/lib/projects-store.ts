@@ -2,7 +2,7 @@ import { Project } from './types';
 import { getSupabaseServerClient, isSupabaseConfigured } from './supabase/server';
 
 export async function getProjects(): Promise<Project[]> {
-  if (!isSupabaseConfigured) {
+  if (!isSupabaseConfigured()) {
     console.warn('Supabase is not configured. Returning empty projects list.');
     return [];
   }
@@ -24,7 +24,7 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
-  if (!isSupabaseConfigured) {
+  if (!isSupabaseConfigured()) {
     return null;
   }
 
@@ -44,7 +44,7 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
 }
 
 export async function addProject(project: Partial<Project>): Promise<Project | null> {
-  if (!isSupabaseConfigured) return null;
+  if (!isSupabaseConfigured()) return null;
 
   const supabase = getSupabaseServerClient();
   const { data, error } = await supabase
@@ -62,7 +62,7 @@ export async function addProject(project: Partial<Project>): Promise<Project | n
 }
 
 export async function updateProject(id: string, updates: Partial<Project>): Promise<Project | null> {
-  if (!isSupabaseConfigured) return null;
+  if (!isSupabaseConfigured()) return null;
 
   const supabase = getSupabaseServerClient();
   const { data, error } = await supabase
@@ -81,7 +81,7 @@ export async function updateProject(id: string, updates: Partial<Project>): Prom
 }
 
 export async function getProjectById(id: string): Promise<Project | null> {
-  if (!isSupabaseConfigured) {
+  if (!isSupabaseConfigured()) {
     return null;
   }
 
@@ -101,7 +101,7 @@ export async function getProjectById(id: string): Promise<Project | null> {
 }
 
 export async function deleteProject(id: string): Promise<boolean> {
-  if (!isSupabaseConfigured) return false;
+  if (!isSupabaseConfigured()) return false;
 
   const supabase = getSupabaseServerClient();
   const { error } = await supabase

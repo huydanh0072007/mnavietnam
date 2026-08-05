@@ -1,9 +1,9 @@
 {
-  "meta": { "schema_version": "1.1.0", "awf_version": "3.3.0" },
-  "project": { "name": "MNA Vietnam", "type": "Next.js Web Application", "status": "development" },
+  "meta": { "schema_version": "1.1.0", "awf_version": "4.0.2" },
+  "project": { "name": "MNA Vietnam", "type": "Next.js Web Application", "status": "production" },
   "tech_stack": { 
     "frontend": {
-      "framework": "Next.js 14/15 App Router",
+      "framework": "Next.js 16.2.11 App Router (Turbopack)",
       "styling": "Tailwind CSS",
       "components": "Lucide React, Radix UI Slot, Canvas Signature Pad"
     }, 
@@ -11,30 +11,44 @@
       "framework": "Next.js API Routes / Server Actions",
       "database": "Supabase PostgreSQL",
       "storage": "Supabase Storage bucket (attachments)",
-      "email": "Nodemailer SMTP Client"
+      "email": "Nodemailer SMTP Client",
+      "hosting": "Vercel"
     }
   },
   "database_schema": { 
-    "summary": "Lưu trữ dự án M&A, Leads (người dùng ký gửi/liên hệ), Cấu hình hệ thống (Settings), Tỉnh thành, và Danh mục Master Data",
+    "summary": "Lưu trữ dự án M&A, Leads (người dùng ký gửi/liên hệ), Cấu hình hệ thống (Settings), Tỉnh thành, Danh mục Master Data, và Thông báo Admin",
     "tables": [
       {"name": "projects", "purpose": "Lưu thông tin dự án M&A, hỗ trợ soft delete qua is_active"},
       {"name": "leads", "purpose": "Lưu yêu cầu liên hệ, ký gửi dự án, chữ ký tay VDR, nhật ký matching, hỗ trợ soft delete qua is_active"},
-      {"name": "settings", "purpose": "Lưu cấu hình hệ thống (SMTP, API Keys) dạng global"},
+      {"name": "settings", "purpose": "Lưu cấu hình hệ thống (SMTP, API Keys, thông tin liên hệ, nội dung trang About) dạng global. Dòng duy nhất id='global' được auto-init bởi getSettings() nếu chưa tồn tại."},
       {"name": "master_data", "purpose": "Lưu các tùy chọn danh mục động cho bộ lọc"},
       {"name": "md_provinces", "purpose": "Lưu danh sách 34 tỉnh thành sau sáp nhập"},
-      {"name": "md_districts", "purpose": "Đã loại bỏ/không sử dụng (Deprecated)"}
-    ], 
+      {"name": "md_districts", "purpose": "Đã loại bỏ/không sử dụng (Deprecated)"},
+      {"name": "admin_notifications", "purpose": "Lưu thông báo cho Admin (new_lead, vdr_sign, project_update)"}
+    ],
+    "settings_columns": [
+      "id (PK, default 'global')", "phone", "email", "address", "zalo_url", "facebook_url", "linkedin_url",
+      "hero_title", "hero_subtitle", "ai_provider", "ai_api_key", "ai_model",
+      "about_hero_title", "about_hero_subtitle", "about_vision_title", "about_vision_desc_1", "about_vision_desc_2",
+      "about_stats (JSONB)", "about_values (JSONB)",
+      "smtp_host", "smtp_port", "smtp_secure", "smtp_user", "smtp_pass", "smtp_from_name", "smtp_from_email",
+      "enable_email_notif", "notification_email_recipients", "notification_frequency",
+      "updated_at"
+    ],
     "relationships_explained": "Leads liên kết với Projects khi nhà đầu tư quan tâm một dự án cụ thể. Leads lưu vết lịch sử matching và phê duyệt VDR vào internal_notes."
   },
   "api_endpoints": [
-    { "path": "/api/auth/login", "explained": "Xử lý đăng nhập Admin, trả về session cookie" },
+    { "path": "/api/auth/login", "explained": "Xử lý đăng nhập Admin, trả về session cookie (HMAC stateless)" },
     { "path": "/api/auth/logout", "explained": "Xóa admin_session cookie" },
     { "path": "/api/auth/check", "explained": "Kiểm tra phiên làm việc admin" },
     { "path": "/api/leads", "explained": "Tạo, lấy danh sách, và cập nhật trạng thái leads (ký gửi/liên hệ)" },
     { "path": "/api/leads/notify", "explained": "Gửi email thông báo tự động bằng SMTP khi trạng thái lead thay đổi" },
-    { "path": "/api/settings", "explained": "Lấy và cập nhật cấu hình hệ thống" },
+    { "path": "/api/leads/audit", "explained": "Lấy lịch sử thay đổi trạng thái lead" },
+    { "path": "/api/settings", "explained": "GET: Lấy cấu hình (auto-mask secrets). POST: Lưu cấu hình bằng upsert (yêu cầu CSRF header + session cookie)" },
     { "path": "/api/settings/test-email", "explained": "Gửi email thử nghiệm để kiểm tra kết nối SMTP" },
-    { "path": "/api/upload", "explained": "Upload tài liệu đính kèm và chữ ký tay lên Supabase Storage bucket 'attachments'" }
+    { "path": "/api/upload", "explained": "Upload tài liệu đính kèm và chữ ký tay lên Supabase Storage bucket 'attachments'" },
+    { "path": "/api/admin/translate", "explained": "Dịch nội dung dự án sang tiếng Anh bằng AI" },
+    { "path": "/api/admin/notifications", "explained": "Quản lý thông báo cho admin" }
   ],
   "business_rules": [
     "Khách hàng xem dự án M&A công khai, liên hệ hoặc ký gửi.",
@@ -42,7 +56,8 @@
     "Áp dụng Soft Delete (is_active = false) đối với Dự án và Leads để đảm bảo toàn vẹn dữ liệu logs.",
     "Khớp lệnh tự động (Smart Matching) tính điểm tương thích Deal Type (+50%) và địa bàn hoạt động trong Lời nhắn (+50%) để đề xuất dự án cho nhà đầu tư.",
     "Duyệt VDR cập nhật trạng thái Lead thành 'due_diligence' (Đã duyệt), 'rejected' (Từ chối) hoặc reset về 'nda_sent' (Chờ duyệt).",
-    "Xuất file CSV chứa ký tự tiếng Việt có dấu bắt buộc phải chèn tiền tố UTF-8 BOM (\\uFEFF) ở đầu để tránh lỗi hiển thị trong Excel."
+    "Xuất file CSV chứa ký tự tiếng Việt có dấu bắt buộc phải chèn tiền tố UTF-8 BOM (\\uFEFF) ở đầu để tránh lỗi hiển thị trong Excel.",
+    "Cấu hình hệ thống (phone, email, address, socials) được quản lý qua API /api/settings và lưu vào bảng settings (id='global'). Trang Frontend đọc qua SettingsContext client-side."
   ],
   "features": [
     "Danh mục dự án M&A (Lọc theo giao dịch, 34 tỉnh mới, loại hình BĐS, sắp xếp A-Z/mới nhất, xuất Excel CSV)",
@@ -50,14 +65,32 @@
     "Admin Dashboard (Kết nối số liệu thật, biểu đồ SVG lead theo tháng, live activity logs)",
     "Hệ thống Leads & VDR (Phân trang, bộ lọc nâng cao, lọc khoảng ngày, zoom chữ ký, duyệt/từ chối/thu hồi VDR, xuất CSV logs)",
     "Khớp lệnh Thông minh - Smart Matcher (Gợi ý và giới thiệu dự án cho nhà đầu tư, ghi nhận vào internal_notes)",
-    "Cấu hình SMTP động trực tiếp trên Dashboard và gửi email notify tự động"
+    "Cấu hình SMTP động trực tiếp trên Dashboard và gửi email notify tự động",
+    "CMS Cài đặt hệ thống (Cập nhật số điện thoại, email, địa chỉ, mạng xã hội, nội dung Hero/About, cấu hình SMTP/Email/AI - lưu trực tiếp vào Supabase)"
   ],
   "knowledge_items": { 
-    "patterns": ["Supabase Storage uploads from buffer API", "UTF-8 BOM file exports in Next.js", "Diacritics-normalized string matching", "Radix UI Slot for Next.js Link nesting", "Stateless HMAC-signed cookies for admin session"], 
+    "patterns": [
+      "Supabase Storage uploads from buffer API", 
+      "UTF-8 BOM file exports in Next.js", 
+      "Diacritics-normalized string matching", 
+      "Radix UI Slot for Next.js Link nesting", 
+      "Stateless HMAC-signed cookies for admin session",
+      "Supabase upsert() thay vì update() để tránh silent failure khi row chưa tồn tại",
+      "Auto-init DB row: getSettings() tự tạo dòng 'global' nếu bảng settings trống",
+      "isSupabaseConfigured() phải là function (không phải const) để tránh bị đóng băng giá trị lúc build trên Vercel"
+    ], 
     "gotchas": [
       "Trang Admin VDR và Leads yêu cầu `credentials: 'include'` trên các client fetch để truyền session cookie trên môi trường serverless Vercel.",
-      "Cấp hành chính quận/huyện đã bị xóa bỏ hoàn toàn ở database, APIs, Admin và Frontend."
+      "Cấp hành chính quận/huyện đã bị xóa bỏ hoàn toàn ở database, APIs, Admin và Frontend.",
+      "Supabase `.update().eq('id', 'global')` trả về error: null khi bảng trống (0 rows affected) — KHÔNG báo lỗi dù không ghi được gì. Phải dùng .upsert() + kiểm tra data trả về.",
+      "Vercel yêu cầu Environment Variables (NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) phải được khai báo trong Dashboard và REDEPLOY để có hiệu lực.",
+      "Next.js trên Vercel mặc định cache fetch requests (Data Cache). Phải thêm cache:'no-store' vào Supabase Client global fetch hoặc từng request.",
+      "Khi thêm cột mới vào bảng settings trên Supabase, phải chạy ALTER TABLE ADD COLUMN trước khi code mới đẩy payload chứa cột đó."
     ], 
-    "conventions": ["Màu thương hiệu: Navy (#0A1628) và Gold (#C4A35A), Emerald cho Excel Export"] 
+    "conventions": [
+      "Màu thương hiệu: Navy (#0A1628) và Gold (#C4A35A), Emerald cho Excel Export",
+      "Admin credentials: admin@mnainternational.com / Admin@MNA2024!",
+      "Service Role Key: Lấy từ Supabase > Settings > API > service_role secret"
+    ] 
   }
 }

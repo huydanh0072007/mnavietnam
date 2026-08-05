@@ -24,7 +24,7 @@ export interface LeadItem {
 }
 
 export async function getLeads(): Promise<LeadItem[]> {
-  if (!isSupabaseConfigured) {
+  if (!isSupabaseConfigured()) {
     console.warn('Supabase is not configured. Returning empty leads list.');
     return [];
   }
@@ -44,7 +44,7 @@ export async function getLeads(): Promise<LeadItem[]> {
 }
 
 export async function addLead(leadData: Omit<LeadItem, 'id' | 'created_at' | 'status' | 'assigned_admin' | 'internal_notes'>): Promise<LeadItem | null> {
-  if (!isSupabaseConfigured) return null;
+  if (!isSupabaseConfigured()) return null;
 
   const supabase = getSupabaseServerClient();
   
@@ -69,7 +69,7 @@ export async function addLead(leadData: Omit<LeadItem, 'id' | 'created_at' | 'st
 }
 
 export async function updateLead(id: string, updates: Partial<LeadItem>): Promise<LeadItem | null> {
-  if (!isSupabaseConfigured) return null;
+  if (!isSupabaseConfigured()) return null;
 
   const supabase = getSupabaseServerClient();
   const { data, error } = await supabase
@@ -88,7 +88,7 @@ export async function updateLead(id: string, updates: Partial<LeadItem>): Promis
 }
 
 export async function deleteLead(id: string): Promise<boolean> {
-  if (!isSupabaseConfigured) return false;
+  if (!isSupabaseConfigured()) return false;
 
   const supabase = getSupabaseServerClient();
   const { error } = await supabase

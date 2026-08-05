@@ -193,8 +193,10 @@ export async function POST(request: NextRequest) {
       signature_url = `/uploads/${fileName}`;
     }
 
+    const { turnstile_token, ...dbLeadData } = sanitizedBody;
+
     const leadDataToSave = {
-      ...sanitizedBody,
+      ...dbLeadData,
       attachment_url,
       signature_url,
       status: sanitizedBody.lead_type === 'submission' ? 'draft_pending' : 'new',

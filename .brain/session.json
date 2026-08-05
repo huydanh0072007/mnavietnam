@@ -1,69 +1,63 @@
 {
-  "updated_at": "2026-07-31T16:40:00Z",
+  "updated_at": "2026-08-05T19:35:00Z",
   "working_on": {
-    "feature": "Nâng cấp CMS Admin Portal & Khớp lệnh Thông minh",
-    "task": "Hoàn thiện Sprint 1-4 nâng cấp CMS Portal cho dự án MNA Vietnam",
+    "feature": "CMS Settings Save & Vercel Deployment Fix",
+    "task": "Fix lỗi cập nhật cài đặt CMS không lưu vào Database và không hiển thị ra trang chủ",
     "status": "completed",
     "files": [
-      "src/app/(admin)/admin/matching/page.tsx",
-      "src/app/(admin)/admin/matching/MatchingClient.tsx",
-      "src/app/(admin)/admin/matching/actions.ts",
-      "src/app/(admin)/admin/leads/page.tsx",
-      "src/app/(admin)/admin/du-an/AdminProjectsClient.tsx",
-      "src/app/(admin)/admin/du-an/[id]/sua/page.tsx",
-      "src/app/(admin)/admin/du-an/[id]/sua/EditProjectClient.tsx",
-      "src/app/(admin)/admin/du-an/actions.ts",
-      "src/app/(admin)/admin/page.tsx",
-      "src/app/(admin)/admin/vdr/page.tsx",
-      "src/app/(admin)/admin/master-data/MasterDataClient.tsx",
-      "src/app/(admin)/admin/master-data/actions.ts",
-      "src/app/(frontend)/[lang]/du-an/[slug]/page.tsx",
-      "src/app/api/upload/route.ts"
+      "src/lib/config-store.ts",
+      "src/lib/supabase/server.ts",
+      "src/app/api/settings/route.ts",
+      "src/app/(admin)/admin/cai-dat/page.tsx",
+      "src/components/layout/Footer.tsx",
+      "src/lib/contexts/SettingsContext.tsx",
+      "src/app/api/upload/route.ts",
+      "src/lib/master-data-store.ts"
     ],
     "blockers": [],
-    "notes": "Đã hoàn thành toàn bộ 4 Sprint nâng cấp quản trị CMS, kết nối số liệu thật Supabase PostgreSQL + Storage, phân trang lọc khoảng ngày, khớp lệnh Matching tự động và hoàn thiện VDR."
+    "notes": "Đã fix triệt để toàn bộ chuỗi lỗi từ env vars → caching → silent failure → empty table. CMS Settings đã hoạt động hoàn chỉnh trên Vercel Production."
   },
   "pending_tasks": [
     {
-      "task": "Deploy lên Production và bàn giao cho khách hàng nghiệm thu",
+      "task": "Tối ưu SEO và Performance cho trang Frontend",
       "priority": "medium",
-      "notes": "User thực hiện lệnh `git push` để Vercel tự động build và deploy bản mới nhất."
+      "notes": "Có thể cải thiện LCP, meta tags, structured data"
+    },
+    {
+      "task": "Hoàn thiện hệ thống email notification tự động",
+      "priority": "medium",
+      "notes": "Cần cấu hình SMTP thật trong CMS Settings"
     }
   ],
   "recent_changes": [
     {
-      "timestamp": "2026-07-31T16:30:00Z",
-      "type": "feature",
-      "description": "Xây dựng Phân hệ Khớp lệnh Thông minh Matching Client & Server gợi ý dự án tương thích và ghi log tự động vào Lead internal_notes.",
+      "timestamp": "2026-08-05T19:30:00Z",
+      "type": "bugfix",
+      "description": "Fix triệt để lỗi CMS Settings không lưu được dữ liệu trên Vercel Production. Root cause: bảng settings trống (không có row id='global'), Supabase .update() silent fail, env vars chưa khai báo trên Vercel, Next.js Data Cache cache kết quả Supabase fetch.",
       "files": [
-        "src/app/(admin)/admin/matching/page.tsx",
-        "src/app/(admin)/admin/matching/MatchingClient.tsx",
-        "src/app/(admin)/admin/matching/actions.ts",
-        "src/app/(frontend)/[lang]/du-an/[slug]/page.tsx"
+        "src/lib/config-store.ts",
+        "src/lib/supabase/server.ts",
+        "src/app/api/settings/route.ts",
+        "src/app/(admin)/admin/cai-dat/page.tsx"
       ]
     },
     {
-      "timestamp": "2026-07-31T12:00:00Z",
+      "timestamp": "2026-08-04T22:40:00Z",
       "type": "feature",
-      "description": "Nâng cấp Dashboard biểu đồ SVG động, xuất CSV Dự án UTF-8 BOM, thêm bộ lọc Ngày dương lịch bắt đầu - kết thúc ở trang Leads, Projects, VDR.",
+      "description": "Thêm trường Địa chỉ (address) vào CMS Settings và Footer frontend. Cập nhật schema bảng settings.",
       "files": [
-        "src/app/(admin)/admin/du-an/AdminProjectsClient.tsx",
-        "src/app/(admin)/admin/page.tsx",
-        "src/app/(admin)/admin/vdr/page.tsx",
-        "src/app/(admin)/admin/leads/page.tsx"
+        "src/app/(admin)/admin/cai-dat/page.tsx",
+        "src/components/layout/Footer.tsx"
       ]
     },
     {
-      "timestamp": "2026-07-31T09:00:00Z",
-      "type": "feature",
-      "description": "Triển khai Sprint 1: Bỏ hoàn toàn Quận/Huyện, inline edit 34 Tỉnh mới, Tạo Lead thủ công + upload tài liệu lên Supabase Storage qua API /api/upload.",
+      "timestamp": "2026-08-01T10:40:00Z",
+      "type": "security",
+      "description": "Hoàn thành Security Audit (VBSec scan) và Deploy workflow. Fix các lỗi bảo mật: CSRF protection, Broken Access Control, Rate Limiting, Input Sanitization.",
       "files": [
-        "src/app/(admin)/admin/master-data/MasterDataClient.tsx",
-        "src/app/(admin)/admin/master-data/actions.ts",
-        "src/app/(admin)/admin/leads/page.tsx",
-        "src/app/api/upload/route.ts",
-        "src/app/(admin)/admin/du-an/[id]/sua/page.tsx",
-        "src/app/(admin)/admin/du-an/[id]/sua/EditProjectClient.tsx"
+        "src/app/api/settings/route.ts",
+        "src/app/api/leads/route.ts",
+        "src/lib/auth.ts"
       ]
     }
   ],
@@ -77,6 +71,11 @@
       "error": "Admin bị logout liên tục khi thao tác trên Vercel do serverless container làm mất session map trong memory",
       "solution": "Chuyển sang stateless HMAC cookies và thêm credentials: 'include' vào tất cả client fetch calls.",
       "resolved": true
+    },
+    {
+      "error": "CMS Settings báo lưu thành công (toast xanh) nhưng dữ liệu không persist vào DB và trang chủ không đổi",
+      "solution": "Chuỗi 6 lỗi: (1) isSupabaseConfigured là const tĩnh → đổi thành function, (2) Thiếu env vars trên Vercel → thêm NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY, (3) Thiếu cột DB → chạy ALTER TABLE, (4) Vercel cache fetch → thêm cache:'no-store' vào Supabase Client global fetch, (5) .update() silent fail khi row không tồn tại → đổi sang .upsert(), (6) Bảng settings trống không có row 'global' → getSettings() auto-init row mặc định.",
+      "resolved": true
     }
   ],
   "decisions_made": [
@@ -87,6 +86,18 @@
     {
       "decision": "Lưu nhật ký Matching và VDR trực tiếp vào internal_notes của Lead",
       "reason": "Giúp lưu vết tập trung dòng thời gian tương tác của một nhà đầu tư cụ thể thay vì chia nhỏ bảng."
+    },
+    {
+      "decision": "Dùng upsert() thay vì update() cho bảng settings",
+      "reason": "Supabase .update() trả error=null khi update 0 rows. upsert() tự tạo row nếu chưa có, đảm bảo luôn ghi thành công."
+    },
+    {
+      "decision": "Auto-init settings row trong getSettings()",
+      "reason": "Tránh phụ thuộc vào việc user phải chạy SQL seed thủ công. Hệ thống tự khởi tạo khi lần đầu truy cập."
+    },
+    {
+      "decision": "Deploy trên Vercel (không phải Cloudflare Pages)",
+      "reason": "User chọn Vercel làm hosting platform chính thức."
     }
   ]
 }

@@ -24,7 +24,7 @@ let mockNotifications: NotificationItem[] = [
 ];
 
 export async function getNotifications(): Promise<NotificationItem[]> {
-  if (!isSupabaseConfigured) {
+  if (!isSupabaseConfigured()) {
     return mockNotifications.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }
 
@@ -62,7 +62,7 @@ export async function addNotification(
     created_at: new Date().toISOString()
   };
 
-  if (!isSupabaseConfigured) {
+  if (!isSupabaseConfigured()) {
     const saved: NotificationItem = {
       ...newNotif,
       id: `N-${Date.now()}`
@@ -92,7 +92,7 @@ export async function addNotification(
 }
 
 export async function markAsRead(id: string): Promise<boolean> {
-  if (!isSupabaseConfigured) {
+  if (!isSupabaseConfigured()) {
     const notif = mockNotifications.find(n => n.id === id);
     if (notif) {
       notif.is_read = true;
@@ -121,7 +121,7 @@ export async function markAsRead(id: string): Promise<boolean> {
 }
 
 export async function markAllAsRead(): Promise<boolean> {
-  if (!isSupabaseConfigured) {
+  if (!isSupabaseConfigured()) {
     mockNotifications.forEach(n => {
       n.is_read = true;
     });

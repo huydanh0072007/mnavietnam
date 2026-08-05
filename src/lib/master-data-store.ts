@@ -114,7 +114,7 @@ export interface MdDistrict {
 // === Master Data Categories ===
 
 export async function getMasterData(category: string): Promise<MasterDataItem[]> {
-  if (!isSupabaseConfigured) return FALLBACK_MASTER_DATA.filter(item => item.category === category);
+  if (!isSupabaseConfigured()) return FALLBACK_MASTER_DATA.filter(item => item.category === category);
   try {
     const { data, error } = await supabaseAdmin
       .from('master_data')
@@ -143,7 +143,7 @@ export async function getMasterData(category: string): Promise<MasterDataItem[]>
 }
 
 export async function getAllMasterData(): Promise<MasterDataItem[]> {
-  if (!isSupabaseConfigured) return FALLBACK_MASTER_DATA;
+  if (!isSupabaseConfigured()) return FALLBACK_MASTER_DATA;
   try {
     const { data, error } = await supabaseAdmin
       .from('master_data')
@@ -220,7 +220,7 @@ export async function getProvinces(all: boolean = false): Promise<MdProvince[]> 
 }
 
 export async function getDistricts(provinceCode?: string, all: boolean = false): Promise<MdDistrict[]> {
-  if (!isSupabaseConfigured) return [];
+  if (!isSupabaseConfigured()) return [];
   try {
     let query = supabaseAdmin
       .from('md_districts')
@@ -256,7 +256,7 @@ export async function saveProvince(province: Partial<MdProvince>) {
 }
 
 export async function updateProvinceName(code: string, name: string) {
-  if (!isSupabaseConfigured) return;
+  if (!isSupabaseConfigured()) return;
   const { error } = await supabaseAdmin
     .from('md_provinces')
     .update({ name })
@@ -265,7 +265,7 @@ export async function updateProvinceName(code: string, name: string) {
 }
 
 export async function toggleProvinceActive(code: string, is_active: boolean) {
-  if (!isSupabaseConfigured) return;
+  if (!isSupabaseConfigured()) return;
   const { error } = await supabaseAdmin
     .from('md_provinces')
     .update({ is_active })
@@ -282,7 +282,7 @@ export async function deleteProvince(code: string) {
 }
 
 export async function addMasterDataItem(category: string, key: string, label: string) {
-  if (!isSupabaseConfigured) return;
+  if (!isSupabaseConfigured()) return;
   const { error } = await supabaseAdmin
     .from('master_data')
     .insert([{
@@ -296,7 +296,7 @@ export async function addMasterDataItem(category: string, key: string, label: st
 }
 
 export async function updateMasterDataItem(id: string, label: string) {
-  if (!isSupabaseConfigured) return;
+  if (!isSupabaseConfigured()) return;
   const { error } = await supabaseAdmin
     .from('master_data')
     .update({ label })
@@ -305,7 +305,7 @@ export async function updateMasterDataItem(id: string, label: string) {
 }
 
 export async function toggleMasterDataItemActive(id: string, is_active: boolean) {
-  if (!isSupabaseConfigured) return;
+  if (!isSupabaseConfigured()) return;
   const { error } = await supabaseAdmin
     .from('master_data')
     .update({ is_active })
