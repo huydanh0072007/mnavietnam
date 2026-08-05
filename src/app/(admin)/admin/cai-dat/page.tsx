@@ -61,7 +61,7 @@ export default function AdminSettingsPage() {
   const [isTestingEmail, setIsTestingEmail] = useState(false);
 
   useEffect(() => {
-    fetch('/api/settings', { credentials: 'include' })
+    fetch('/api/settings', { credentials: 'include', cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if(data) {
