@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, getClientIP, sanitizeInput, validateSession, SESSION_COOKIE_NAME } from '@/lib/auth';
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase/server';
-import { getLeads, addLead, updateLead } from '@/lib/leads-store';
+import { getLeads, addLead, updateLead, deleteLead } from '@/lib/leads-store';
 import { addNotification } from '@/lib/notifications-store';
 import { sendLeadNotificationToAdmin } from '@/lib/email-service';
 import { writeFile } from 'fs/promises';
@@ -25,7 +25,7 @@ async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
   }
 }
 
-// Helper to save files to public/uploads
+// Helper to save files to Supabase or public/uploads
 async function saveUploadedFile(file: File): Promise<string> {
   const ext = path.extname(file.name).toLowerCase();
   
@@ -49,18 +49,60 @@ async function saveUploadedFile(file: File): Promise<string> {
 
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
+  const base = path.basename(file.name, ext).replace(/[^a-zA-Z0-9]/g, '_');
+  const uniqueName = `${base}_${Date.now()}${ext}`;
+
+  if (isSupabaseConfigured()) {
+    const supabase = getSupabaseServerClient();
+    const { data, error } = await supabase.storage
+      .from('attachments')
+      .upload(`public/${uniqueName}`, buffer, {
+        contentType: file.type,
+        upsert: false
+      });
+      
+    if (!error && data) {
+      const { data: publicUrlData } = supabase.storage.from('attachments').getPublicUrl(data.path);
+      return publicUrlData.publicUrl;
+    }
+    console.warn('Supabase storage upload error, falling back to local:', error);
+  }
   
   const uploadDir = path.join(process.cwd(), 'public', 'uploads');
   if (!existsSync(uploadDir)) {
     mkdirSync(uploadDir, { recursive: true });
   }
-
-  const base = path.basename(file.name, ext).replace(/[^a-zA-Z0-9]/g, '_');
-  const uniqueName = `${base}_${Date.now()}${ext}`;
-  const filePath = path.join(uploadDir, uniqueName);
   
+  const filePath = path.join(uploadDir, uniqueName);
   await writeFile(filePath, buffer);
   return `/uploads/${uniqueName}`;
+}
+
+async function saveBase64Image(base64Str: string, prefix: string): Promise<string> {
+  const base64Data = base64Str.replace(/^data:image\/png;base64,/, "");
+  const buffer = Buffer.from(base64Data, 'base64');
+  const fileName = `${prefix}_${Date.now()}.png`;
+
+  if (isSupabaseConfigured()) {
+    const supabase = getSupabaseServerClient();
+    const { data, error } = await supabase.storage
+      .from('attachments')
+      .upload(`public/${fileName}`, buffer, {
+        contentType: 'image/png',
+        upsert: false
+      });
+      
+    if (!error && data) {
+      const { data: publicUrlData } = supabase.storage.from('attachments').getPublicUrl(data.path);
+      return publicUrlData.publicUrl;
+    }
+    console.warn('Supabase signature upload error, falling back to local:', error);
+  }
+
+  const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+  if (!existsSync(uploadDir)) mkdirSync(uploadDir, { recursive: true });
+  require('fs').writeFileSync(path.join(uploadDir, fileName), base64Data, 'base64');
+  return `/uploads/${fileName}`;
 }
 
 export async function GET(request: NextRequest) {
@@ -185,12 +227,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (signatureBase64) {
-      const base64Data = signatureBase64.replace(/^data:image\/png;base64,/, "");
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-      if (!existsSync(uploadDir)) mkdirSync(uploadDir, { recursive: true });
-      const fileName = `sig_${Date.now()}.png`;
-      require('fs').writeFileSync(path.join(uploadDir, fileName), base64Data, 'base64');
-      signature_url = `/uploads/${fileName}`;
+      signature_url = await saveBase64Image(signatureBase64, 'sig');
     }
 
     const { turnstile_token, ...dbLeadData } = sanitizedBody;
@@ -244,5 +281,31 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Lead submission error:', error);
     return NextResponse.json({ success: false, errors: ['Đã có lỗi xảy ra. Vui lòng thử lại sau.'] }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+    if (!sessionCookie || !validateSession(sessionCookie)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Missing lead ID' }, { status: 400 });
+    }
+
+    const success = await deleteLead(id);
+    if (success) {
+      return NextResponse.json({ success: true, message: 'Lead deleted successfully' });
+    } else {
+      return NextResponse.json({ success: false, error: 'Failed to delete lead' }, { status: 500 });
+    }
+  } catch (error) {
+    console.error('Error in DELETE /api/leads:', error);
+    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

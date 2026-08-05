@@ -337,6 +337,35 @@ export default function AdminLeadsPage() {
     }
   };
 
+  const [isDeletingLead, setIsDeletingLead] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleDeleteLead = async () => {
+    if (!selectedLead) return;
+    setIsDeletingLead(true);
+    try {
+      const res = await fetch(`/api/leads?id=${selectedLead.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (res.ok) {
+        toast.success('Đã xóa vĩnh viễn Lead thành công');
+        setShowDeleteConfirm(false);
+        const updatedList = leads.filter(l => l.id !== selectedLead.id);
+        setLeads(updatedList);
+        setSelectedLead(updatedList.length > 0 ? updatedList[0] : null);
+      } else {
+        toast.error('Không thể xóa Lead này');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Lỗi khi xử lý xóa Lead');
+    } finally {
+      setIsDeletingLead(false);
+    }
+  };
+
   const handleHideLead = async () => {
     if (!selectedLead) return;
     setIsHidingLead(true);
@@ -850,15 +879,25 @@ export default function AdminLeadsPage() {
                       </select>
                     </div>
 
-                    {/* Hide Lead Button */}
-                    <button
-                      onClick={() => setShowHideConfirm(true)}
-                      className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-semibold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition-colors"
-                      title="Ẩn Lead khỏi hệ thống"
-                    >
-                      <EyeOff className="w-3.5 h-3.5" />
-                      Ẩn Lead này
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setShowHideConfirm(true)}
+                        className="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-semibold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition-colors"
+                        title="Ẩn Lead khỏi hệ thống"
+                      >
+                        <EyeOff className="w-3.5 h-3.5" />
+                        Ẩn Lead
+                      </button>
+
+                      <button
+                        onClick={() => setShowDeleteConfirm(true)}
+                        className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-semibold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition-colors"
+                        title="Xóa vĩnh viễn Lead này"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Xóa Lead
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -1192,6 +1231,39 @@ export default function AdminLeadsPage() {
           </div>
         </div>
       )}
+
+      {/* CONFIRM DELETE LEAD MODAL */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <div className="flex items-center gap-3 text-red-600">
+              <AlertCircle className="w-6 h-6 shrink-0" />
+              <h3 className="text-lg font-bold text-gray-900">Xóa vĩnh viễn Lead</h3>
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Bạn có chắc chắn muốn <strong className="text-red-600">xóa vĩnh viễn</strong> Lead của <strong className="text-gray-900">{selectedLead?.full_name}</strong> không? 
+              Thao tác này sẽ xóa hoàn toàn dữ liệu khỏi cơ sở dữ liệu và không thể khôi phục.
+            </p>
+            <div className="flex justify-end gap-3 pt-2">
+              <button 
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-900"
+              >
+                Hủy
+              </button>
+              <button 
+                onClick={handleDeleteLead} 
+                disabled={isDeletingLead}
+                className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1.5"
+              >
+                {isDeletingLead ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                Xác nhận Xóa
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* Status Update Modal */}
       {statusModal && statusModal.isOpen && (
