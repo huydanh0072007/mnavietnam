@@ -67,7 +67,7 @@ async function saveUploadedFile(file: File): Promise<string> {
     }
     console.warn('Supabase storage upload error:', error);
     if (process.env.NODE_ENV === 'production') {
-      throw new Error('Không thể tải lên file (Supabase Error). Vui lòng cấu hình đúng Storage.');
+      throw new Error(`Không thể tải lên file (Supabase Error: ${error?.message || 'Unknown'}). Vui lòng kiểm tra lại Key và Bucket.`);
     }
   } else if (process.env.NODE_ENV === 'production') {
     throw new Error('Supabase chưa được cấu hình. Hệ thống không thể lưu file trên máy chủ thực tế.');
@@ -103,7 +103,7 @@ async function saveBase64Image(base64Str: string, prefix: string): Promise<strin
     }
     console.warn('Supabase signature upload error:', error);
     if (process.env.NODE_ENV === 'production') {
-      throw new Error('Không thể tải lên chữ ký (Supabase Error).');
+      throw new Error(`Không thể tải lên chữ ký (Supabase Error: ${error?.message || 'Unknown'}). Vui lòng kiểm tra lại Key và Bucket.`);
     }
   } else if (process.env.NODE_ENV === 'production') {
     throw new Error('Supabase chưa được cấu hình. Hệ thống không thể lưu chữ ký trên máy chủ thực tế.');
