@@ -88,8 +88,19 @@ export async function getSettings(): Promise<GlobalSettings> {
     .single();
 
   if (error || !data) {
-    console.error('Error fetching settings:', error);
-    return defaultSettings;
+    // Row doesn't exist yet — auto-create it with defaults
+    console.warn('Settings row not found, auto-creating with defaults...');
+    const { data: newData, error: insertError } = await supabase
+      .from('settings')
+      .upsert({ id: 'global', ...defaultSettings }, { onConflict: 'id' })
+      .select()
+      .single();
+
+    if (insertError || !newData) {
+      console.error('Failed to auto-create settings row:', insertError);
+      return defaultSettings;
+    }
+    return { ...defaultSettings, ...newData } as GlobalSettings;
   }
 
   return { ...defaultSettings, ...data } as GlobalSettings;
