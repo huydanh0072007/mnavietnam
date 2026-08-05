@@ -1,4 +1,13 @@
 {
+  "metadata": {
+    "title": "M$A International - Real Estate M&A Portal",
+    "description": "The leading exclusive platform connecting transfers and joint ventures for real estate development projects in Vietnam.",
+    "keywords": "M&A, real estate, project transfer, joint venture, investment partnership, property M&A, Vietnam"
+  },
+  "about_metadata": {
+    "title": "About M$A International | Real Estate M&A Connection Platform",
+    "description": "Learn about the vision, mission, and expert team of M$A International - the connection portal for premier real estate transfers and joint venture investments."
+  },
   "navigation": {
     "home": "Home",
     "projects": "Projects",

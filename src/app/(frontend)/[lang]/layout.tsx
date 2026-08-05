@@ -13,46 +13,56 @@ const playfair = Playfair_Display({
   variable: '--font-playfair',
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: 'M$A International - Cổng thông tin Dự án M&A Bất động sản',
-    template: '%s | M$A International',
-  },
-  description: 'M$A International - Nền tảng kết nối Độc quyền chuyển nhượng và hợp tác đầu tư phát triển dự án bất động sản uy tín hàng đầu tại Việt Nam.',
-  keywords: ['M&A', 'bất động sản', 'chuyển nhượng dự án', 'hợp tác đầu tư', 'bán dự án', 'BĐS', 'Việt Nam'],
-  authors: [{ name: 'M$A International' }],
-  creator: 'M$A International',
-  publisher: 'M$A International',
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  openGraph: {
-    title: 'M$A International - Cổng thông tin Dự án M&A Bất động sản',
-    description: 'Nền tảng kết nối Độc quyền chuyển nhượng và hợp tác đầu tư phát triển dự án bất động sản uy tín hàng đầu tại Việt Nam.',
-    url: 'https://mnainternational.pages.dev',
-    siteName: 'M$A International',
-    locale: 'vi_VN',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'M$A International',
-    description: 'Nền tảng kết nối Độc quyền chuyển nhượng và hợp tác đầu tư BĐS.',
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ lang: string }> 
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const dict = await getDictionary(lang as Locale);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mnavietnam.vercel.app';
+
+  return {
+    title: {
+      default: dict.metadata.title,
+      template: '%s | M$A International',
+    },
+    description: dict.metadata.description,
+    keywords: dict.metadata.keywords.split(',').map((k: string) => k.trim()),
+    authors: [{ name: 'M$A International' }],
+    creator: 'M$A International',
+    publisher: 'M$A International',
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    openGraph: {
+      title: dict.metadata.title,
+      description: dict.metadata.description,
+      url: `${siteUrl}/${lang}`,
+      siteName: 'M$A International',
+      locale: lang === 'en' ? 'en_US' : 'vi_VN',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'M$A International',
+      description: dict.metadata.description,
+    },
+    robots: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
-  },
-};
+  };
+}
 
 import { getDictionary } from '@/lib/get-dictionary';
 import { Locale } from '@/i18n-config';

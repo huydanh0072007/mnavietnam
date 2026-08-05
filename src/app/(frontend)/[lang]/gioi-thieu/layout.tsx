@@ -1,10 +1,19 @@
-import React from 'react';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { getDictionary } from '@/lib/get-dictionary';
+import { Locale } from '@/i18n-config';
 
-export const metadata: Metadata = {
-  title: 'Giới thiệu về M$A International | Nền tảng kết nối M&A Bất động sản',
-  description: 'Tìm hiểu về tầm nhìn, sứ mệnh và đội ngũ chuyên gia của M$A International - cổng kết nối chuyển nhượng và hợp tác đầu tư dự án bất động sản cao cấp.',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const dict = await getDictionary(lang as Locale);
+  return {
+    title: dict.about_metadata.title,
+    description: dict.about_metadata.description,
+  };
+}
 
 export default function GioiThieuLayout({
   children,
