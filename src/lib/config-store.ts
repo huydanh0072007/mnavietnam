@@ -136,15 +136,20 @@ export async function saveSettings(newSettings: Partial<GlobalSettings>): Promis
   };
 
   const supabase = getSupabaseServerClient();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('settings')
-    .update(dbPayload)
-    .eq('id', 'global');
+    .upsert({ id: 'global', ...dbPayload }, { onConflict: 'id' })
+    .select()
+    .single();
 
   if (error) {
-    console.error('Error updating settings:', error);
+    console.error('Error saving settings:', error);
     throw new Error(`Failed to save settings: ${error.message}`);
   }
 
-  return mergedSettings;
+  if (!data) {
+    throw new Error('Failed to save settings: No data returned after upsert.');
+  }
+
+  return { ...mergedSettings, ...data } as GlobalSettings;
 }
